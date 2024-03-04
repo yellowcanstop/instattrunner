@@ -14,14 +14,11 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
 
-// Screen which shows "How to Play"
 public class HelpScreen implements Screen {
     private InstattRunner parent;
     private Stage stage;
     private Skin skin;
 
-
-    // Constructor with reference to parent passed in
     public HelpScreen(InstattRunner instattRunner) {
         parent = instattRunner;
         stage = new Stage(new ScreenViewport()); // Stage is the controller to react to user input
@@ -42,7 +39,6 @@ public class HelpScreen implements Screen {
         skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
         Label titleLabel = new Label("How to Play", skin);
 
-        // todo: render text about instructions, buffs/debuffs
         Label i1 = new Label("Spacebar to jump", skin);
         Label i2 = new Label("Once hit obstacle, die", skin);
 
@@ -53,7 +49,6 @@ public class HelpScreen implements Screen {
 
 
         // Go back to menu
-        // todo: make back button small
         TextButton menu = new TextButton("Back to Menu", skin);
         menu.addListener(new ChangeListener() {
             @Override

@@ -13,23 +13,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
 
-// Initial menu screen
 public class MenuScreen implements Screen {
     private InstattRunner parent;
     private Stage stage;
     private Skin skin;
-    private Label titleLabel;
 
-    // Constructor with reference to parent passed in
     public MenuScreen(InstattRunner instattRunner) {
         parent = instattRunner;
         stage = new Stage(new ScreenViewport()); // Stage is the controller to react to user input
-
         // load skin using asset manager
         parent.assetMan.queueAddSkin();
         parent.assetMan.manager.finishLoading();
         skin = parent.assetMan.manager.get("skin/comic-ui.json");
-
     }
 
     @Override
@@ -46,7 +41,7 @@ public class MenuScreen implements Screen {
 
         // Create labels and buttons
         //skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
-        titleLabel = new Label("Instatt Runner", skin);
+        Label titleLabel = new Label("Instatt Runner", skin);
         TextButton play = new TextButton("Start Game", skin);
         TextButton help = new TextButton("How to Play", skin);
         TextButton exit = new TextButton("Quit", skin);

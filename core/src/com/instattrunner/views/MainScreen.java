@@ -5,15 +5,22 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.IRModel;
 import com.instattrunner.InstattRunner;
 import com.instattrunner.controller.KeyboardController;
+
+import java.util.Iterator;
 
 
 // Screen which shows the game play
@@ -22,69 +29,93 @@ public class MainScreen implements Screen {
     IRModel model;
     OrthographicCamera cam;
     Box2DDebugRenderer debugRenderer;
-    boolean debug = true; // flag for debug
+    boolean debug = true; // tweak if want to debug
     KeyboardController controller;
     Texture playerTex;
     Texture bgTex;
     Texture obTex;
+    Texture buffTex;
     SpriteBatch sb;
+    BitmapFont font = new BitmapFont();
 
-    // Constructor with reference to parent passed in
+
     public MainScreen(InstattRunner instattRunner) {
         parent = instattRunner;
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
 
-        parent.assetMan.queueAddImages(); // tells AM we want to load images
-        parent.assetMan.manager.finishLoading(); // tells AM to load images and wait until finished loading
-        playerTex = parent.assetMan.manager.get("images/droplet.png"); // gets images as a texture
+        parent.assetMan.queueAddImages();
+        parent.assetMan.manager.finishLoading();
+
+        playerTex = parent.assetMan.manager.get("images/droplet.png");
+        obTex = parent.assetMan.manager.get("images/bucket.png");
+        buffTex = parent.assetMan.manager.get("images/buff.png");
         bgTex = parent.assetMan.manager.get("images/bg.jpg");
 
         sb = new SpriteBatch();
-        // tell SpriteBatch we are using OrthographicCamera with the 32x24 screen size
         sb.setProjectionMatrix(cam.combined);
 
         controller = new KeyboardController();
-        model = new IRModel(controller, cam, parent.assetMan); // allow model to access controller
-
-
+        model = new IRModel(controller, cam, parent.assetMan);
 
     }
 
 
     @Override
     public void show() {
-        // set controller as the class which processes inputs
         Gdx.input.setInputProcessor(controller);
     }
 
     @Override
     public void render(float delta) {
         model.logicStep(delta); // move game logic forward; use if to pause game
+
         Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         if (debug) debugRenderer.render(model.world, cam.combined);
 
-        // use sprite batch to draw playerTex on screen
         sb.begin();
+        /*
         // player only 2 units wide so set width and height at 2
         // sb draws images from the corner vs box2d bodies positioned centre
         // have to position texture 1/2 the width to left and 1/2 the height down
-        // todo: need to store the player class in the body's userdata
+        // todo: need to store the player class in the body's userdata?
         // which will contain the size, and use hat to get correct offset needed (not just -1)
+
+         */
         sb.draw(playerTex, model.player.getPosition().x-2, model.player.getPosition().y-1, 3, 3);
-        //sb.draw(bgTex, 0, 0, cam.viewportWidth, cam.viewportHeight);
 
+        for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
+            Body obstacle = iter.next();
+            sb.draw(obTex, obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
+        }
 
+        for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
+            Body buff = iter.next();
+            sb.draw(buffTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
+        }
 
-        if(TimeUtils.millis() - model.lastTime > 3000) model.spawnObstacles();
+        font.getData().setScale(0.05f);
+        font.draw(sb, "S " + model.score, 12, 10);
 
+        if(TimeUtils.millis() - model.lastTime > 2000) {
+            if (model.speedUp) {
+                model.spawnObstacles(model.fast);
+            }
+            else {
+                model.spawnObstacles(model.regular);
+            }
+        }
 
+        model.trackObstacles();
+
+        if(TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
 
 
         sb.end();
 
-        // if player is dead, show end screen
+
         if (model.isDead) {
             parent.finalScore = model.score;
             parent.changeScreen(InstattRunner.END);

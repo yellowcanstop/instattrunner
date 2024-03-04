@@ -14,14 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
 
-// Screen which shows score with button back to menu
 public class EndScreen implements Screen {
     private InstattRunner parent;
     private Stage stage;
     private Skin skin;
 
-
-    // Constructor with reference to parent passed in
     public EndScreen(InstattRunner instattRunner) {
         parent = instattRunner;
         stage = new Stage(new ScreenViewport()); // Stage is the controller to react to user input
@@ -45,7 +42,6 @@ public class EndScreen implements Screen {
         Label l2 = new Label("lol i guess you managed to score " + parent.finalScore + " tho...", skin);
 
         // Go back to menu
-        // todo: make back button small
         TextButton menu = new TextButton("Back to Menu", skin);
         menu.addListener(new ChangeListener() {
             @Override

@@ -8,10 +8,10 @@ import com.instattrunner.views.HelpScreen;
 import com.instattrunner.views.MainScreen;
 import com.instattrunner.views.MenuScreen;
 
-// This class is parent of model, views, controllers:
-// - model for game data and logic processing
-// - views for displaying and rendering
-// - controllers for mapping user input to methods in model
+/* This class is parent of model, views, controllers:
+- model for game data and logic processing
+- views for displaying and rendering
+- controllers for mapping user input to methods in model */
 public class InstattRunner extends Game {
 	private MenuScreen menuScreen;
 	private MainScreen mainScreen;
@@ -44,6 +44,7 @@ public class InstattRunner extends Game {
 				break;
 			case END:
 				if (endScreen == null) endScreen = new EndScreen(this);
+				mainScreen = null;
 				this.setScreen(endScreen);
 				break;
 		}

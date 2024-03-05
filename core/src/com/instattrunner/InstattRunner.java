@@ -56,7 +56,9 @@ public class InstattRunner extends Game {
 		menuScreen = new MenuScreen(this);
 		setScreen(menuScreen);
 
-		// load music
+
+		//testing
+		// load music 
 		assetMan.queueAddMusic();
 		assetMan.manager.finishLoading();
 		bgMusic = assetMan.manager.get("music/rain.mp3");

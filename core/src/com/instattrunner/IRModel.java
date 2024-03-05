@@ -33,7 +33,7 @@ public class IRModel {
     // tweak player jump
     public boolean jumpHigh = false;
     public boolean jumpLow = false;
-    public static int NORMAL = 40;
+    public static int NORMAL = 250;
     public static int HIGH = 60;
     public static int LOW = 20;
     // tweak speed of obstacles
@@ -47,7 +47,7 @@ public class IRModel {
         controller = cont;
         camera = cam;
         irAM = assetMan;
-        world = new World(new Vector2(0, -10f), true);
+        world = new World(new Vector2(0, -50f), true);
         world.setContactListener(new IRContactListener(this));
 
         createFloor();
@@ -100,7 +100,7 @@ public class IRModel {
         shape.setRadius(2);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 5f;
+        fixtureDef.density = 4f;
         fixtureDef.friction = 0.5f;
         fixtureDef.restitution = 0.3f; // bounciness
         player.createFixture(fixtureDef);

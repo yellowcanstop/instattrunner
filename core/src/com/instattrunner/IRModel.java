@@ -33,6 +33,7 @@ public class IRModel {
     // tweak player jump
     public boolean jumpHigh = false;
     public boolean jumpLow = false;
+
     public static int NORMAL = 100;
     public static int HIGH = 60;
     public static int LOW = 20;
@@ -78,6 +79,7 @@ public class IRModel {
     }
 
     private void tweakJump(int y) {
+
         if (player.getPosition().y < 9 && canJump && jumpCount < 5) {
             player.applyLinearImpulse(0, y, player.getWorldCenter().x, player.getWorldCenter().y, true);
             jumpCount++;
@@ -212,6 +214,7 @@ public class IRModel {
             }
         }
     }
+
 
     public void spawnBuffs() {
         Body buff = createBuff();

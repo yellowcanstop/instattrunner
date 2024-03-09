@@ -33,7 +33,8 @@ public class IRModel {
     // tweak player jump
     public boolean jumpHigh = false;
     public boolean jumpLow = false;
-    public static int NORMAL = 20;
+
+    public static int NORMAL = 100;
     public static int HIGH = 60;
     public static int LOW = 20;
     // tweak speed of obstacles
@@ -67,10 +68,24 @@ public class IRModel {
 
     }
 
+    private boolean canJump = true; // always true when player touches ground
+    private boolean jumped = false;
+    private int jumpCount = 0;
+
+    public void resetJump() {
+        canJump = true;
+        jumped = false;
+        jumpCount = 0;
+    }
+
     private void tweakJump(int y) {
-        if (player.getPosition().y < Gdx.graphics.getHeight()/100) {
+
+        if (player.getPosition().y < 9 && canJump && jumpCount < 5) {
             player.applyLinearImpulse(0, y, player.getWorldCenter().x, player.getWorldCenter().y, true);
-            System.out.println("jump executed");
+            jumpCount++;
+        }
+        else if (player.getPosition().y > 9) {
+            canJump = false;
         }
     }
 
@@ -79,17 +94,33 @@ public class IRModel {
     public void logicStep(float delta) {
         if (jumpHigh) {
             if (controller.space) {
+                jumped = true;
                 tweakJump(HIGH);
             }
+            else if (!controller.space && jumped) {
+                canJump = false;
+           }
         }
         if (jumpLow) {
             if (controller.space) {
+                jumped = true;
                 tweakJump(LOW);
             }
+            else if (!controller.space && jumped) {
+                canJump = false;
+           }
         }
+
+
         if (controller.space) {
+            jumped = true;
             tweakJump(NORMAL);
         }
+        else if (!controller.space && jumped){
+            canJump = false;
+            System.out.printf("Toggled canJump: %b  jumped: %b\n", canJump, jumped);
+        }
+
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
     }
 
@@ -105,13 +136,13 @@ public class IRModel {
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.5f;
-        fixtureDef.restitution = 0.3f; // bounciness
+        fixtureDef.restitution = 0f; // bounciness
         player.createFixture(fixtureDef);
         shape.dispose();
         player.setUserData("PLAYER");
     }
 
-    private void createFloor() {
+    private Body createFloor() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set(0, -10);
@@ -120,6 +151,9 @@ public class IRModel {
         shape.setAsBox(50, 1);
         floor.createFixture(shape, 0.0f);
         shape.dispose();
+        floor.setUserData("FLOOR");
+
+        return floor;
     }
 
     private void passThrough(Body bod) {

@@ -25,6 +25,14 @@ public class IRContactListener implements ContactListener {
         }
 
 
+        if (fa.getBody().getUserData() == "FLOOR" && fb.getBody().getUserData() == "PLAYER" || fb.getBody().getUserData() == "FLOOR" && fa.getBody().getUserData() == "PLAYER") {
+            System.out.printf("Player is on ground at %f\n", fa.getBody().getPosition().y);
+            parent.resetJump();
+            
+            return;
+        }
+
+
         // check collision with buff
         if (fa.getBody().getUserData() == "BUFF" || fb.getBody().getUserData() == "BUFF") {
             this.triggerBuff();

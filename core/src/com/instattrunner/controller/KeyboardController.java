@@ -8,7 +8,7 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.SPACE) {
+        if (keycode == Input.Keys.SPACE || keycode == Input.Keys.UP) {
             space = true;
             return true;
         }
@@ -17,7 +17,7 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.SPACE) {
+        if (keycode == Input.Keys.SPACE || keycode == Input.Keys.UP) {
             space = false;
             return true;
         }

@@ -35,8 +35,9 @@ public class MainScreen implements Screen {
     Texture playerTex;
     Texture bgTex;
     Texture obTex;
-    Texture buffTex;
-    Texture debuffTex;
+    Texture coffeeTex;
+    Texture beerTex;
+    Texture sportsMajorTex;
     SpriteBatch sb;
     BitmapFont font = new BitmapFont();
 
@@ -51,9 +52,10 @@ public class MainScreen implements Screen {
 
         playerTex = parent.assetMan.manager.get("images/droplet.png");
         obTex = parent.assetMan.manager.get("images/bucket.png");
-        buffTex = parent.assetMan.manager.get("images/buff.png");
-        debuffTex = parent.assetMan.manager.get("images/debuff.png");
+        coffeeTex = parent.assetMan.manager.get("images/test_coffee.png");
+        beerTex = parent.assetMan.manager.get("images/test_beer.png");
         bgTex = parent.assetMan.manager.get("images/bg.jpg");
+        sportsMajorTex = parent.assetMan.manager.get("images/test_sports.png");
 
         sb = new SpriteBatch();
         sb.setProjectionMatrix(cam.combined);
@@ -67,6 +69,17 @@ public class MainScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(controller);
+    }
+
+    private void renderObstacles() {
+        if(TimeUtils.millis() - model.lastTime > 2000) {
+            if (model.speedUp) {
+                model.spawnObstacles(model.fast);
+            }
+            else {
+                model.spawnObstacles(model.regular);
+            }
+        }
     }
 
     @Override
@@ -93,6 +106,8 @@ public class MainScreen implements Screen {
 
         sb.draw(playerTex, model.player.getPosition().x-2, model.player.getPosition().y-1, 3, 3);
 
+        sb.draw(sportsMajorTex, model.sportsMajor.getPosition().x-2, model.sportsMajor.getPosition().y-1, 3, 3);
+
 
 
         for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
@@ -101,16 +116,22 @@ public class MainScreen implements Screen {
         }
 
 
+
+
         for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
             Body buff = iter.next();
-            sb.draw(buffTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
+            sb.draw(coffeeTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
         }
+
+
 
 
         for (Iterator<Body> iter = model.debuffs.iterator(); iter.hasNext(); ) {
             Body debuff = iter.next();
-            sb.draw(debuffTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
+            sb.draw(beerTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
         }
+
+
 
 
 
@@ -119,17 +140,13 @@ public class MainScreen implements Screen {
         font.getData().setScale(0.05f);
         font.draw(sb, "Score: " + model.score, 12, 10);
 
-        if(TimeUtils.millis() - model.lastTime > 2000) {
-            if (model.speedUp) {
-                model.spawnObstacles(model.fast);
-            }
-            else {
-                model.spawnObstacles(model.regular);
-            }
-        }
+        renderObstacles();
+
+
 
         model.trackObstacles();
 
+        // testing randomizing buffs and debuffs spawning
         int choice = MathUtils.random(1); // 0 or 1
         if (choice == 0) {
             if (TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
@@ -138,7 +155,16 @@ public class MainScreen implements Screen {
             if(TimeUtils.millis() - model.buffTime > 2000) model.spawnDebuffs();
         }
 
-
+        // deactivate debuff effect for beer
+        if (model.beerActive && TimeUtils.timeSinceMillis(model.beerTime) > 10000) {
+            model.jumpLow = false;
+            model.beerActive = false;
+        }
+        // deactivate buff effect for coffee
+        if (model.coffeeActive && TimeUtils.timeSinceMillis(model.coffeeTime) > 10000) {
+            model.jumpHigh = false;
+            model.coffeeActive = false;
+        }
 
         sb.end();
 

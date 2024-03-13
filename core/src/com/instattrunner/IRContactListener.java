@@ -33,40 +33,43 @@ public class IRContactListener implements ContactListener {
         }
 
 
-        // check collision with buff
-        if (fa.getBody().getUserData() == "BUFF" || fb.getBody().getUserData() == "BUFF") {
-            this.triggerBuff();
+        // check collision with coffee
+        if (fa.getBody().getUserData() == "COFFEE" || fb.getBody().getUserData() == "COFFEE") {
+            this.triggerCoffee();
             return;
         }
-        // check collision with debuff
-        if (fa.getBody().getUserData() == "DEBUFF" || fb.getBody().getUserData() == "DEBUFF") {
-            this.triggerDebuff();
+        // check collision with beer
+        if (fa.getBody().getUserData() == "BEER" || fb.getBody().getUserData() == "BEER") {
+            this.triggerBeer();
             return;
         }
+        /*
         // check collision with fattening
         if (fa.getBody().getUserData() == "FAT" || fb.getBody().getUserData() == "FAT") {
             this.triggerFat();
             return;
         }
-        // check collision with speedup
-        if (fa.getBody().getUserData() == "SPEED" || fb.getBody().getUserData() == "SPEED") {
-            this.triggerSpeed();
+
+         */
+        // check collision with sports major
+        if (fa.getBody().getUserData() == "SPORTS" || fb.getBody().getUserData() == "SPORTS") {
+            this.triggerSportsMajor();
             return;
         }
     }
 
-    // tweak velocity of obstacles
-    private void triggerSpeed() {
-        System.out.println("Speed up");
+    // sports major increases speed of gameplay for 10 seconds
+    private void triggerSportsMajor() {
+        System.out.println("Speed up obstacles");
         parent.playSound(IRModel.COLLECT_SOUND);
         parent.speedUp = true;
         long suTime = TimeUtils.millis();
-        if(TimeUtils.millis() - suTime > 10) {
+        if(TimeUtils.millis() - suTime > 2000) { // todo change to 10 secs
             parent.speedUp = false;
         }
     }
 
-
+    /*
     // trigger heaviness
     private void triggerFat() {
         System.out.println("Fattened");
@@ -85,22 +88,24 @@ public class IRContactListener implements ContactListener {
         }
     }
 
-    // buff effect valid for 2 seconds
-    private void triggerBuff() {
-        System.out.println("Buff collected");
+     */
+
+    // activate buff effect (deactivated in MainScreen after x seconds)
+    private void triggerCoffee() {
+        System.out.println("Coffee collected");
         parent.playSound(IRModel.COLLECT_SOUND);
         parent.jumpHigh = true;
-        long collectTime = TimeUtils.millis();
-        if(TimeUtils.millis() - collectTime > 2000) { parent.jumpHigh = false; }
+        parent.coffeeActive = true;
+        parent.coffeeTime = TimeUtils.millis();
     }
 
-    // debuff effect valid for 2 seconds
-    private void triggerDebuff() {
-        System.out.println("Debuff collected");
+    // activate debuff effect (deactivated in MainScreen after x seconds)
+    public void triggerBeer() {
+        System.out.println("Beer collected");
         parent.playSound(IRModel.COLLECT_SOUND);
         parent.jumpLow = true;
-        long collectTime = TimeUtils.millis();
-        if(TimeUtils.millis() - collectTime > 2000) { parent.jumpLow = false; }
+        parent.beerActive = true;
+        parent.beerTime = TimeUtils.millis();
     }
 
     @Override

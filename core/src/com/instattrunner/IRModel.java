@@ -31,17 +31,35 @@ public class IRModel {
     public Array buffs = new Array<Body>();
     public Array debuffs = new Array<Body>();
     public long buffTime;
-    // tweak player jump
-    public boolean jumpHigh = false;
-    public boolean jumpLow = false;
 
-    public static int NORMAL = 100;
-    public static int HIGH = 60;
+
+
+
+
+    /* Individual Buff Debuff
+    * variables are declared here in logic model,
+    * effects are activated in contact listener,
+    * effects are deactivated after x seconds in main screen
+    */
+    /* Coffee: jump higher; Beer: jump lower; Otherwise: normal */
+    public static int NORMAL = 90;
+    public static int HIGH = 110;
     public static int LOW = 20;
-    // tweak speed of obstacles
+    public long beerTime = 0;
+    public boolean beerActive = false;
+    public boolean jumpLow = false;
+    public long coffeeTime = 0;
+    public boolean coffeeActive = false;
+    public boolean jumpHigh = false;
+    /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
+    public Body sportsMajor;
+    public Body bizMajor;
     public boolean speedUp = false;
-    public float fast = -20f;
+    public boolean slowDown = false;
+    public float fast = -40f;
     public float regular = -10f;
+
+
 
 
     // world to keep all physical objects in the game
@@ -55,8 +73,8 @@ public class IRModel {
         createFloor();
         createPlayer();
 
-        //createFat();
-        //createSpeed();
+
+        sportsMajor = sportsMajor();
 
         // get our body factory singleton and store it in bodyFactory
         //BodyFactory bodyFactory = BodyFactory.getInstance(world);
@@ -180,7 +198,7 @@ public class IRModel {
         return bodyk;
     }
 
-    private Body createBuff() {
+    private Body createCoffee() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(15,4);
@@ -193,12 +211,12 @@ public class IRModel {
         bodyk.createFixture(shape, 0.0f);
         shape.dispose();
         bodyk.setLinearVelocity(-20f, 0);
-        bodyk.setUserData("BUFF");
+        bodyk.setUserData("COFFEE");
         passThrough(bodyk);
         return bodyk;
     }
 
-    private Body createDebuff() {
+    private Body createBeer() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(15,4);
@@ -211,12 +229,11 @@ public class IRModel {
         bodyk.createFixture(shape, 0.0f);
         shape.dispose();
         bodyk.setLinearVelocity(-20f, 0);
-        bodyk.setUserData("DEBUFF");
+        bodyk.setUserData("BEER");
         passThrough(bodyk);
         return bodyk;
     }
 
-    // todo: random choice of buff, obstacles spawned using MathUtils.random(20001), choosing from an array?
     public void spawnObstacles(float v) {
         Body obstacle = createObstacle(v);
         obstacles.add(obstacle);
@@ -236,19 +253,19 @@ public class IRModel {
 
 
     public void spawnBuffs() {
-        Body buff = createBuff();
+        Body buff = createCoffee();
         buffs.add(buff);
         buffTime = TimeUtils.millis();
     }
 
     public void spawnDebuffs() {
-        Body debuff = createDebuff();
+        Body debuff = createBeer();
         debuffs.add(debuff);
         buffTime = TimeUtils.millis();
     }
 
 
-
+    /*
     // test for debuff which increases player density
     private Body createFat() {
         BodyDef bodyDef = new BodyDef();
@@ -267,12 +284,14 @@ public class IRModel {
         passThrough(bodyk);
         return bodyk;
     }
+    */
 
-    // test for speed up which increases velocity of obstacles
-    private Body createSpeed() {
+
+    // debuff which increases velocity of obstacles
+    private Body sportsMajor() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(15,4);
+        bodyDef.position.set(8,4);
         Body bodyk = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(1,1);
@@ -282,7 +301,7 @@ public class IRModel {
         bodyk.createFixture(shape, 0.0f);
         shape.dispose();
         bodyk.setLinearVelocity(-10f, 0);
-        bodyk.setUserData("SPEED");
+        bodyk.setUserData("SPORTS");
         passThrough(bodyk);
         return bodyk;
     }

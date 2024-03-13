@@ -17,14 +17,16 @@ public class IRAssetManager {
     public final String playerImage = "images/droplet.png";
     public final String obstacleImage = "images/bucket.png";
     public final String bgImage = "images/bg.jpg";
-    public final String buffImage = "images/buff.png";
-    public final String debuffImage = "images/debuff.png";
+    public final String coffeeImage = "images/test_coffee.png";
+    public final String beerImage = "images/test_beer.png";
+    public final String sportsMajorImage = "images/test_sports.png";
     public void queueAddImages(){
         manager.load(playerImage, Texture.class);
         manager.load(obstacleImage, Texture.class);
         manager.load(bgImage, Texture.class);
-        manager.load(buffImage, Texture.class);
-        manager.load(debuffImage, Texture.class);
+        manager.load(coffeeImage, Texture.class);
+        manager.load(beerImage, Texture.class);
+        manager.load(sportsMajorImage, Texture.class);
     }
     // Load sound effects
     public final String jumpSound = "sounds/drop.wav";

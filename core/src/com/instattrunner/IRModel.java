@@ -31,6 +31,7 @@ public class IRModel {
     public Body floor;
     public Array<Body> obstacles = new Array<Body>();
     public Array<Body> buffs = new Array<Body>();
+    public Array<Body> debuffs = new Array<Body>();
 
 
     // Vars for environment

@@ -29,6 +29,7 @@ public class IRModel {
     public Array obstacles = new Array<Body>();
     public long lastTime;
     public Array buffs = new Array<Body>();
+    public Array debuffs = new Array<Body>();
     public long buffTime;
     // tweak player jump
     public boolean jumpHigh = false;
@@ -197,6 +198,24 @@ public class IRModel {
         return bodyk;
     }
 
+    private Body createDebuff() {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(15,4);
+        Body bodyk = world.createBody(bodyDef);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1,1);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        bodyk.createFixture(shape, 0.0f);
+        shape.dispose();
+        bodyk.setLinearVelocity(-20f, 0);
+        bodyk.setUserData("DEBUFF");
+        passThrough(bodyk);
+        return bodyk;
+    }
+
     // todo: random choice of buff, obstacles spawned using MathUtils.random(20001), choosing from an array?
     public void spawnObstacles(float v) {
         Body obstacle = createObstacle(v);
@@ -219,6 +238,12 @@ public class IRModel {
     public void spawnBuffs() {
         Body buff = createBuff();
         buffs.add(buff);
+        buffTime = TimeUtils.millis();
+    }
+
+    public void spawnDebuffs() {
+        Body debuff = createDebuff();
+        debuffs.add(debuff);
         buffTime = TimeUtils.millis();
     }
 

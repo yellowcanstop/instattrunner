@@ -18,11 +18,13 @@ public class IRAssetManager {
     public final String obstacleImage = "images/bucket.png";
     public final String bgImage = "images/bg.jpg";
     public final String buffImage = "images/buff.png";
+    public final String debuffImage = "images/debuff.png";
     public void queueAddImages(){
         manager.load(playerImage, Texture.class);
         manager.load(obstacleImage, Texture.class);
         manager.load(bgImage, Texture.class);
         manager.load(buffImage, Texture.class);
+        manager.load(debuffImage, Texture.class);
     }
     // Load sound effects
     public final String jumpSound = "sounds/drop.wav";

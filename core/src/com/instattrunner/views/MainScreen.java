@@ -71,6 +71,7 @@ public class MainScreen implements Screen {
         Gdx.input.setInputProcessor(controller);
     }
 
+    // todo: buggy rendering when switch between fast, regular, slow
     private void renderObstacles() {
         if(TimeUtils.millis() - model.lastTime > 2000) {
             if (model.speedUp && !model.slowDown) {
@@ -110,24 +111,30 @@ public class MainScreen implements Screen {
 
         sb.draw(playerTex, model.player.getPosition().x-2, model.player.getPosition().y-1, 3, 3);
 
-        sb.draw(sportsMajorTex, model.sportsMajor.getPosition().x-2, model.sportsMajor.getPosition().y-1, 3, 3);
-        sb.draw(bizMajorTex, model.bizMajor.getPosition().x-2, model.bizMajor.getPosition().y-1, 3, 3);
-
-
         // Draw image onto body
         for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
             Body obstacle = iter.next();
             sb.draw(obTex, obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
         }
 
-        for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
+        for (Iterator<Body> iter = model.coffeeArray.iterator(); iter.hasNext(); ) {
             Body buff = iter.next();
             sb.draw(coffeeTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
         }
 
-        for (Iterator<Body> iter = model.debuffs.iterator(); iter.hasNext(); ) {
+        for (Iterator<Body> iter = model.beerArray.iterator(); iter.hasNext(); ) {
             Body debuff = iter.next();
             sb.draw(beerTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
+        }
+
+        for (Iterator<Body> iter = model.sportsArray.iterator(); iter.hasNext(); ) {
+            Body buff = iter.next();
+            sb.draw(sportsMajorTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
+        }
+
+        for (Iterator<Body> iter = model.bizArray.iterator(); iter.hasNext(); ) {
+            Body debuff = iter.next();
+            sb.draw(bizMajorTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
         }
 
         // Score counter needs to look better. potential status bar
@@ -139,12 +146,20 @@ public class MainScreen implements Screen {
         model.trackObstacles(); // track score
 
         // testing randomizing buffs and debuffs spawning
-        int choice = MathUtils.random(1); // 0 or 1
-        if (choice == 0) {
-            if (TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
-        }
-        else {
-            if(TimeUtils.millis() - model.buffTime > 2000) model.spawnDebuffs();
+        int choice = MathUtils.random(3);
+        switch(choice) {
+            case 0:
+                if (TimeUtils.millis() - model.buffTime > 2000) model.spawnCoffee();
+                break;
+            case 1:
+                if(TimeUtils.millis() - model.buffTime > 2000) model.spawnBeer();
+                break;
+            case 2:
+                if(TimeUtils.millis() - model.buffTime > 2000) model.spawnSports();
+                break;
+            case 3:
+                if(TimeUtils.millis() - model.buffTime > 2000) model.spawnBiz();
+                break;
         }
 
         // deactivate debuff effect for beer

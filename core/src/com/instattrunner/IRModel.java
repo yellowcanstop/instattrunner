@@ -19,6 +19,7 @@ public class IRModel {
     private OrthographicCamera camera;
     private KeyboardController controller;
     public Body player;
+    public Body floor;
     public boolean isDead = false;
     public int score = 0;
     private IRAssetManager irAM;
@@ -27,10 +28,12 @@ public class IRModel {
     public static final int JUMP_SOUND = 0;
     public static final int COLLECT_SOUND = 1;
     public Array obstacles = new Array<Body>();
-    public long lastTime;
-    public Array buffs = new Array<Body>();
-    public Array debuffs = new Array<Body>();
-    public long buffTime;
+    public long lastTime; // to control frequency of obstacles
+    public Array coffeeArray = new Array<Body>();
+    public Array beerArray = new Array<Body>();
+    public Array sportsArray = new Array<Body>();
+    public Array bizArray = new Array<Body>();
+    public long buffTime; // necessary to separate out for diff buff debuff?
 
 
 
@@ -53,16 +56,15 @@ public class IRModel {
     public boolean jumpHigh = false;
     /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
     public float regular = -20f;
-    public Body sportsMajor;
+    public float fast = -40f;
+    public float slow = -5f;
     public boolean speedUp = false;
     public boolean sportsActive = false;
     public long sportsTime = 0;
-    public float fast = -40f;
-    public Body bizMajor;
     public boolean slowDown = false;
     public boolean bizActive = false;
     public long bizTime = 0;
-    public float slow = -5f;
+
 
 
 
@@ -75,12 +77,8 @@ public class IRModel {
         world = new World(new Vector2(0, -50f), true);
         world.setContactListener(new IRContactListener(this));
 
-        createFloor();
-        createPlayer();
-
-
-        sportsMajor = createSports();
-        bizMajor = createBiz();
+        floor = createFloor();
+        player = createPlayer();
 
         // get our body factory singleton and store it in bodyFactory
         //BodyFactory bodyFactory = BodyFactory.getInstance(world);
@@ -149,12 +147,12 @@ public class IRModel {
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
     }
 
-    private void createPlayer() {
+    private Body createPlayer() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(-14, -8);
         bodyDef.fixedRotation = false;
-        player = world.createBody(bodyDef);
+        Body bodyd = world.createBody(bodyDef);
         CircleShape shape = new CircleShape();
         shape.setRadius(2);
         FixtureDef fixtureDef = new FixtureDef();
@@ -162,23 +160,23 @@ public class IRModel {
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.5f;
         fixtureDef.restitution = 0f; // bounciness
-        player.createFixture(fixtureDef);
+        bodyd.createFixture(fixtureDef);
         shape.dispose();
-        player.setUserData("PLAYER");
+        bodyd.setUserData("PLAYER");
+        return bodyd;
     }
 
     private Body createFloor() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set(0, -10);
-        Body floor = world.createBody(bodyDef);
+        Body bodys = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(50, 1);
-        floor.createFixture(shape, 0.0f);
+        bodys.createFixture(shape, 0.0f);
         shape.dispose();
-        floor.setUserData("FLOOR");
-
-        return floor;
+        bodys.setUserData("FLOOR");
+        return bodys;
     }
 
     private void passThrough(Body bod) {
@@ -257,16 +255,23 @@ public class IRModel {
         }
     }
 
-
-    public void spawnBuffs() {
-        Body buff = createCoffee();
-        buffs.add(buff);
+    public void spawnCoffee() {
+        coffeeArray.add(createCoffee());
         buffTime = TimeUtils.millis();
     }
 
-    public void spawnDebuffs() {
-        Body debuff = createBeer();
-        debuffs.add(debuff);
+    public void spawnBeer() {
+        beerArray.add(createBeer());
+        buffTime = TimeUtils.millis();
+    }
+
+    public void spawnSports() {
+        sportsArray.add(createSports());
+        buffTime = TimeUtils.millis();
+    }
+
+    public void spawnBiz() {
+        bizArray.add(createBiz());
         buffTime = TimeUtils.millis();
     }
 
@@ -297,7 +302,7 @@ public class IRModel {
     private Body createSports() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(8,4);
+        bodyDef.position.set(15,4);
         Body bodyk = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(1,1);
@@ -306,7 +311,7 @@ public class IRModel {
         fixtureDef.density = 1f;
         bodyk.createFixture(shape, 0.0f);
         shape.dispose();
-        bodyk.setLinearVelocity(-10f, 0);
+        bodyk.setLinearVelocity(-20f, 0);
         bodyk.setUserData("SPORTS");
         passThrough(bodyk);
         return bodyk;
@@ -316,7 +321,7 @@ public class IRModel {
     private Body createBiz() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(8,4);
+        bodyDef.position.set(15,4);
         Body bodyk = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(1,1);
@@ -325,7 +330,7 @@ public class IRModel {
         fixtureDef.density = 1f;
         bodyk.createFixture(shape, 0.0f);
         shape.dispose();
-        bodyk.setLinearVelocity(-10f, 0);
+        bodyk.setLinearVelocity(-20f, 0);
         bodyk.setUserData("BIZ");
         passThrough(bodyk);
         return bodyk;

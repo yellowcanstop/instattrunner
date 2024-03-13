@@ -19,7 +19,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.IRModel;
 import com.instattrunner.InstattRunner;
-import com.instattrunner.StatusBar;
 import com.instattrunner.controller.KeyboardController;
 
 import java.util.Iterator;

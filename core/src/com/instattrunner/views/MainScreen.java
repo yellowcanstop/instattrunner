@@ -35,11 +35,15 @@ public class MainScreen implements Screen {
     boolean debug = true; // tweak if want to debug
     KeyboardController controller;
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
+    public final String[] buffImages = {"pic/Business man 2.png", "pic/Nutrition major.png", "pic/Dean.png", "pic/Coffee.png"};
+    public final String[] debuffImages = {"pic/Sports science major.png", "pic/Culinary major.png", "pic/Beer.png"};
+
+
     Texture playerTex;
     Texture bgTex;
-    Array<Texture> obTex = new Array<Texture>();
-    Texture buffTex;
-    Texture debuffTex;
+    Array<Texture> obTexs = new Array<Texture>();
+    Array<Texture> buffTexs = new Array<Texture>();
+    Array<Texture> debuffTexs = new Array<Texture>();
     SpriteBatch sb;
     BitmapFont font = new BitmapFont();
 
@@ -49,30 +53,27 @@ public class MainScreen implements Screen {
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
 
-        parent.assetMan.queueAddImages();
-        parent.assetMan.manager.finishLoading();
-
-
-        playerTex = parent.assetMan.manager.get("images/droplet.png");
-<<<<<<< HEAD
-        
-        for (String obstacleImage : obstacleImages)
-            obTex.add(parent.assetMan.manager.get(obstacleImage));
-        
-        buffTex = parent.assetMan.manager.get("pic/Coffee.png");
-        debuffTex = parent.assetMan.manager.get("pic/Alcohol.png");
-=======
-        obTex = parent.assetMan.manager.get("images/bucket.png");
-        buffTex = parent.assetMan.manager.get("images/buff.png");
-        debuffTex = parent.assetMan.manager.get("images/debuff.png");
->>>>>>> dc7280a68d88e04c1b201f3543490e9e22b50db6
-        bgTex = parent.assetMan.manager.get("images/bg.jpg");
-
         sb = new SpriteBatch();
         sb.setProjectionMatrix(cam.combined);
 
         controller = new KeyboardController();
         model = new IRModel(controller, cam, parent.assetMan);
+    
+        parent.assetMan.queueAddImages();
+        parent.assetMan.manager.finishLoading();
+
+
+        // Gets images as texture from asset manager
+        // obstacle, buff, debuff runs through array of image file names and import them into array of texture
+        playerTex = parent.assetMan.manager.get("images/droplet.png");
+        bgTex = parent.assetMan.manager.get("images/bg.jpg");
+        
+        for (String obstacleImage : obstacleImages)
+            obTexs.add(parent.assetMan.manager.get(obstacleImage));
+        for (String buffImage : buffImages)
+            buffTexs.add(parent.assetMan.manager.get(buffImage));
+        for (String debuffImage : debuffImages)
+            debuffTexs.add(parent.assetMan.manager.get(debuffImage));
 
     }
 
@@ -104,25 +105,25 @@ public class MainScreen implements Screen {
 
          */
 
+        
+        // Draw all objects
+        // Draw player 
         sb.draw(playerTex, model.player.getPosition().x-2, model.player.getPosition().y-1, 3, 3);
 
-
-
+        // Draw all obstacles, buffs, debuffs
         for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
             Body obstacle = iter.next();
-            sb.draw(obTex.get(((BodyData) obstacle.getUserData()).texture_id), obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
+            sb.draw(obTexs.get(model.getTextureId(obstacle)), obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
         }
-
 
         for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
             Body buff = iter.next();
-            sb.draw(buffTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
+            sb.draw(buffTexs.get(model.getTextureId(buff)), buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
         }
-
 
         for (Iterator<Body> iter = model.debuffs.iterator(); iter.hasNext(); ) {
             Body debuff = iter.next();
-            sb.draw(debuffTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
+            sb.draw(debuffTexs.get(model.getTextureId(debuff)), debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
         }
 
 
@@ -187,8 +188,12 @@ public class MainScreen implements Screen {
     public void dispose() {
         playerTex.dispose();
         bgTex.dispose();
-        for (Texture obstacle : obTex)
-            obstacle.dispose();
+        for (Texture obTex : obTexs)
+            obTex.dispose();
+        for (Texture buffTex : buffTexs)
+            buffTex.dispose();
+        for (Texture debuffTex : debuffTexs)
+            debuffTex.dispose();
         sb.dispose();
     }
 }

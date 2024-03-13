@@ -24,7 +24,6 @@ public class IRModel {
     private IRAssetManager irAM;
     private Sound jump;
     private Sound collect;
-<<<<<<< HEAD
 
 
     // Bodies (yes bodies, just not human)
@@ -42,15 +41,6 @@ public class IRModel {
     public int score = 0;
 
 
-=======
-    public static final int JUMP_SOUND = 0;
-    public static final int COLLECT_SOUND = 1;
-    public Array obstacles = new Array<Body>();
-    public long lastTime;
-    public Array buffs = new Array<Body>();
-    public Array debuffs = new Array<Body>();
-    public long buffTime;
->>>>>>> dc7280a68d88e04c1b201f3543490e9e22b50db6
     // tweak player jump
     public boolean jumpHigh = false;
     public boolean jumpLow = false;
@@ -100,6 +90,8 @@ public class IRModel {
         collect = assetMan.manager.get("sounds/drop.wav");
 
     }
+
+
 
 
     private boolean canJump = true; // always true when player touches ground
@@ -211,6 +203,8 @@ public class IRModel {
     }
 
     private Body createObstacle(float v) {
+        int tempTextureId = MathUtils.random(0, 3);
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(15,-8);
@@ -226,7 +220,7 @@ public class IRModel {
 
         bodyk.createFixture(shape, 0.0f);
         bodyk.setLinearVelocity(v, 0);
-        bodyk.setUserData(new BodyData("OBSTACLE", MathUtils.random(0, 3)));
+        bodyk.setUserData(new BodyData("OBSTACLE", tempTextureId));
 
         shape.dispose();
 
@@ -234,6 +228,8 @@ public class IRModel {
     }
 
     private Body createBuff() {
+        int tempTextureId = MathUtils.random(0, 3);
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(15,4);
@@ -246,12 +242,14 @@ public class IRModel {
         bodyk.createFixture(shape, 0.0f);
         shape.dispose();
         bodyk.setLinearVelocity(-20f, 0);
-        bodyk.setUserData("BUFF");
+        bodyk.setUserData(new BodyData("BUFF", tempTextureId));
         passThrough(bodyk);
         return bodyk;
     }
 
     private Body createDebuff() {
+        int tempTextureId = MathUtils.random(0, 2);
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(15,4);
@@ -264,7 +262,7 @@ public class IRModel {
         bodyk.createFixture(shape, 0.0f);
         shape.dispose();
         bodyk.setLinearVelocity(-20f, 0);
-        bodyk.setUserData("DEBUFF");
+        bodyk.setUserData(new BodyData("DEBUFF", tempTextureId));
         passThrough(bodyk);
         return bodyk;
     }
@@ -351,9 +349,11 @@ public class IRModel {
         }
     }
 
-    public String 
+    public String getBodyObjectType(Body bod){
+        return ((BodyData) bod.getUserData()).bodyObjectType;
+    }
 
-
-
-
+    public int getTextureId(Body bod){
+        return ((BodyData) bod.getUserData()).textureId;
+    }
 }

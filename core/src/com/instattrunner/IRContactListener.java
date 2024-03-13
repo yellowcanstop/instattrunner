@@ -19,14 +19,14 @@ public class IRContactListener implements ContactListener {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
         // check collision with obstacle
-        if ((((BodyData) fa.getBody().getUserData()).body_object_type == "OBSTACLE" && ((BodyData) fb.getBody().getUserData()).body_object_type == "PLAYER") || (((BodyData) fb.getBody().getUserData()).body_object_type == "OBSTACLE" && ((BodyData) fa.getBody().getUserData()).body_object_type  == "PLAYER")) {
+        if ((parent.getBodyObjectType(fa.getBody()) == "OBSTACLE" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "OBSTACLE" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.println("Player hit obstacle");
             parent.isDead = true; // triggers change to end screen from render() in main
             return;
         }
 
 
-        if (((BodyData) fa.getBody().getUserData()).body_object_type == "FLOOR" && ((BodyData) fb.getBody().getUserData()).body_object_type == "PLAYER" || ((BodyData) fb.getBody().getUserData()).body_object_type  == "FLOOR" && ((BodyData) fa.getBody().getUserData()).body_object_type == "PLAYER") {
+        if ((parent.getBodyObjectType(fa.getBody())  == "FLOOR" && parent.getBodyObjectType(fb.getBody())  == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "FLOOR" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.printf("Player is on ground at %f\n", fa.getBody().getPosition().y);
             parent.resetJump();
             
@@ -34,26 +34,26 @@ public class IRContactListener implements ContactListener {
         }
 
 
-        // // check collision with buff
-        // if (fa.getBody().getUserData() == "BUFF" || fb.getBody().getUserData() == "BUFF") {
-        //     this.triggerBuff();
-        //     return;
-        // }
-        // // check collision with debuff
-        // if (fa.getBody().getUserData() == "DEBUFF" || fb.getBody().getUserData() == "DEBUFF") {
-        //     this.triggerDebuff();
-        //     return;
-        // }
-        // // check collision with fattening
-        // if (fa.getBody().getUserData() == "FAT" || fb.getBody().getUserData() == "FAT") {
-        //     this.triggerFat();
-        //     return;
-        // }
-        // // check collision with speedup
-        // if (fa.getBody().getUserData() == "SPEED" || fb.getBody().getUserData() == "SPEED") {
-        //     this.triggerSpeed();
-        //     return;
-        // }
+    //     // check collision with buff
+    //     if (parent.getBodyObjectType(fa.getBody())  == "BUFF" || parent.getBodyObjectType(fb.getBody()) == "BUFF") {
+    //         this.triggerBuff();
+    //         return;
+    //     }
+    //     // check collision with debuff
+    //     if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF" || parent.getBodyObjectType(fb.getBody()) == "DEBUFF") {
+    //         this.triggerDebuff();
+    //         return;
+    //     }
+    //     // check collision with fattening
+    //     if (parent.getBodyObjectType(fa.getBody()) == "FAT" || parent.getBodyObjectType(fb.getBody()) == "FAT") {
+    //         this.triggerFat();
+    //         return;
+    //     }
+    //     // check collision with speedup
+    //     if (parent.getBodyObjectType(fa.getBody()) == "SPEED" || parent.getBodyObjectType(fb.getBody()) == "SPEED") {
+    //         this.triggerSpeed();
+    //         return;
+    //     }
     }
 
     // tweak velocity of obstacles

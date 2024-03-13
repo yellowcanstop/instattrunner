@@ -16,25 +16,12 @@ public class IRAssetManager {
 
     // Images files
     public final String playerImage = "images/droplet.png";
-    public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
     public final String bgImage = "images/bg.jpg";
-<<<<<<< HEAD
-    public final String[] buffImages = {"pic/Alcohol.png", "pic/Business man 2.png", "pic/Coffee.png", "pic/Culinary major.png", "pic/Dean.png", "pic/Nutrition major.png", "pic/Sports science major.png"};
-    public final String debuffImage = "images/debuff.png";
+    public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
+    public final String[] buffImages = {"pic/Business man 2.png", "pic/Nutrition major.png", "pic/Dean.png", "pic/Coffee.png"};
+    public final String[] debuffImages = {"pic/Sports science major.png", "pic/Culinary major.png", "pic/Beer.png"};
 
     // Sound effect files
-=======
-    public final String buffImage = "images/buff.png";
-    public final String debuffImage = "images/debuff.png";
-    public void queueAddImages(){
-        manager.load(playerImage, Texture.class);
-        manager.load(obstacleImage, Texture.class);
-        manager.load(bgImage, Texture.class);
-        manager.load(buffImage, Texture.class);
-        manager.load(debuffImage, Texture.class);
-    }
-    // Load sound effects
->>>>>>> dc7280a68d88e04c1b201f3543490e9e22b50db6
     public final String jumpSound = "sounds/drop.wav";
     public final String collectSound = "sounds/drop.wav";
 
@@ -48,12 +35,13 @@ public class IRAssetManager {
     // Loop to loop through all value of string array which has all path of obstacles and buff
     public void queueAddImages(){
         manager.load(playerImage, Texture.class);
-        for (String obstacle : obstacleImages)
-            manager.load(obstacle, Texture.class);
         manager.load(bgImage, Texture.class);
+        for (String obstacleImage : obstacleImages)
+            manager.load(obstacleImage, Texture.class);
         for (String buffImage : buffImages)
             manager.load(buffImage, Texture.class);
-        manager.load(debuffImage, Texture.class);
+        for (String debuffImage : debuffImages)
+            manager.load(debuffImage, Texture.class);
     }
 
     // Load sound effects

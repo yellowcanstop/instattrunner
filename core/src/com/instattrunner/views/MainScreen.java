@@ -54,12 +54,18 @@ public class MainScreen implements Screen {
 
 
         playerTex = parent.assetMan.manager.get("images/droplet.png");
+<<<<<<< HEAD
         
         for (String obstacleImage : obstacleImages)
             obTex.add(parent.assetMan.manager.get(obstacleImage));
         
         buffTex = parent.assetMan.manager.get("pic/Coffee.png");
         debuffTex = parent.assetMan.manager.get("pic/Alcohol.png");
+=======
+        obTex = parent.assetMan.manager.get("images/bucket.png");
+        buffTex = parent.assetMan.manager.get("images/buff.png");
+        debuffTex = parent.assetMan.manager.get("images/debuff.png");
+>>>>>>> dc7280a68d88e04c1b201f3543490e9e22b50db6
         bgTex = parent.assetMan.manager.get("images/bg.jpg");
 
         sb = new SpriteBatch();

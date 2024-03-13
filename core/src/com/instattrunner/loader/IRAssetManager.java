@@ -18,10 +18,23 @@ public class IRAssetManager {
     public final String playerImage = "images/droplet.png";
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
     public final String bgImage = "images/bg.jpg";
+<<<<<<< HEAD
     public final String[] buffImages = {"pic/Alcohol.png", "pic/Business man 2.png", "pic/Coffee.png", "pic/Culinary major.png", "pic/Dean.png", "pic/Nutrition major.png", "pic/Sports science major.png"};
     public final String debuffImage = "images/debuff.png";
 
     // Sound effect files
+=======
+    public final String buffImage = "images/buff.png";
+    public final String debuffImage = "images/debuff.png";
+    public void queueAddImages(){
+        manager.load(playerImage, Texture.class);
+        manager.load(obstacleImage, Texture.class);
+        manager.load(bgImage, Texture.class);
+        manager.load(buffImage, Texture.class);
+        manager.load(debuffImage, Texture.class);
+    }
+    // Load sound effects
+>>>>>>> dc7280a68d88e04c1b201f3543490e9e22b50db6
     public final String jumpSound = "sounds/drop.wav";
     public final String collectSound = "sounds/drop.wav";
 

@@ -24,6 +24,7 @@ public class IRModel {
     private IRAssetManager irAM;
     private Sound jump;
     private Sound collect;
+<<<<<<< HEAD
 
 
     // Bodies (yes bodies, just not human)
@@ -41,6 +42,15 @@ public class IRModel {
     public int score = 0;
 
 
+=======
+    public static final int JUMP_SOUND = 0;
+    public static final int COLLECT_SOUND = 1;
+    public Array obstacles = new Array<Body>();
+    public long lastTime;
+    public Array buffs = new Array<Body>();
+    public Array debuffs = new Array<Body>();
+    public long buffTime;
+>>>>>>> dc7280a68d88e04c1b201f3543490e9e22b50db6
     // tweak player jump
     public boolean jumpHigh = false;
     public boolean jumpLow = false;

@@ -65,6 +65,7 @@ public class IRModel {
 
 
 
+    // Contructor
     // world to keep all physical objects in the game
     public IRModel(KeyboardController cont, OrthographicCamera cam, IRAssetManager assetMan) {
         controller = cont;
@@ -90,6 +91,7 @@ public class IRModel {
 
     }
 
+
     private boolean canJump = true; // always true when player touches ground
     private boolean jumped = false;
     private int jumpCount = 0;
@@ -101,7 +103,6 @@ public class IRModel {
     }
 
     private void tweakJump(int y) {
-
         if (player.getPosition().y < 9 && canJump && jumpCount < 5) {
             player.applyLinearImpulse(0, y, player.getWorldCenter().x, player.getWorldCenter().y, true);
             jumpCount++;
@@ -339,4 +340,10 @@ public class IRModel {
                 break;
         }
     }
+
+    public String 
+
+
+
+
 }

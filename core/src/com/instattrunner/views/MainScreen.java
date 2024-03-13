@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -38,6 +39,7 @@ public class MainScreen implements Screen {
     Texture bgTex;
     Array<Texture> obTex = new Array<Texture>();
     Texture buffTex;
+    Texture debuffTex;
     SpriteBatch sb;
     BitmapFont font = new BitmapFont();
 
@@ -56,7 +58,8 @@ public class MainScreen implements Screen {
         for (String obstacleImage : obstacleImages)
             obTex.add(parent.assetMan.manager.get(obstacleImage));
         
-        buffTex = parent.assetMan.manager.get("pic/Alcohol.png");
+        buffTex = parent.assetMan.manager.get("pic/Coffee.png");
+        debuffTex = parent.assetMan.manager.get("pic/Alcohol.png");
         bgTex = parent.assetMan.manager.get("images/bg.jpg");
 
         sb = new SpriteBatch();
@@ -80,6 +83,9 @@ public class MainScreen implements Screen {
         Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        //sb.setProjectionMatrix(StatusBar.stage.getCamera().combined);
+        //StatusBar.stage.draw();
+
         if (debug) debugRenderer.render(model.world, cam.combined);
 
         sb.begin();
@@ -91,20 +97,34 @@ public class MainScreen implements Screen {
         // which will contain the size, and use hat to get correct offset needed (not just -1)
 
          */
+
         sb.draw(playerTex, model.player.getPosition().x-2, model.player.getPosition().y-1, 3, 3);
+
+
 
         for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
             Body obstacle = iter.next();
             sb.draw(obTex.get(((BodyData) obstacle.getUserData()).texture_id), obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
         }
 
+
         for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
             Body buff = iter.next();
             sb.draw(buffTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
         }
 
+
+        for (Iterator<Body> iter = model.debuffs.iterator(); iter.hasNext(); ) {
+            Body debuff = iter.next();
+            sb.draw(debuffTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
+        }
+
+
+
+
+
         font.getData().setScale(0.05f);
-        font.draw(sb, "S " + model.score, 12, 10);
+        font.draw(sb, "Score: " + model.score, 12, 10);
 
         if(TimeUtils.millis() - model.lastTime > 2000) {
             if (model.speedUp) {
@@ -117,7 +137,14 @@ public class MainScreen implements Screen {
 
         model.trackObstacles();
 
-        if(TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
+        int choice = MathUtils.random(1); // 0 or 1
+        if (choice == 0) {
+            if (TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
+        }
+        else {
+            if(TimeUtils.millis() - model.buffTime > 2000) model.spawnDebuffs();
+        }
+
 
 
         sb.end();

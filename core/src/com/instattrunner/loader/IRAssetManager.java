@@ -19,6 +19,7 @@ public class IRAssetManager {
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
     public final String bgImage = "images/bg.jpg";
     public final String[] buffImages = {"pic/Alcohol.png", "pic/Business man 2.png", "pic/Coffee.png", "pic/Culinary major.png", "pic/Dean.png", "pic/Nutrition major.png", "pic/Sports science major.png"};
+    public final String debuffImage = "images/debuff.png";
 
     // Sound effect files
     public final String jumpSound = "sounds/drop.wav";
@@ -39,6 +40,7 @@ public class IRAssetManager {
         manager.load(bgImage, Texture.class);
         for (String buffImage : buffImages)
             manager.load(buffImage, Texture.class);
+        manager.load(debuffImage, Texture.class);
     }
 
     // Load sound effects

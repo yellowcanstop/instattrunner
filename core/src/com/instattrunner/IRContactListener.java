@@ -3,6 +3,7 @@ package com.instattrunner;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.instattrunner.BodyData;
 
 // contact listener to react to collisions in world
 // everytime two bodies collide, beginContact is run
@@ -18,14 +19,14 @@ public class IRContactListener implements ContactListener {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
         // check collision with obstacle
-        if ((fa.getBody().getUserData() == "OBSTACLE" && fb.getBody().getUserData() == "PLAYER") || (fb.getBody().getUserData() == "OBSTACLE" && fa.getBody().getUserData() == "PLAYER")) {
+        if ((((BodyData) fa.getBody().getUserData()).body_object_type == "OBSTACLE" && ((BodyData) fb.getBody().getUserData()).body_object_type == "PLAYER") || (((BodyData) fb.getBody().getUserData()).body_object_type == "OBSTACLE" && ((BodyData) fa.getBody().getUserData()).body_object_type  == "PLAYER")) {
             System.out.println("Player hit obstacle");
             parent.isDead = true; // triggers change to end screen from render() in main
             return;
         }
 
 
-        if (fa.getBody().getUserData() == "FLOOR" && fb.getBody().getUserData() == "PLAYER" || fb.getBody().getUserData() == "FLOOR" && fa.getBody().getUserData() == "PLAYER") {
+        if (((BodyData) fa.getBody().getUserData()).body_object_type == "FLOOR" && ((BodyData) fb.getBody().getUserData()).body_object_type == "PLAYER" || ((BodyData) fb.getBody().getUserData()).body_object_type  == "FLOOR" && ((BodyData) fa.getBody().getUserData()).body_object_type == "PLAYER") {
             System.out.printf("Player is on ground at %f\n", fa.getBody().getPosition().y);
             parent.resetJump();
             
@@ -33,26 +34,26 @@ public class IRContactListener implements ContactListener {
         }
 
 
-        // check collision with buff
-        if (fa.getBody().getUserData() == "BUFF" || fb.getBody().getUserData() == "BUFF") {
-            this.triggerBuff();
-            return;
-        }
-        // check collision with debuff
-        if (fa.getBody().getUserData() == "DEBUFF" || fb.getBody().getUserData() == "DEBUFF") {
-            this.triggerDebuff();
-            return;
-        }
-        // check collision with fattening
-        if (fa.getBody().getUserData() == "FAT" || fb.getBody().getUserData() == "FAT") {
-            this.triggerFat();
-            return;
-        }
-        // check collision with speedup
-        if (fa.getBody().getUserData() == "SPEED" || fb.getBody().getUserData() == "SPEED") {
-            this.triggerSpeed();
-            return;
-        }
+        // // check collision with buff
+        // if (fa.getBody().getUserData() == "BUFF" || fb.getBody().getUserData() == "BUFF") {
+        //     this.triggerBuff();
+        //     return;
+        // }
+        // // check collision with debuff
+        // if (fa.getBody().getUserData() == "DEBUFF" || fb.getBody().getUserData() == "DEBUFF") {
+        //     this.triggerDebuff();
+        //     return;
+        // }
+        // // check collision with fattening
+        // if (fa.getBody().getUserData() == "FAT" || fb.getBody().getUserData() == "FAT") {
+        //     this.triggerFat();
+        //     return;
+        // }
+        // // check collision with speedup
+        // if (fa.getBody().getUserData() == "SPEED" || fb.getBody().getUserData() == "SPEED") {
+        //     this.triggerSpeed();
+        //     return;
+        // }
     }
 
     // tweak velocity of obstacles

@@ -18,7 +18,7 @@ public class IRAssetManager {
     public final String playerImage = "images/droplet.png";
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
     public final String bgImage = "images/bg.jpg";
-    public final String[] buffImages = {"pic/Alcohol.png", "Business man 2.png", "Coffee.png", "Culinary major.png", "Dean.png", "Nutrition major.png", "Sports science major.png"};
+    public final String[] buffImages = {"pic/Alcohol.png", "pic/Business man 2.png", "pic/Coffee.png", "pic/Culinary major.png", "pic/Dean.png", "pic/Nutrition major.png", "pic/Sports science major.png"};
 
     // Sound effect files
     public final String jumpSound = "sounds/drop.wav";

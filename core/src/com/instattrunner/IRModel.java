@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
+import com.instattrunner.BodyData;
 
 import java.util.Iterator;
 
@@ -18,29 +19,49 @@ public class IRModel {
     public World world;
     private OrthographicCamera camera;
     private KeyboardController controller;
-    public Body player;
-    public boolean isDead = false;
-    public int score = 0;
+
+    // Load sound asset from AssetManager to be used to play when 
     private IRAssetManager irAM;
     private Sound jump;
     private Sound collect;
-    public static final int JUMP_SOUND = 0;
-    public static final int COLLECT_SOUND = 1;
-    public Array obstacles = new Array<Body>();
-    public long lastTime;
-    public Array buffs = new Array<Body>();
-    public long buffTime;
+
+
+    // Bodies (yes bodies, just not human)
+    public Body player;
+    public Body floor;
+    public Array<Body> obstacles = new Array<Body>();
+    public Array<Body> buffs = new Array<Body>();
+
+
+    // Vars for environment
+    public long lastTime;    // Time since last obstacle spawn
+    public long buffTime;    // Time for buff (not sure yet)
+    public boolean isDead = false;
+    public int score = 0;
+
+
     // tweak player jump
     public boolean jumpHigh = false;
     public boolean jumpLow = false;
 
-    public static int NORMAL = 100;
-    public static int HIGH = 60;
-    public static int LOW = 20;
+
     // tweak speed of obstacles
     public boolean speedUp = false;
     public float fast = -20f;
     public float regular = -10f;
+
+
+    // ENUM
+    // enum for jump
+    public static int NORMAL = 100;
+    public static int HIGH = 60;
+    public static int LOW = 20;
+
+    // enum for sound 
+    public static final int JUMP_SOUND = 0;
+    public static final int COLLECT_SOUND = 1;
+
+
 
 
     // world to keep all physical objects in the game
@@ -125,35 +146,50 @@ public class IRModel {
     }
 
     private void createPlayer() {
+        // Create BodyDef for new Body for player
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(-14, -8);
         bodyDef.fixedRotation = false;
+
+        // Create new Body of player in World
         player = world.createBody(bodyDef);
+
+        // Create new CircleShape for the Fixture of the Body of player
         CircleShape shape = new CircleShape();
         shape.setRadius(2);
+
+        // Create new FixtureDef for Body of player
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.5f;
         fixtureDef.restitution = 0f; // bounciness
+
+        // Set Fixture of Body of player to fixtureDef
         player.createFixture(fixtureDef);
+        // Set UserData of the particular Body of player
+        // Used to identify the body
+        player.setUserData(new BodyData("PLAYER", 0));
+
+        // Dispose shape to prevent memory leak
         shape.dispose();
-        player.setUserData("PLAYER");
     }
 
-    private Body createFloor() {
+    private void createFloor() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set(0, -10);
-        Body floor = world.createBody(bodyDef);
+
+        floor = world.createBody(bodyDef);
+
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(50, 1);
-        floor.createFixture(shape, 0.0f);
-        shape.dispose();
-        floor.setUserData("FLOOR");
 
-        return floor;
+        floor.createFixture(shape, 0.0f);
+        floor.setUserData(new BodyData("FLOOR", 0));
+
+        shape.dispose();
     }
 
     private void passThrough(Body bod) {
@@ -166,16 +202,22 @@ public class IRModel {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(15,-8);
+
         Body bodyk = world.createBody(bodyDef);
+
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(1,1);
+
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
+
         bodyk.createFixture(shape, 0.0f);
-        shape.dispose();
         bodyk.setLinearVelocity(v, 0);
-        bodyk.setUserData("OBSTACLE");
+        bodyk.setUserData(new BodyData("OBSTACLE", MathUtils.random(0, 3)));
+
+        shape.dispose();
+
         return bodyk;
     }
 

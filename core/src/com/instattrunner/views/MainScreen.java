@@ -15,7 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.instattrunner.BodyData;
 import com.instattrunner.IRModel;
 import com.instattrunner.InstattRunner;
 import com.instattrunner.controller.KeyboardController;
@@ -31,9 +33,10 @@ public class MainScreen implements Screen {
     Box2DDebugRenderer debugRenderer;
     boolean debug = true; // tweak if want to debug
     KeyboardController controller;
+    public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
     Texture playerTex;
     Texture bgTex;
-    Texture obTex;
+    Array<Texture> obTex = new Array<Texture>();
     Texture buffTex;
     SpriteBatch sb;
     BitmapFont font = new BitmapFont();
@@ -47,9 +50,13 @@ public class MainScreen implements Screen {
         parent.assetMan.queueAddImages();
         parent.assetMan.manager.finishLoading();
 
+
         playerTex = parent.assetMan.manager.get("images/droplet.png");
-        obTex = parent.assetMan.manager.get("images/bucket.png");
-        buffTex = parent.assetMan.manager.get("images/buff.png");
+        
+        for (String obstacleImage : obstacleImages)
+            obTex.add(parent.assetMan.manager.get(obstacleImage));
+        
+        buffTex = parent.assetMan.manager.get("pic/Alcohol.png");
         bgTex = parent.assetMan.manager.get("images/bg.jpg");
 
         sb = new SpriteBatch();
@@ -88,7 +95,7 @@ public class MainScreen implements Screen {
 
         for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
             Body obstacle = iter.next();
-            sb.draw(obTex, obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
+            sb.draw(obTex.get(((BodyData) obstacle.getUserData()).texture_id), obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
         }
 
         for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
@@ -147,7 +154,8 @@ public class MainScreen implements Screen {
     public void dispose() {
         playerTex.dispose();
         bgTex.dispose();
-        obTex.dispose();
+        for (Texture obstacle : obTex)
+            obstacle.dispose();
         sb.dispose();
     }
 }

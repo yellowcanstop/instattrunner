@@ -53,20 +53,32 @@ public class IRContactListener implements ContactListener {
          */
         // check collision with sports major
         if (fa.getBody().getUserData() == "SPORTS" || fb.getBody().getUserData() == "SPORTS") {
-            this.triggerSportsMajor();
+            this.triggerSports();
+            return;
+        }
+        // check collision with biz major
+        if (fa.getBody().getUserData() == "BIZ" || fb.getBody().getUserData() == "BIZ") {
+            this.triggerBiz();
             return;
         }
     }
 
     // sports major increases speed of gameplay for 10 seconds
-    private void triggerSportsMajor() {
+    private void triggerSports() {
         System.out.println("Speed up obstacles");
         parent.playSound(IRModel.COLLECT_SOUND);
         parent.speedUp = true;
-        long suTime = TimeUtils.millis();
-        if(TimeUtils.millis() - suTime > 2000) { // todo change to 10 secs
-            parent.speedUp = false;
-        }
+        parent.sportsActive = true;
+        parent.sportsTime = TimeUtils.millis();
+    }
+
+    // biz major decreases speed of gameplay for 10 seconds
+    private void triggerBiz() {
+        System.out.println("Slow down obstacles");
+        parent.playSound(IRModel.COLLECT_SOUND);
+        parent.slowDown = true;
+        parent.bizActive = true;
+        parent.bizTime = TimeUtils.millis();
     }
 
     /*

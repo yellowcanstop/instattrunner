@@ -20,6 +20,7 @@ public class IRAssetManager {
     public final String coffeeImage = "images/test_coffee.png";
     public final String beerImage = "images/test_beer.png";
     public final String sportsMajorImage = "images/test_sports.png";
+    public final String bizMajorImage = "images/test_biz.png";
     public void queueAddImages(){
         manager.load(playerImage, Texture.class);
         manager.load(obstacleImage, Texture.class);
@@ -27,6 +28,7 @@ public class IRAssetManager {
         manager.load(coffeeImage, Texture.class);
         manager.load(beerImage, Texture.class);
         manager.load(sportsMajorImage, Texture.class);
+        manager.load(bizMajorImage, Texture.class);
     }
     // Load sound effects
     public final String jumpSound = "sounds/drop.wav";

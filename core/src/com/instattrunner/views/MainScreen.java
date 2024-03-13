@@ -35,9 +35,8 @@ public class MainScreen implements Screen {
     Texture playerTex;
     Texture bgTex;
     Texture obTex;
-    Texture coffeeTex;
-    Texture beerTex;
-    Texture sportsMajorTex;
+    Texture coffeeTex, beerTex;
+    Texture sportsMajorTex, bizMajorTex;
     SpriteBatch sb;
     BitmapFont font = new BitmapFont();
 
@@ -56,6 +55,7 @@ public class MainScreen implements Screen {
         beerTex = parent.assetMan.manager.get("images/test_beer.png");
         bgTex = parent.assetMan.manager.get("images/bg.jpg");
         sportsMajorTex = parent.assetMan.manager.get("images/test_sports.png");
+        bizMajorTex = parent.assetMan.manager.get("images/test_biz.png");
 
         sb = new SpriteBatch();
         sb.setProjectionMatrix(cam.combined);
@@ -73,8 +73,11 @@ public class MainScreen implements Screen {
 
     private void renderObstacles() {
         if(TimeUtils.millis() - model.lastTime > 2000) {
-            if (model.speedUp) {
+            if (model.speedUp && !model.slowDown) {
                 model.spawnObstacles(model.fast);
+            }
+            else if (model.slowDown && !model.speedUp) {
+                model.spawnObstacles(model.slow);
             }
             else {
                 model.spawnObstacles(model.regular);
@@ -94,6 +97,7 @@ public class MainScreen implements Screen {
 
         if (debug) debugRenderer.render(model.world, cam.combined);
 
+        /* START DRAWING */
         sb.begin();
         /*
         // player only 2 units wide so set width and height at 2
@@ -107,44 +111,32 @@ public class MainScreen implements Screen {
         sb.draw(playerTex, model.player.getPosition().x-2, model.player.getPosition().y-1, 3, 3);
 
         sb.draw(sportsMajorTex, model.sportsMajor.getPosition().x-2, model.sportsMajor.getPosition().y-1, 3, 3);
+        sb.draw(bizMajorTex, model.bizMajor.getPosition().x-2, model.bizMajor.getPosition().y-1, 3, 3);
 
 
-
+        // Draw image onto body
         for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
             Body obstacle = iter.next();
             sb.draw(obTex, obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
         }
-
-
-
 
         for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
             Body buff = iter.next();
             sb.draw(coffeeTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
         }
 
-
-
-
         for (Iterator<Body> iter = model.debuffs.iterator(); iter.hasNext(); ) {
             Body debuff = iter.next();
             sb.draw(beerTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
         }
 
-
-
-
-
-
-
+        // Score counter needs to look better. potential status bar
         font.getData().setScale(0.05f);
         font.draw(sb, "Score: " + model.score, 12, 10);
 
+        // Obstacles
         renderObstacles();
-
-
-
-        model.trackObstacles();
+        model.trackObstacles(); // track score
 
         // testing randomizing buffs and debuffs spawning
         int choice = MathUtils.random(1); // 0 or 1
@@ -165,9 +157,20 @@ public class MainScreen implements Screen {
             model.jumpHigh = false;
             model.coffeeActive = false;
         }
+        // deactivate debuff effect for sports major
+        if (model.sportsActive && TimeUtils.timeSinceMillis(model.sportsTime) > 10000) {
+            model.speedUp = false;
+            model.sportsActive = false;
+        }
+        // deactivate buff effect for biz major
+        if (model.bizActive && TimeUtils.timeSinceMillis(model.bizTime) > 10000) {
+            model.slowDown = false;
+            model.bizActive = false;
+        }
+
 
         sb.end();
-
+        /* END DRAWING */
 
         if (model.isDead) {
             parent.finalScore = model.score;

@@ -52,12 +52,17 @@ public class IRModel {
     public boolean coffeeActive = false;
     public boolean jumpHigh = false;
     /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
+    public float regular = -20f;
     public Body sportsMajor;
-    public Body bizMajor;
     public boolean speedUp = false;
-    public boolean slowDown = false;
+    public boolean sportsActive = false;
+    public long sportsTime = 0;
     public float fast = -40f;
-    public float regular = -10f;
+    public Body bizMajor;
+    public boolean slowDown = false;
+    public boolean bizActive = false;
+    public long bizTime = 0;
+    public float slow = -5f;
 
 
 
@@ -74,7 +79,8 @@ public class IRModel {
         createPlayer();
 
 
-        sportsMajor = sportsMajor();
+        sportsMajor = createSports();
+        bizMajor = createBiz();
 
         // get our body factory singleton and store it in bodyFactory
         //BodyFactory bodyFactory = BodyFactory.getInstance(world);
@@ -288,7 +294,7 @@ public class IRModel {
 
 
     // debuff which increases velocity of obstacles
-    private Body sportsMajor() {
+    private Body createSports() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(8,4);
@@ -302,6 +308,25 @@ public class IRModel {
         shape.dispose();
         bodyk.setLinearVelocity(-10f, 0);
         bodyk.setUserData("SPORTS");
+        passThrough(bodyk);
+        return bodyk;
+    }
+
+    // buff which decreases velocity of obstacles
+    private Body createBiz() {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(8,4);
+        Body bodyk = world.createBody(bodyDef);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1,1);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        bodyk.createFixture(shape, 0.0f);
+        shape.dispose();
+        bodyk.setLinearVelocity(-10f, 0);
+        bodyk.setUserData("BIZ");
         passThrough(bodyk);
         return bodyk;
     }

@@ -15,7 +15,8 @@ public class IRAssetManager {
     public final AssetManager manager = new AssetManager();
 
     // Images files
-    public final String playerImage = "images/droplet.png";
+    // public final String playerImage = "images/droplet.png";
+    public final String playerImage = "images/debug.png";
     public final String bgImage = "images/bg.jpg";
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
     public final String[] buffImages = {"pic/Business man 2.png", "pic/Nutrition major.png", "pic/Dean.png", "pic/Coffee.png"};

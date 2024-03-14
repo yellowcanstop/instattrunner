@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
+import com.instattrunner.BodyEditorLoader;
+
+
 import com.instattrunner.BodyData;
 
 import java.util.Iterator;
@@ -94,6 +97,7 @@ public class IRModel {
 
 
 
+    // Variables for jump method
     private boolean canJump = true; // always true when player touches ground
     private boolean jumped = false;
     private int jumpCount = 0;
@@ -107,12 +111,16 @@ public class IRModel {
     private void tweakJump(int y) {
         if (player.getPosition().y < 9 && canJump && jumpCount < 5) {
             player.applyLinearImpulse(0, y, player.getWorldCenter().x, player.getWorldCenter().y, true);
+            // player.applyLinearImpulse(0, y, player.getPosition().x, player.getPosition().y, true);
             jumpCount++;
         }
         else if (player.getPosition().y > 9) {
             canJump = false;
         }
     }
+
+
+
 
     // todo ensure player cannot jump outside of view
     // logic method to run logic part of the model
@@ -149,35 +157,40 @@ public class IRModel {
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
     }
 
+
+
+
     private void createPlayer() {
         // Create BodyDef for new Body for player
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(-14, -8);
+        bodyDef.position.set(-13, -6);
         bodyDef.fixedRotation = false;
 
         // Create new Body of player in World
         player = world.createBody(bodyDef);
 
-        // Create new CircleShape for the Fixture of the Body of player
-        CircleShape shape = new CircleShape();
-        shape.setRadius(2);
-
         // Create new FixtureDef for Body of player
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        fixtureDef.friction = 0.5f;
+        fixtureDef.density = 0.5f;
+        fixtureDef.friction = 1f;
         fixtureDef.restitution = 0f; // bounciness
 
-        // Set Fixture of Body of player to fixtureDef
-        player.createFixture(fixtureDef);
+        // Create new CircleShape for the Fixture of the Body of player
+        // Passes player Body to BodyEditorLoader 
+        // BodyEditorLoader creates multiple convex polygon using .json file 
+        // 1 convex polygon, 1 FixtureDef
+        // Each FixtureDef is .createFixture to player Body
+        // All done in BodyEditorLoader through method .attachFixture
+        // Scale is scale of shape
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
+        float scale = .008f;
+
+        loader.attachFixture(player, "Sprite.png", fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name
+
         // Set UserData of the particular Body of player
         // Used to identify the body
         player.setUserData(new BodyData("PLAYER", 0));
-
-        // Dispose shape to prevent memory leak
-        shape.dispose();
     }
 
     private void createFloor() {
@@ -349,10 +362,16 @@ public class IRModel {
         }
     }
 
+    // Takes Body
+    // Returns BodyObjectType (player, obstacle, buff, debuff)
+    // Used to check what Body it is (mostly in contact listener)
     public String getBodyObjectType(Body bod){
         return ((BodyData) bod.getUserData()).bodyObjectType;
     }
 
+    // Takes Body
+    // Returns TextureId (int)
+    // Used to check what texture Body is using (mostly for obstacle, buff, debuff) (mostly used for hitbox and rendering)
     public int getTextureId(Body bod){
         return ((BodyData) bod.getUserData()).textureId;
     }

@@ -65,7 +65,8 @@ public class MainScreen implements Screen {
 
         // Gets images as texture from asset manager
         // obstacle, buff, debuff runs through array of image file names and import them into array of texture
-        playerTex = parent.assetMan.manager.get("images/droplet.png");
+        // playerTex = parent.assetMan.manager.get("images/droplet.png");
+        playerTex = parent.assetMan.manager.get("images/debug.png");
         bgTex = parent.assetMan.manager.get("images/bg.jpg");
         
         for (String obstacleImage : obstacleImages)

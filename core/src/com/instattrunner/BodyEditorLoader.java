@@ -79,18 +79,14 @@ public class BodyEditorLoader {
 		RigidBodyModel rbModel = model.rigidBodies.get(name);
 		if (rbModel == null) throw new RuntimeException("Name '" + name + "' was not found.");
 
-		Vector2 origin = vec.set(rbModel.origin);
-        origin.x = origin.x * scale;
-        origin.y = origin.y * scale;
+		Vector2 origin = vec.set(rbModel.origin).scl(scale);
 
 		for (int i=0, n=rbModel.polygons.size(); i<n; i++) {
 			PolygonModel polygon = rbModel.polygons.get(i);
 			Vector2[] vertices = polygon.buffer;
 
 			for (int ii=0, nn=vertices.length; ii<nn; ii++) {
-				vertices[ii] = newVec().set(polygon.vertices.get(ii));
-                vertices[ii].x = vertices[ii].x * scale;
-                vertices[ii].y = vertices[ii].y * scale;
+				vertices[ii] = newVec().set(polygon.vertices.get(ii)).scl(scale);
 				vertices[ii].sub(origin);
 			}
 
@@ -105,9 +101,7 @@ public class BodyEditorLoader {
 
 		for (int i=0, n=rbModel.circles.size(); i<n; i++) {
 			CircleModel circle = rbModel.circles.get(i);
-			Vector2 center = newVec().set(circle.center);
-            center.x = center.x * scale;
-            center.y = center.y * scale;
+			Vector2 center = newVec().set(circle.center).scl(scale);
 			float radius = circle.radius * scale;
 
 			circleShape.setPosition(center);
@@ -139,9 +133,7 @@ public class BodyEditorLoader {
 		RigidBodyModel rbModel = model.rigidBodies.get(name);
 		if (rbModel == null) throw new RuntimeException("Name '" + name + "' was not found.");
 
-		Vector2 temp = vec.set(rbModel.origin);
-        temp.x = temp.x * scale;
-        temp.y = temp.y * scale;
+		Vector2 temp = vec.set(rbModel.origin).scl(scale);
 
 		return temp;
 	}

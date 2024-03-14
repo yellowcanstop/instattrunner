@@ -5,6 +5,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
+import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -23,14 +26,22 @@ public class IRModel {
     private OrthographicCamera camera;
     private KeyboardController controller;
 
-    // Load sound asset from AssetManager to be used to play when 
+    // Load sound asset from AssetManager to be used during gameplay
     private IRAssetManager irAM;
+    private BodyEditorLoader obstacleLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
+    private BodyEditorLoader buffLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
+    private BodyEditorLoader debuffLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
     private Sound jump;
     private Sound collect;
+
+    public final String[] obstacleImages = irAM.obstacleImages;
+    public final String[] buffImages = irAM.buffImages;
+    public final String[] debuffImages = irAM.debuffImages;
 
 
     // Bodies (yes bodies, just not human)
     public Body player;
+    public Body playerStand;
     public Body floor;
     public Array<Body> obstacles = new Array<Body>();
     public Array<Body> buffs = new Array<Body>();
@@ -64,6 +75,12 @@ public class IRModel {
     // enum for sound 
     public static final int JUMP_SOUND = 0;
     public static final int COLLECT_SOUND = 1;
+
+    public Vector2 playerWC;
+    public Vector2 playerStandWC;
+    public Vector2 avgWC;
+
+
 
 
 
@@ -111,7 +128,6 @@ public class IRModel {
     private void tweakJump(int y) {
         if (player.getPosition().y < 9 && canJump && jumpCount < 5) {
             player.applyLinearImpulse(0, y, player.getWorldCenter().x, player.getWorldCenter().y, true);
-            // player.applyLinearImpulse(0, y, player.getPosition().x, player.getPosition().y, true);
             jumpCount++;
         }
         else if (player.getPosition().y > 9) {
@@ -157,42 +173,69 @@ public class IRModel {
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
     }
 
+    
 
+
+    private void passThrough(Body bod) {
+        for (Fixture fix : bod.getFixtureList()) {
+            fix.setSensor(true);
+        }
+    }
 
 
     private void createPlayer() {
-        // Create BodyDef for new Body for player
+        // Create new BodyDef for both player Body and playerStand Body
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = BodyType.DynamicBody;
         bodyDef.position.set(-13, -6);
-        bodyDef.fixedRotation = false;
+        bodyDef.fixedRotation = true;
 
-        // Create new Body of player in World
-        player = world.createBody(bodyDef);
-
-        // Create new FixtureDef for Body of player
+        // Create new FixtureDef for both playerStand and player Body
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 0.5f;
         fixtureDef.friction = 1f;
         fixtureDef.restitution = 0f; // bounciness
 
-        // Create new CircleShape for the Fixture of the Body of player
-        // Passes player Body to BodyEditorLoader 
+        // Declaring scale for rendering the Body
+        float scale = .008f;  // around half of goose scale
+
+        // Create new BodyEditorLoader and load convex polygon using .json file
+        // Has complex polygon combo for both player and playerStand
+        // Passes Body to BodyEditorLoader 
         // BodyEditorLoader creates multiple convex polygon using .json file 
         // 1 convex polygon, 1 FixtureDef
-        // Each FixtureDef is .createFixture to player Body
+        // Each FixtureDef is .createFixture to Body
         // All done in BodyEditorLoader through method .attachFixture
-        // Scale is scale of shape
+        // Scale is scale of shape (scale is same as stand)
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
-        float scale = .008f;
 
-        loader.attachFixture(player, "Sprite.png", fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name
+
+        // STAND BODY
+        // Create new Body of playerStand in World
+        playerStand = world.createBody(bodyDef);
+
+        // Load and createFixture with polygons to playerStand Body
+        loader.attachFixture(playerStand, "SpriteStand", fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name (without pic/)
+
+        // Set UserData of the particular Body 
+        // Used to identify the body
+        playerStand.setUserData(new BodyData("STAND", 0));
+
+
+        // PLAYER BODY 
+        // Create new Body of player in World
+        player = world.createBody(bodyDef);
+
+        // Load and createFixture with polygons to player Body
+        loader.attachFixture(player, "Sprite.png", fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name (without pic/)
 
         // Set UserData of the particular Body of player
         // Used to identify the body
         player.setUserData(new BodyData("PLAYER", 0));
-    }
+   }
 
+
+//    to rearrange and comment later
     private void createFloor() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -209,35 +252,31 @@ public class IRModel {
         shape.dispose();
     }
 
-    private void passThrough(Body bod) {
-        for (Fixture fix : bod.getFixtureList()) {
-            fix.setSensor(true);
-        }
-    }
 
     private Body createObstacle(float v) {
+        // Generate random int from 0 to 3
+        // int is id for texture declared (in IRAssetManager and MainScreen)
         int tempTextureId = MathUtils.random(0, 3);
 
+        // Create new BodyDef 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(15,-8);
 
-        Body bodyk = world.createBody(bodyDef);
+        // Create new Body in World
+        Body obstacle = world.createBody(bodyDef);
 
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1,1);
-
+        // Create new FixtureDef
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
         fixtureDef.density = 1f;
 
-        bodyk.createFixture(shape, 0.0f);
-        bodyk.setLinearVelocity(v, 0);
-        bodyk.setUserData(new BodyData("OBSTACLE", tempTextureId));
+        obstacle.setLinearVelocity(v, 0);
+        obstacle.setUserData(new BodyData("OBSTACLE", tempTextureId));
 
-        shape.dispose();
 
-        return bodyk;
+        passThrough(obstacle);
+        
+        return obstacle;
     }
 
     private Body createBuff() {

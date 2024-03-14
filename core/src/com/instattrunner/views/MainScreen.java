@@ -134,24 +134,24 @@ public class MainScreen implements Screen {
         font.getData().setScale(0.05f);
         font.draw(sb, "Score: " + model.score, 12, 10);
 
-        if(TimeUtils.millis() - model.lastTime > 2000) {
-            if (model.speedUp) {
-                model.spawnObstacles(model.fast);
-            }
-            else {
-                model.spawnObstacles(model.regular);
-            }
-        }
+        // if(TimeUtils.millis() - model.lastTime > 2000) {
+        //     if (model.speedUp) {
+        //         model.spawnObstacles(model.fast);
+        //     }
+        //     else {
+        //         model.spawnObstacles(model.regular);
+        //     }
+        // }
 
-        model.trackObstacles();
+        // model.trackObstacles();
 
-        int choice = MathUtils.random(1); // 0 or 1
-        if (choice == 0) {
-            if (TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
-        }
-        else {
-            if(TimeUtils.millis() - model.buffTime > 2000) model.spawnDebuffs();
-        }
+        // int choice = MathUtils.random(1); // 0 or 1
+        // if (choice == 0) {
+        //     if (TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
+        // }
+        // else {
+        //     if(TimeUtils.millis() - model.buffTime > 2000) model.spawnDebuffs();
+        // }
 
 
 

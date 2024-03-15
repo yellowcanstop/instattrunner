@@ -26,18 +26,21 @@ public class IRModel {
     private OrthographicCamera camera;
     private KeyboardController controller;
 
-    // Load sound asset from AssetManager to be used during gameplay
-    private IRAssetManager irAM;
-    private BodyEditorLoader obstacleLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
-    private BodyEditorLoader buffLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
-    private BodyEditorLoader debuffLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
+    // BodyEditorLoader for loading complex polygons to FixtureDef to Body
+    // Declared here (only obstacle, buff, debuff) as repeatedly called and used (player is only used once, hence not here)
+    private BodyEditorLoader obstacleLoader = new BodyEditorLoader(Gdx.files.internal("obstacleComplexPolygon.json"));
+    private BodyEditorLoader buffLoader = new BodyEditorLoader(Gdx.files.internal("buffComplexPolygon.json"));
+    private BodyEditorLoader debuffLoader = new BodyEditorLoader(Gdx.files.internal("debuffComplexPolygon.json"));
+
+    // Declare array to store name of images
+    // Will be used by BodyEditorLoader to load different complex polygons based on image name to FixtureDef 
+    public final String[] obstacleImages;
+    public final String[] buffImages;
+    public final String[] debuffImages;
+
+    // Declare object Sound to store sound loaded from asset manager
     private Sound jump;
     private Sound collect;
-
-    public final String[] obstacleImages = irAM.obstacleImages;
-    public final String[] buffImages = irAM.buffImages;
-    public final String[] debuffImages = irAM.debuffImages;
-
 
     // Bodies (yes bodies, just not human)
     public Body player;
@@ -90,7 +93,6 @@ public class IRModel {
     public IRModel(KeyboardController cont, OrthographicCamera cam, IRAssetManager assetMan) {
         controller = cont;
         camera = cam;
-        irAM = assetMan;
         world = new World(new Vector2(0, -50f), true);
         world.setContactListener(new IRContactListener(this));
 
@@ -109,6 +111,10 @@ public class IRModel {
         jump = assetMan.manager.get("sounds/drop.wav");
         collect = assetMan.manager.get("sounds/drop.wav");
 
+        // Load names of obstacle, buff and debuff images
+        obstacleImages = assetMan.obstacleImages;
+        buffImages = assetMan.buffImages;
+        debuffImages = assetMan.debuffImages;
     }
 
 
@@ -184,50 +190,36 @@ public class IRModel {
 
 
     private void createPlayer() {
-        // Create new BodyDef for both player Body and playerStand Body
+        // Create new BodyDef for player Body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyType.DynamicBody;
         bodyDef.position.set(-13, -6);
         bodyDef.fixedRotation = true;
 
-        // Create new FixtureDef for both playerStand and player Body
+        // Create new FixtureDef for player Body
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 0.5f;
+        fixtureDef.density = 0.9f;
         fixtureDef.friction = 1f;
         fixtureDef.restitution = 0f; // bounciness
 
-        // Declaring scale for rendering the Body
+        // Create scale for rendering the Body
         float scale = .008f;  // around half of goose scale
 
         // Create new BodyEditorLoader and load convex polygon using .json file
-        // Has complex polygon combo for both player and playerStand
+        // Has complex polygon combo for player 
         // Passes Body to BodyEditorLoader 
         // BodyEditorLoader creates multiple convex polygon using .json file 
         // 1 convex polygon, 1 FixtureDef
         // Each FixtureDef is .createFixture to Body
         // All done in BodyEditorLoader through method .attachFixture
-        // Scale is scale of shape (scale is same as stand)
+        // Scale is scale of shape 
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygon.json"));
 
-
-        // STAND BODY
-        // Create new Body of playerStand in World
-        playerStand = world.createBody(bodyDef);
-
-        // Load and createFixture with polygons to playerStand Body
-        loader.attachFixture(playerStand, "SpriteStand", fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name (without pic/)
-
-        // Set UserData of the particular Body 
-        // Used to identify the body
-        playerStand.setUserData(new BodyData("STAND", 0));
-
-
-        // PLAYER BODY 
         // Create new Body of player in World
         player = world.createBody(bodyDef);
 
         // Load and createFixture with polygons to player Body
-        loader.attachFixture(player, "Sprite.png", fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name (without pic/)
+        loader.attachFixture(player, "pic/Sprite.png", fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name (without pic/)
 
         // Set UserData of the particular Body of player
         // Used to identify the body
@@ -270,11 +262,14 @@ public class IRModel {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 1f;
 
+        // Create scale for rendering the Body
+        float scale = .008f;  // around half of goose scale
+
+        // FixtureDef.shape complex polygon and .createFixture to Body
+        obstacleLoader.attachFixture(obstacle, obstacleImages[tempTextureId], fixtureDef, scale);
+
         obstacle.setLinearVelocity(v, 0);
         obstacle.setUserData(new BodyData("OBSTACLE", tempTextureId));
-
-
-        passThrough(obstacle);
         
         return obstacle;
     }

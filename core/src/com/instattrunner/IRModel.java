@@ -47,9 +47,8 @@ public class IRModel {
     private final String[] buffImages;
     private final String[] debuffImages;
 
-    // Declare array to store width and height of different player, obstacle, buff and debuff
     // Declare width and height of floor for computation
-    private final Vector2 floorWidHei = new Vector2(32f, 3f);
+    private Vector2 floorWidHei;
 
     // Scale of category of body
     private final float playerScale;
@@ -73,8 +72,8 @@ public class IRModel {
 
     // tweak speed of obstacles
     public boolean speedUp = false;
-    public float fast = -20f;
-    public float regular = -10f;
+    public float fast = -25f;
+    public float regular = -18f;
 
     // ENUM
     // enum for jump
@@ -121,12 +120,9 @@ public class IRModel {
         buffImages = assetMan.buffImages;
         debuffImages = assetMan.debuffImages;
 
-        // Load width and height of obstacle, buff and debuff 
-        playerWidHei = assetMan.playerWidHei;
-        obstacleWidHei = assetMan.obstacleWidHei;
-        buffWidHei = assetMan.buffWidHei;
-        debuffWidHei = assetMan.debuffWidHei; 
-
+        // Load width and height of floor
+        floorWidHei = assetMan.floorWidHei;
+        
         // Load scale of body of different category
         playerScale = assetMan.playerScale;
         obstacleScale = assetMan.obstacleScale;
@@ -265,55 +261,6 @@ public class IRModel {
 
         // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
         player.setUserData(new BodyData("PLAYER", 0));
-        System.out.println(player.getPosition());
-    }
-
-    private void dum(Body bod) {
-        float minX = Float.MAX_VALUE;
-        float minY = Float.MAX_VALUE;
-        float maxX = Float.MIN_VALUE;
-        float maxY = Float.MIN_VALUE;
-
-        // Iterate through each fixture attached to the body
-        for (Fixture fixture : bod.getFixtureList()) {
-            Shape shape = fixture.getShape();
-            if (shape.getType() == Shape.Type.Polygon) {
-                PolygonShape polygon = (PolygonShape) shape;
-                // Get the number of vertices in the polygon shape
-                int vertexCount = polygon.getVertexCount();
-                // Iterate through each vertex to find the minimum and maximum extents
-                for (int i = 0; i < vertexCount; i++) {
-                    Vector2 vertex = new Vector2();
-                    polygon.getVertex(i, vertex);
-                    // Update the minimum and maximum extents along the x and y axes
-                    minX = Math.min(minX, vertex.x);
-                    minY = Math.min(minY, vertex.y);
-                    maxX = Math.max(maxX, vertex.x);
-                    maxY = Math.max(maxY, vertex.y);
-                }
-            } else if (shape.getType() == Shape.Type.Circle) {
-                CircleShape circle = (CircleShape) shape;
-        // Get the position of the circle shape (center)
-        Vector2 center = circle.getPosition();
-        // Calculate the radius
-        float radius = circle.getRadius();
-        // Update the minimum and maximum extents based on the circle's bounding box
-        minX = Math.min(minX, center.x - radius);
-        minY = Math.min(minY, center.y - radius);
-        maxX = Math.max(maxX, center.x + radius);
-        maxY = Math.max(maxY, center.y + radius);
-            }
-        }
-
-        // Calculate the width and height of the body based on the extents
-        float width = maxX - minX;
-        float height = maxY - minY;
-
-        System.out.println("Width: " + width);
-        System.out.println("Height: " + height);
-
-
-
     }
 
 
@@ -325,7 +272,7 @@ public class IRModel {
         // Create new BodyDef 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(15, (float)(floor.getPosition().y + (floorWidHei.y / 2)));
+        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2)));
         // Create new Body in World
         Body obstacle = world.createBody(bodyDef);
 
@@ -350,7 +297,7 @@ public class IRModel {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(15, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 10));
+        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 11.5));
 
         Body buff = world.createBody(bodyDef);
 
@@ -372,7 +319,7 @@ public class IRModel {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(15, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 10));
+        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 11.5));
 
         Body debuff = world.createBody(bodyDef);
 
@@ -399,7 +346,7 @@ public class IRModel {
     public void trackObstacles() {
         for (Iterator<Body> iter = obstacles.iterator(); iter.hasNext(); ) {
             Body obstacle = iter.next();
-            if (obstacle.getPosition().x < -16) {
+            if (obstacle.getPosition().x < -25) {  // -16 + (-9)  (9 is aprox max unit size of obstacle)
                 System.out.println("Score: " + score);
                 score++;
                 iter.remove();
@@ -419,7 +366,18 @@ public class IRModel {
         buffTime = TimeUtils.millis();
     }
 
-
+    public void trackBuffsDebuffs() {
+        for (Iterator<Body> iter = buffs.iterator(); iter.hasNext(); ) {
+            Body buff = iter.next();
+            if (buff.getPosition().x < -21)  // -16 + (-5)  (5 is aprox max unit size of buff/debuff) 
+                iter.remove();
+        }
+        for (Iterator<Body> iter = debuffs.iterator(); iter.hasNext(); ) {
+            Body debuff = iter.next();
+            if (debuff.getPosition().x < -21) 
+                iter.remove();
+        }
+    }
 
     // test for debuff which increases player density
     private Body createFat() {

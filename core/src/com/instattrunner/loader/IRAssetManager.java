@@ -16,6 +16,7 @@ public class IRAssetManager {
     public final AssetManager manager = new AssetManager();
 
     // Images files
+    public final String floorImage = "pic/Floor.png";
     public final String playerImage = "pic/Sprite.png";
     public final String bgImage = "images/bg.jpg";
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
@@ -24,6 +25,7 @@ public class IRAssetManager {
 
     // Body height and width with respect to import
     // Multiply by scale when used
+    public final Vector2 floorWidHei = new Vector2(32f, 3f);
     public final Vector2 playerWidHei = new Vector2(580.0f, 886.0f);
     public final Vector2[] obstacleWidHei = new Vector2[] {new Vector2(388.0f, 239.0f), new Vector2(554.0f, 427.0f), new Vector2(792.0f, 351.0f), new Vector2(499.0f, 616.0f)};
     public final Vector2[] buffWidHei = new Vector2[] {new Vector2(308.0f, 942.0f), new Vector2(487.0f, 935.0f), new Vector2(334.0f, 935.0f), new Vector2(301.0f, 467.0f)};
@@ -48,6 +50,7 @@ public class IRAssetManager {
     // Load images
     // Loop to loop through all value of string array which has all path of obstacles and buff
     public void queueAddImages(){
+        manager.load(floorImage, Texture.class);
         manager.load(playerImage, Texture.class);
         manager.load(bgImage, Texture.class);
         for (String obstacleImage : obstacleImages)

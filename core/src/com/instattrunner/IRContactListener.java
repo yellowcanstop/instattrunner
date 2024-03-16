@@ -3,7 +3,6 @@ package com.instattrunner;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.instattrunner.BodyData;
 
 // contact listener to react to collisions in world
 // everytime two bodies collide, beginContact is run
@@ -29,7 +28,6 @@ public class IRContactListener implements ContactListener {
         if ((parent.getBodyObjectType(fa.getBody())  == "FLOOR" && parent.getBodyObjectType(fb.getBody())  == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "FLOOR" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.printf("Player is on ground at %f\n", fa.getBody().getPosition().y);
             parent.resetJump();
-            
             return;
         }
 

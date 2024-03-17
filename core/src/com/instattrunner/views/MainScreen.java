@@ -57,10 +57,12 @@ public class MainScreen implements Screen {
     private Vector2[] debuffWidHei; 
 
     // Scale of category of body
-    private final float playerScale;
     private final float obstacleScale;
     private final float buffScale;
     private final float debuffScale;
+
+    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
+    public long spawnInterval = 2000;
 
 
 
@@ -77,7 +79,7 @@ public class MainScreen implements Screen {
         sb.setProjectionMatrix(cam.combined);
 
         controller = new KeyboardController();
-        model = new IRModel(controller, cam, assMan);
+        model = new IRModel(controller, cam, assMan, this);
     
         assMan.queueAddImages();
         assMan.manager.finishLoading();
@@ -108,7 +110,6 @@ public class MainScreen implements Screen {
         debuffWidHei = assMan.debuffWidHei;
 
         // Load scale of category of Body
-        playerScale = assMan.playerScale;
         obstacleScale = assMan.obstacleScale;
         buffScale = assMan.buffScale;
         debuffScale = assMan.debuffScale;
@@ -136,67 +137,48 @@ public class MainScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * playerScale, playerWidHei.y * playerScale);
+        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * parent.assetMan.playerScale, playerWidHei.y * parent.assetMan.playerScale);
         // Draw floor
         sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
-
         // Draw all obstacles, buffs, debuffs
-        loopDraw(model.obstacles.iterator(), obTexs, obstacleWidHei, obstacleScale);
-        loopDraw(model.buffs.iterator(), buffTexs, buffWidHei, buffScale);
-        loopDraw(model.debuffs.iterator(), debuffTexs, debuffWidHei, debuffScale);
+        loopDraw(model.obstacles, obTexs, obstacleWidHei, obstacleScale);
+        loopDraw(model.buffs, buffTexs, buffWidHei, buffScale);
+        loopDraw(model.debuffs, debuffTexs, debuffWidHei, debuffScale);
 
-        // for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
-        //     Body obstacle = iter.next();
-        //     // .getTextureId return texture id of particular model and use it as index on the texture array 
-        //     // .getPosition returns bottom left coord as these are complex polygon (only floor .getPosition return center)
-        //     tempTextureId = model.getTextureId(obstacle);
-        //     tempWidHei = obstacleWidHei[tempTextureId];
-        //     sb.draw(obTexs.get(tempTextureId), obstacle.getPosition().x, obstacle.getPosition().y, tempWidHei.x* obstacleScale, tempWidHei.y * obstacleScale);
-        // }
-
-        // for (Iterator<Body> iter = model.buffs.iterator(); iter.hasNext(); ) {
-        //     Body buff = iter.next();
-        //     tempTextureId = model.getTextureId(buff);
-        //     tempWidHei = buffWidHei[tempTextureId];
-        //     sb.draw(buffTexs.get(tempTextureId), buff.getPosition().x, buff.getPosition().y, tempWidHei.x * buffScale, tempWidHei.y * buffScale);
-        // }
-
-        // for (Iterator<Body> iter = model.debuffs.iterator(); iter.hasNext(); ) {
-        //     Body debuff = iter.next();
-        //     tempTextureId = model.getTextureId(debuff);
-        //     tempWidHei = debuffWidHei[tempTextureId];
-        //     sb.draw(debuffTexs.get(tempTextureId), debuff.getPosition().x, debuff.getPosition().y, tempWidHei.x * debuffScale, tempWidHei.y * debuffScale);
-        // }
-
-       
 
         font.getData().setScale(0.05f);
         font.draw(sb, "Score: " + model.score, 12, 10);
 
-        if(TimeUtils.millis() - model.lastTime > 2000) {
-            if (model.speedUp) {
+
+        // have to change as this is not how its supposed to work 
+        // Spawn obstacle based on speed var determiner 
+        if(TimeUtils.millis() - model.obstacleTime > spawnInterval) {
+            if (model.speedUp && !model.slowDown) {
                 model.spawnObstacles(model.fast);
+            }
+            else if (model.slowDown && !model.speedUp) {
+                model.spawnObstacles(model.slow);
             }
             else {
                 model.spawnObstacles(model.regular);
             }
         }
-
         model.trackObstacles();
 
+        // Randomly choose to spawn buff or debuff every 2 seconds 
+        // Type of buff/debuff will be randomly choosen by .create method in IRModel
         int choice = MathUtils.random(1); // 0 or 1
-        if (choice == 0) {
-            if (TimeUtils.millis() - model.buffTime > 2000) model.spawnBuffs();
-        }
-        else {
-            if(TimeUtils.millis() - model.buffTime > 2000) model.spawnDebuffs();
-        }
-
+        if (choice == 0) 
+            if (TimeUtils.millis() - model.buffTime > spawnInterval) model.spawnBuffs();
+        else 
+            if(TimeUtils.millis() - model.buffTime > spawnInterval) model.spawnDebuffs();
         model.trackBuffsDebuffs();
+
+   
 
         sb.end();
 
-        if (model.isDead) {
+        if (model.isDead && !model.immunity) {
             parent.finalScore = model.score;
             parent.changeScreen(InstattRunner.END);
             model.isDead = false;
@@ -237,16 +219,16 @@ public class MainScreen implements Screen {
     }
 
     // Just trying to reduce repeated code
-    private void loopDraw(Iterator<Body> iter, Array<Texture> bodyTexs, Vector2[] bodyWidHei, float bodyScale) {
+    private void loopDraw(Array<Body> bodys, Array<Texture> bodyTexs, Vector2[] bodyWidHei, float bodyScale) {
         int tempTextureId;
         Vector2 tempWidHei;
-        for (; iter.hasNext(); ) {
-            Body body = iter.next();
+
+        for (Body body : bodys) {
             // .getTextureId return texture id of particular model and use it as index on the texture array 
             // .getPosition returns bottom left coord as these are complex polygon (only floor .getPosition return center)
             tempTextureId = model.getTextureId(body);
             tempWidHei = bodyWidHei[tempTextureId];
             sb.draw(bodyTexs.get(tempTextureId), body.getPosition().x, body.getPosition().y, tempWidHei.x* bodyScale, tempWidHei.y * bodyScale);
         }
-    }
+   }
 }

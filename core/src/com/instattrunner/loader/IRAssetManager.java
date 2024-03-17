@@ -15,12 +15,28 @@ hence help reduce memory usage */
 public class IRAssetManager {
     public final AssetManager manager = new AssetManager();
 
+    // Enum for obstacle, buff, debuff
+    // obstacle
+    public static final int CAT = 0;
+    public static final int GOOSE = 1;
+    public static final int LAKE = 2;
+    public static final int STAIRS = 3;
+    // buff
+    public static final int BUSINESS_MAN_1_AI = 0;
+    public static final int NUTRITION_MAJOR = 1;
+    public static final int COFFEE = 2;
+    public static final int DEAN = 3;
+    // debuff
+    public static final int SPORTS_SCIENCE_MAJOR = 0;
+    public static final int CULINARY_MAJOR = 1;
+    public static final int BEER = 2;
+
     // Images files
     public final String floorImage = "pic/Floor.png";
     public final String playerImage = "pic/Sprite.png";
     public final String bgImage = "images/bg.jpg";
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
-    public final String[] buffImages = {"pic/Business man 1 (AI).png", "pic/Nutrition major.png", "pic/Dean.png", "pic/Coffee.png"};
+    public final String[] buffImages = {"pic/Business man 1 (AI).png", "pic/Nutrition major.png", "pic/Coffee.png", "pic/Dean.png"};
     public final String[] debuffImages = {"pic/Sports science major.png", "pic/Culinary major.png", "pic/Beer.png"};
 
     // Body height and width with respect to import
@@ -28,7 +44,7 @@ public class IRAssetManager {
     public final Vector2 floorWidHei = new Vector2(32f, 3f);
     public final Vector2 playerWidHei = new Vector2(580.0f, 886.0f);
     public final Vector2[] obstacleWidHei = new Vector2[] {new Vector2(388.0f, 239.0f), new Vector2(554.0f, 427.0f), new Vector2(792.0f, 351.0f), new Vector2(499.0f, 616.0f)};
-    public final Vector2[] buffWidHei = new Vector2[] {new Vector2(308.0f, 942.0f), new Vector2(487.0f, 935.0f), new Vector2(334.0f, 935.0f), new Vector2(301.0f, 467.0f)};
+    public final Vector2[] buffWidHei = new Vector2[] {new Vector2(308.0f, 942.0f), new Vector2(487.0f, 935.0f), new Vector2(301.0f, 467.0f), new Vector2(334.0f, 935.0f)};
     public final Vector2[] debuffWidHei = new Vector2[] {new Vector2(809.0f, 467.0f), new Vector2(364.0f, 935.0f), new Vector2(360.0f, 468.0f)};
 
     // Scale of category of body

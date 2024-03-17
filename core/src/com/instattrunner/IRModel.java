@@ -3,29 +3,30 @@ package com.instattrunner;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter.SpawnEllipseSide;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
-import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
+import com.instattrunner.views.MainScreen;
 import com.instattrunner.BodyEditorLoader;
 
 
 import com.instattrunner.BodyData;
 
 import java.util.Iterator;
-import java.util.Vector;
 
 // Controls all logic in game
 public class IRModel {
     public World world;
     private OrthographicCamera camera;
     private KeyboardController controller;
+    private MainScreen main;
+    private IRAssetManager assMan;
 
     // Bodies (yes bodies, just not human bodies, although we have a player BODY)
     public Body player;
@@ -36,6 +37,7 @@ public class IRModel {
 
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
     // Declared here (only obstacle, buff, debuff) as repeatedly called and used (player is only used once, hence not here)
+    private BodyEditorLoader playerLoader;
     private BodyEditorLoader obstacleLoader;
     private BodyEditorLoader buffLoader;
     private BodyEditorLoader debuffLoader;
@@ -51,96 +53,134 @@ public class IRModel {
     private Vector2 floorWidHei;
 
     // Scale of category of body
-    private final float playerScale;
-    private final float obstacleScale;
-    private final float buffScale;
-    private final float debuffScale;
+    private float playerScale;
+    private float obstacleScale;
+    private float buffScale;
+    private float debuffScale;
 
     // Declare object Sound to store sound loaded from asset manager
     private Sound jump;
     private Sound collect;
 
-    // Vars for environment
-    public long lastTime;    // Time since last obstacle spawn
-    public long buffTime;    // Time for buff (not sure yet)
-    public boolean isDead = false;
-    public int score = 0;
-
-    // tweak player jump
-    public boolean jumpHigh = false;
-    public boolean jumpLow = false;
-
-    // tweak speed of obstacles
-    public boolean speedUp = false;
-    public float fast = -25f;
-    public float regular = -18f;
-
-    // ENUM
-    // enum for jump
-    public static int NORMAL = 140;
-    public static int HIGH = 100;
-    public static int LOW = 60;
-
     // enum for sound 
     public static final int JUMP_SOUND = 0;
     public static final int COLLECT_SOUND = 1;
+
+    // Vars for environment
+    public long obstacleTime;    // Time since last obstacle spawn
+    public long buffTime;    // Time since last buff/debuff spawn
+    public boolean isDead = false;
+    public boolean immunity = false;
+    public int score = 0;
+
+
+    // Enum for obstacle, buff, debuff
+    // obstacle
+    private static final int SPEED = IRAssetManager.BUSINESS_MAN_1_AI;
+    private static final int SIZE = IRAssetManager.NUTRITION_MAJOR;
+    private static final int JUMP = IRAssetManager.COFFEE;
+    private static final int IMMUNE = IRAssetManager.DEAN;
+    // buff
+    private static final int BUSINESS_MAN_1_AI = IRAssetManager.BUSINESS_MAN_1_AI;
+    private static final int NUTRITION_MAJOR = IRAssetManager.NUTRITION_MAJOR;
+    private static final int COFFEE = IRAssetManager.COFFEE;
+    private static final int DEAN = IRAssetManager.DEAN;
+    // debuff
+    private static final int SPORTS_SCIENCE_MAJOR = IRAssetManager.SPORTS_SCIENCE_MAJOR;
+    private static final int CULINARY_MAJOR = IRAssetManager.CULINARY_MAJOR;
+    private static final int BEER = IRAssetManager.BEER;
+
+  
+
+    /* Individual Buff Debuff
+    * variables are declared here in logic model,
+    * variables are edited in contact listener,
+    * effects are activated and processed deactivated after x seconds in logic model (sorry, had to change to logic model as i'll be using the Body(s) in main screen, didn't feel like importing again to contact listener)
+    */
+    // xTime to store time when collided 
+    // xActive to determine whether buff/debuff is still active (becomes false after currentTime - xTime > x)
+
+    // tweak height of jump
+    /* Coffee: jump higher; Beer: jump lower; Otherwise: normal */
+
+    public long[] effectTime = new long[4];            // effect(buff and debuff of same category) start time
+    public boolean[] effectActive = new boolean[4];    // effect(buff and debuff of same category) active or not 
+    public boolean[] buffActive = new boolean[4];      // whether buff is active or not 
+    public boolean[] debuffActive = new boolean[4];    // whether debuff is active or not (last one is a place holder to counter Dean buff)
+
+    public long beerTime = 0;
+    public boolean beerActive = false;
+    public boolean jumpLow = false;
+
+    public long coffeeTime = 0;
+    public boolean coffeeActive = false;
+    public boolean jumpHigh = false;
+    
+    // enum for jump
+    public static int NORMAL = 125;
+    public static int HIGH = 160;
+    public static int LOW = 80;
+
+    // tweak speed of obstacles
+    /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
+    public float regular = -20f;
+    public float fast = -40f;
+    public float slow = -5f;
+
+    public long sportsTime = 0;
+    public boolean sportsActive = false;
+    public boolean speedUp = false;
+
+    public long bizTime = 0;
+    public boolean bizActive = false;
+    public boolean slowDown = false;
 
 
 
 
     // Contructor
     // world to keep all physical objects in the game
-    public IRModel(KeyboardController cont, OrthographicCamera cam, IRAssetManager assetMan) {
+    public IRModel(KeyboardController cont, OrthographicCamera cam, IRAssetManager assetMan, MainScreen mainScreen) {
         controller = cont;
         camera = cam;
+        main = mainScreen;
+        assMan = assetMan;
         world = new World(new Vector2(0, -60f), true);
         world.setContactListener(new IRContactListener(this));
-
-    
-        //createFat();
-        //createSpeed();
 
         // get our body factory singleton and store it in bodyFactory
         //BodyFactory bodyFactory = BodyFactory.getInstance(world);
 
         // load sounds into model
-        assetMan.queueAddSounds();
-        assetMan.manager.finishLoading();
-        jump = assetMan.manager.get("sounds/drop.wav");
-        collect = assetMan.manager.get("sounds/drop.wav");
+        assMan.queueAddSounds();
+        assMan.manager.finishLoading();
+        jump = assMan.manager.get("sounds/drop.wav");
+        collect = assMan.manager.get("sounds/drop.wav");
 
         // Init BodyEditorLoader
+        playerLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygons.json"));
         obstacleLoader = new BodyEditorLoader(Gdx.files.internal("obstacleComplexPolygons.json"));
         buffLoader = new BodyEditorLoader(Gdx.files.internal("buffComplexPolygons.json"));
         debuffLoader = new BodyEditorLoader(Gdx.files.internal("debuffComplexPolygons.json"));
 
         // Load names of obstacle, buff and debuff images
-        playerImage = assetMan.playerImage;
-        obstacleImages = assetMan.obstacleImages;
-        buffImages = assetMan.buffImages;
-        debuffImages = assetMan.debuffImages;
+        playerImage = assMan.playerImage;
+        obstacleImages = assMan.obstacleImages;
+        buffImages = assMan.buffImages;
+        debuffImages = assMan.debuffImages;
 
         // Load width and height of floor
-        floorWidHei = assetMan.floorWidHei;
+        floorWidHei = assMan.floorWidHei;
         
         // Load scale of body of different category
-        playerScale = assetMan.playerScale;
-        obstacleScale = assetMan.obstacleScale;
-        buffScale = assetMan.buffScale;
-        debuffScale = assetMan.debuffScale;
+        playerScale = assMan.playerScale;
+        obstacleScale = assMan.obstacleScale;
+        buffScale = assMan.buffScale;
+        debuffScale = assMan.debuffScale;
 
+        // Create floor and player of game 
         createFloor();
         createPlayer();
-        // dum(player);
-
-        // for (int i = 0; i < 4; i++)
-        //     dum(createObstacle(1, i));
-
-        // for (int i = 0; i < 4; i++)
-        //     dum(createBuff(i));
-
-        // for (int i = 0; i < 3; i++)
-        //     dum(createDebuff(i));
     }
 
 
@@ -173,7 +213,7 @@ public class IRModel {
     // todo ensure player cannot jump outside of view
     // logic method to run logic part of the model
     public void logicStep(float delta) {
-        if (jumpHigh) {
+        if (buffActive[COFFEE]) {
             if (controller.space) {
                 jumped = true;
                 tweakJump(HIGH);
@@ -182,7 +222,7 @@ public class IRModel {
                 canJump = false;
            }
         }
-        if (jumpLow) {
+        if (debuffActive[BEER]) {
             if (controller.space) {
                 jumped = true;
                 tweakJump(LOW);
@@ -202,9 +242,103 @@ public class IRModel {
             System.out.printf("Toggled canJump: %b  jumped: %b\n", canJump, jumped);
         }
 
+
+        // for loop goes through all buff debuff category 
+        // Check if they are expired, or both active
+        // If found expired or both active, turn them off as they cancel each other
+        for (int i = 0; i < 4; i++){
+            // Would exists where in same category, exact expire and obtain new buff/debuff, new buff/debuff would be cancelled, let it slip as it would be very computationaly expensive to handle
+            if (TimeUtils.timeSinceMillis(effectTime[i]) > 10000){
+                buffActive[i] = false;
+                debuffActive[i] = false;
+                effectActive[i] = false;    
+                effectCancellation(i);
+            }
+      
+            if (buffActive[i] && debuffActive[i]){
+                buffActive[i] = false;
+                debuffActive[i] = false;
+                effectActive[i] = false;    
+                effectCancellation(i);
+            }
+        }
+        // Move on to process active buff/debuff and enable their effects
+        
+        // Change speed of obstacle logic 
+        if (effectActive[SPEED]){
+            if (buffActive[BUSINESS_MAN_1_AI]){
+                setSpeed(-10);
+                main.spawnInterval = 4000;
+            }
+            else if (debuffActive[SPORTS_SCIENCE_MAJOR]){
+                setSpeed(-30);
+                main.spawnInterval = 3500;
+            }
+        }
+
+        // Change size of obstacle logic 
+        if (effectActive[SIZE]){
+            if (buffActive[NUTRITION_MAJOR])
+                setSize(0.0058f);
+            else if (debuffActive[CULINARY_MAJOR])
+                setSize(0.0082f);
+        }
+
+        // Enable immunity of player
+        if (effectActive[IMMUNE])
+            immunity = true;
+
+
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
     }
 
+    private void effectCancellation(int effectType){
+        switch (effectType) {
+            case SPEED:
+                setSpeed(-20);
+                main.spawnInterval = 2000;
+                break;
+
+            case SIZE:
+                setSize(effectType);
+                break;
+
+            case JUMP:
+                break;
+
+            case IMMUNE:
+                immunity = false;
+                break;
+
+            default:
+                System.out.println("Some error has occured while cancelling effects.");
+        }
+    }
+
+    private void setSpeed(int velocity){
+        // Loop through all obstacles and set linear velocity to parameter (can be faster or slower, or regular)
+        for (Body osbtacle : obstacles) 
+            osbtacle.setLinearVelocity((float) velocity, 0);
+    }
+
+    private void setSize(float scale){
+        // Get array of all fixture in player
+        Array<Fixture> playerFixtures = new Array<Fixture>();
+        player.getFixtureList();
+
+        // Destroy all fixtures in player body
+        for (Fixture fixture : playerFixtures)
+            player.destroyFixture(fixture);
+        
+        // Create new FixtureDef for player Body
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.density = 1.9f;
+        fixtureDef.friction = 1f;
+        fixtureDef.restitution = 0f; // bounciness
+
+        // Load FixtureDefs to player Body
+        playerLoader.attachFixture(player, playerImage, fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name
+    }
 
     private void passThrough(Body bod) {
         for (Fixture fix : bod.getFixtureList()) {
@@ -245,7 +379,7 @@ public class IRModel {
         fixtureDef.friction = 1f;
         fixtureDef.restitution = 0f; // bounciness
 
-        // Create new BodyEditorLoader and load convex polygon using .json file
+        // Create new BodyEditorLoader (in declaration part) and load convex polygon using .json file
         // Has complex polygon combo for player 
         // Passes Body to BodyEditorLoader 
         // BodyEditorLoader creates multiple convex polygon using .json file 
@@ -253,11 +387,10 @@ public class IRModel {
         // Each FixtureDef is .createFixture to Body
         // All done in BodyEditorLoader through method .attachFixture
         // Scale is scale of shape 
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygons.json"));
     
         // Load and createFixture with polygons to player Body
         // Load with respect to scale declared in asset manager
-        loader.attachFixture(player, playerImage, fixtureDef, playerScale);    // Name is the name set when making complex polygon. For all, all is image file name
+        playerLoader.attachFixture(player, playerImage, fixtureDef, playerScale);    // Name is the name set when making complex polygon. For all, all is image file name
 
         // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
         player.setUserData(new BodyData("PLAYER", 0));
@@ -338,9 +471,8 @@ public class IRModel {
 
     // todo: random choice of buff, obstacles spawned using MathUtils.random(20001), choosing from an array?
     public void spawnObstacles(float v) {
-        Body obstacle = createObstacle(v);
-        obstacles.add(obstacle);
-        lastTime = TimeUtils.millis();
+        obstacles.add(createObstacle(v));
+        obstacleTime = TimeUtils.millis();
     }
 
     public void trackObstacles() {
@@ -355,17 +487,17 @@ public class IRModel {
     }
 
     public void spawnBuffs() {
-        Body buff = createBuff();
-        buffs.add(buff);
+        buffs.add(createBuff());
         buffTime = TimeUtils.millis();
     }
 
     public void spawnDebuffs() {
-        Body debuff = createDebuff();
-        debuffs.add(debuff);
+        debuffs.add(createDebuff());
         buffTime = TimeUtils.millis();
     }
 
+    // Check if buff/debuff is out of screen
+    // If true, remove and discard
     public void trackBuffsDebuffs() {
         for (Iterator<Body> iter = buffs.iterator(); iter.hasNext(); ) {
             Body buff = iter.next();
@@ -377,44 +509,6 @@ public class IRModel {
             if (debuff.getPosition().x < -21) 
                 iter.remove();
         }
-    }
-
-    // test for debuff which increases player density
-    private Body createFat() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(15,4);
-        Body bodyk = world.createBody(bodyDef);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1,1);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        bodyk.createFixture(shape, 0.0f);
-        shape.dispose();
-        bodyk.setLinearVelocity(-10f, 0);
-        bodyk.setUserData("FAT");
-        passThrough(bodyk);
-        return bodyk;
-    }
-
-    // test for speed up which increases velocity of obstacles
-    private Body createSpeed() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(15,4);
-        Body bodyk = world.createBody(bodyDef);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1,1);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        bodyk.createFixture(shape, 0.0f);
-        shape.dispose();
-        bodyk.setLinearVelocity(-10f, 0);
-        bodyk.setUserData("SPEED");
-        passThrough(bodyk);
-        return bodyk;
     }
 
     public void playSound(int sound) {

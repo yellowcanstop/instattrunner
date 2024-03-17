@@ -108,16 +108,16 @@ public class IRModel {
     public boolean[] buffActive = new boolean[4];      // whether buff is active or not 
     public boolean[] debuffActive = new boolean[4];    // whether debuff is active or not (last one is a place holder to counter Dean buff)
 
-    public long beerTime = 0;
-    public boolean beerActive = false;
-    public boolean jumpLow = false;
+    // public long beerTime = 0;
+    // public boolean beerActive = false;
+    // public boolean jumpLow = false;
 
-    public long coffeeTime = 0;
-    public boolean coffeeActive = false;
-    public boolean jumpHigh = false;
+    // public long coffeeTime = 0;
+    // public boolean coffeeActive = false;
+    // public boolean jumpHigh = false;
     
     // enum for jump
-    public static int NORMAL = 125;
+    public static int NORMAL = 225;
     public static int HIGH = 160;
     public static int LOW = 80;
 
@@ -127,13 +127,13 @@ public class IRModel {
     public float fast = -40f;
     public float slow = -5f;
 
-    public long sportsTime = 0;
-    public boolean sportsActive = false;
-    public boolean speedUp = false;
+    // public long sportsTime = 0;
+    // public boolean sportsActive = false;
+    // public boolean speedUp = false;
 
-    public long bizTime = 0;
-    public boolean bizActive = false;
-    public boolean slowDown = false;
+    // public long bizTime = 0;
+    // public boolean bizActive = false;
+    // public boolean slowDown = false;
 
 
 
@@ -208,8 +208,6 @@ public class IRModel {
     }
 
 
-
-
     // todo ensure player cannot jump outside of view
     // logic method to run logic part of the model
     public void logicStep(float delta) {
@@ -253,6 +251,7 @@ public class IRModel {
                 debuffActive[i] = false;
                 effectActive[i] = false;    
                 effectCancellation(i);
+                effectTime[i] = TimeUtils.millis();
             }
       
             if (buffActive[i] && debuffActive[i]){
@@ -300,7 +299,7 @@ public class IRModel {
                 break;
 
             case SIZE:
-                setSize(effectType);
+                setSize(0.007f);
                 break;
 
             case JUMP:
@@ -322,6 +321,7 @@ public class IRModel {
     }
 
     private void setSize(float scale){
+        assMan.playerScale = scale;
         // Get array of all fixture in player
         Array<Fixture> playerFixtures = new Array<Fixture>();
         player.getFixtureList();

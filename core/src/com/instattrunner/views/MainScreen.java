@@ -172,11 +172,15 @@ public class MainScreen implements Screen {
 
         sb.end();
 
-        if (model.isDead && !model.immunity) {
-            parent.finalScore = model.score;
-            parent.changeScreen(InstattRunner.END);
-            model.isDead = false;
-        }
+        if (model.isDead) {
+            if (!model.immunity){
+                parent.finalScore = model.score;
+                parent.changeScreen(InstattRunner.END);
+                model.isDead = false;
+            }
+            else 
+                model.isDead = false;
+       }
     }
 
     @Override

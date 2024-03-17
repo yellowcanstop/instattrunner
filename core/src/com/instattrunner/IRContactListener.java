@@ -94,63 +94,6 @@ public class IRContactListener implements ContactListener {
         }
     }
 
-    // sports major increases speed of gameplay for 10 seconds
-    private void triggerSports() {
-        System.out.println("Speed up obstacles");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.speedUp = true;
-        parent.sportsActive = true;
-        parent.sportsTime = TimeUtils.millis();
-    }
-
-    // biz major decreases speed of gameplay for 10 seconds
-    private void triggerBiz() {
-        System.out.println("Slow down obstacles");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.slowDown = true;
-        parent.bizActive = true;
-        parent.bizTime = TimeUtils.millis();
-    }
-
-    /*
-    // trigger heaviness
-    private void triggerFat() {
-        System.out.println("Fattened");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        long fatTime = TimeUtils.millis();
-        effectFat(10f);
-        if(TimeUtils.millis() - fatTime > 2000) {
-            effectFat(5f);
-        }
-    }
-
-    private void effectFat(float density) {
-        for (Fixture fix : parent.player.getFixtureList()) {
-            fix.setDensity(density);
-            parent.player.resetMassData();
-        }
-    }
-
-     */
-
-    // activate buff effect (deactivated in MainScreen after x seconds)
-    private void triggerCoffee() {
-        System.out.println("Coffee collected");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.jumpHigh = true;
-        parent.coffeeActive = true;
-        parent.coffeeTime = TimeUtils.millis();
-    }
-
-    // activate debuff effect (deactivated in MainScreen after x seconds)
-    public void triggerBeer() {
-        System.out.println("Beer collected");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.jumpLow = true;
-        parent.beerActive = true;
-        parent.beerTime = TimeUtils.millis();
-    }
-
     @Override
     public void endContact(Contact contact) {
 

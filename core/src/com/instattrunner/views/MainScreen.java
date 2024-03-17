@@ -121,6 +121,7 @@ public class MainScreen implements Screen {
         Gdx.input.setInputProcessor(controller);
     }
 
+
     @Override
     public void render(float delta) {
         model.logicStep(delta); // move game logic forward; use if to pause game
@@ -133,6 +134,7 @@ public class MainScreen implements Screen {
 
         if (debug) debugRenderer.render(model.world, cam.combined);
 
+        /* START DRAWING */
         sb.begin();
  
         // Draw all objects
@@ -152,17 +154,9 @@ public class MainScreen implements Screen {
 
         // have to change as this is not how its supposed to work 
         // Spawn obstacle based on speed var determiner 
-        if(TimeUtils.millis() - model.obstacleTime > spawnInterval) {
-            if (model.speedUp && !model.slowDown) {
-                model.spawnObstacles(model.fast);
-            }
-            else if (model.slowDown && !model.speedUp) {
-                model.spawnObstacles(model.slow);
-            }
-            else {
-                model.spawnObstacles(model.regular);
-            }
-        }
+        if(TimeUtils.millis() - model.obstacleTime > spawnInterval) 
+            model.spawnObstacles(model.regular);
+   
         model.trackObstacles();
 
         // Randomly choose to spawn buff or debuff every 2 seconds 

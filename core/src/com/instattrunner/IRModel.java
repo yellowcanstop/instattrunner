@@ -469,7 +469,6 @@ public class IRModel {
         return debuff;
     }
 
-    // todo: random choice of buff, obstacles spawned using MathUtils.random(20001), choosing from an array?
     public void spawnObstacles(float v) {
         obstacles.add(createObstacle(v));
         obstacleTime = TimeUtils.millis();

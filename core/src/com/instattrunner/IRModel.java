@@ -18,6 +18,8 @@ import com.instattrunner.BodyEditorLoader;
 
 import com.instattrunner.BodyData;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 // Controls all logic in game
@@ -61,6 +63,14 @@ public class IRModel {
     private float obstacleScale;
     private float buffScale;
     private float debuffScale;
+
+    // ArrayList for spawn randomization
+    private ArrayList<Integer> obstacleSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2,3));
+    private ArrayList<Integer> obstacleSpawnUsed = new ArrayList<>();
+    private ArrayList<Integer> buffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2,3));
+    private ArrayList<Integer> buffSpawnUsed = new ArrayList<>();
+    private ArrayList<Integer> debuffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2));
+    private ArrayList<Integer> debuffSpawnUsed = new ArrayList<>();
 
     // Declare object Sound to store sound loaded from asset manager
     private Sound jump;
@@ -111,20 +121,11 @@ public class IRModel {
     public boolean[] effectActive = new boolean[4];    // effect(buff and debuff of same category) active or not 
     public boolean[] buffActive = new boolean[4];      // whether buff is active or not 
     public boolean[] debuffActive = new boolean[4];    // whether debuff is active or not (last one is a place holder to counter Dean buff)
-    
 
-    // public long beerTime = 0;
-    // public boolean beerActive = false;
-    // public boolean jumpLow = false;
-
-    // public long coffeeTime = 0;
-    // public boolean coffeeActive = false;
-    // public boolean jumpHigh = false;
-    
     // enum for jump
-    public static int NORMAL = 125;
-    public static int HIGH = 150;
-    public static int LOW = 80;
+    public static int NORMAL = 115;
+    public static int HIGH = 135;
+    public static int LOW = 73;
 
     // tweak speed of obstacles
     /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
@@ -266,11 +267,11 @@ public class IRModel {
         if (effectActive[SPEED]){
             if (buffActive[BUSINESS_MAN_1_AI]){
                 setSpeed(-14);
-                main.spawnInterval = 4000;
+                main.spawnInterval = 3500;
             }
             else if (debuffActive[SPORTS_SCIENCE_MAJOR]){
                 setSpeed(-30);
-                main.spawnInterval = 3500;
+                main.spawnInterval = 1500;
             }
         }
 
@@ -336,22 +337,22 @@ public class IRModel {
        // Set player to different sizes depending on parameter
         if (scale == 0.0054f){
             player = smallPlayer;
-            NORMAL = 85;
-            HIGH = 120;
-            LOW = 48;
+            NORMAL = 78;
+            HIGH = 100;
+            LOW = 35;
         }
         else if (scale == 0.007f){
             player = regularPlayer;
-            NORMAL = 125;
-            HIGH = 150;
-            LOW = 80;
+            NORMAL = 115;
+            HIGH = 135;
+            LOW = 73;
         }
 
         else if (scale == 0.0082f){
             player = bigPlayer;
-            NORMAL = 145;
-            HIGH = 170;
-            LOW = 100;
+            NORMAL = 160;
+            HIGH = 185;
+            LOW = 115;
         }
         else 
             System.out.println("Some error has occured while changing sizes.");
@@ -428,9 +429,16 @@ public class IRModel {
 
 
     private Body createObstacle(float v) {
-        // Generate random int from 0 to 3
+        // Generate random int from 0 to size of arraylist unused - 1
+        // To pick element from unused list
         // int is id for texture declared (in IRAssetManager)
-        int tempTextureId = MathUtils.random(0, 3);
+        if (obstacleSpawnUnused.isEmpty()){
+            ArrayList<Integer> temp = obstacleSpawnUnused;
+            obstacleSpawnUnused = obstacleSpawnUsed;
+            obstacleSpawnUsed = temp;
+        }
+        int tempTextureId = obstacleSpawnUnused.remove(MathUtils.random(0, obstacleSpawnUnused.size() - 1));
+        obstacleSpawnUsed.add(tempTextureId);
 
         // Create new BodyDef 
         BodyDef bodyDef = new BodyDef();

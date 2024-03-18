@@ -51,7 +51,7 @@ public class IRAssetManager {
     public float playerScale;
     public final float obstacleScale = 0.011f;
     public final float buffScale = 0.006f;
-    public final float debuffScale = 0.006f;
+    public final float debuffScale = 0.0073f;
 
     // Sound effect files
     public final String jumpSound = "sounds/drop.wav";

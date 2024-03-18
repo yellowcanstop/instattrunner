@@ -161,14 +161,15 @@ public class MainScreen implements Screen {
 
         // Randomly choose to spawn buff or debuff every 2 seconds 
         // Type of buff/debuff will be randomly choosen by .create method in IRModel
-        int choice = MathUtils.random(1); // 0 or 1
-        if (choice == 0) 
-            if (TimeUtils.millis() - model.buffTime > spawnInterval) model.spawnBuffs();
-        else 
-            if(TimeUtils.millis() - model.buffTime > spawnInterval) model.spawnDebuffs();
-        model.trackBuffsDebuffs();
+        int choice = MathUtils.random(0, 1); // 0 or 1
 
-   
+        if (TimeUtils.timeSinceMillis(model.buffTime) > spawnInterval){
+            if (choice == 0) 
+                model.spawnBuffs();
+            else if (choice == 1)
+                model.spawnDebuffs();
+        }
+        model.trackBuffsDebuffs();
 
         sb.end();
 
@@ -184,7 +185,10 @@ public class MainScreen implements Screen {
             }
 
             model.isDead = false;
-       }
+        }
+
+            System.out.printf("%b %b %b %b\n", model.buffActive[0], model.buffActive[1], model.buffActive[2], model.buffActive[3]);
+            System.out.printf("%b %b %b %b\n", model.debuffActive[0], model.debuffActive[1], model.debuffActive[2], model.debuffActive[3]);
     }
 
     @Override

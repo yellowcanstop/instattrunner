@@ -34,6 +34,7 @@ public class IRModel {
     public Body smallPlayer;    // Pre-build as very computationaly intensive, tends to crash game when done during run time
     public Body bigPlayer;
     public Body floor;
+    public Body collideObstacle;
     public Array<Body> obstacles = new Array<Body>();
     public Array<Body> buffs = new Array<Body>();
     public Array<Body> debuffs = new Array<Body>();
@@ -110,6 +111,7 @@ public class IRModel {
     public boolean[] effectActive = new boolean[4];    // effect(buff and debuff of same category) active or not 
     public boolean[] buffActive = new boolean[4];      // whether buff is active or not 
     public boolean[] debuffActive = new boolean[4];    // whether debuff is active or not (last one is a place holder to counter Dean buff)
+    
 
     // public long beerTime = 0;
     // public boolean beerActive = false;
@@ -121,7 +123,7 @@ public class IRModel {
     
     // enum for jump
     public static int NORMAL = 125;
-    public static int HIGH = 160;
+    public static int HIGH = 150;
     public static int LOW = 80;
 
     // tweak speed of obstacles
@@ -130,13 +132,6 @@ public class IRModel {
     public float fast = -40f;
     public float slow = -5f;
 
-    // public long sportsTime = 0;
-    // public boolean sportsActive = false;
-    // public boolean speedUp = false;
-
-    // public long bizTime = 0;
-    // public boolean bizActive = false;
-    // public boolean slowDown = false;
 
 
 
@@ -144,6 +139,7 @@ public class IRModel {
     // Contructor
     // world to keep all physical objects in the game
     public IRModel(KeyboardController cont, OrthographicCamera cam, IRAssetManager assetMan, MainScreen mainScreen) {
+        System.out.println("New Model Created.");
         controller = cont;
         camera = cam;
         main = mainScreen;
@@ -176,6 +172,7 @@ public class IRModel {
         floorWidHei = assMan.floorWidHei;
         
         // Load scale of body of different category
+        assMan.playerScale = 0.007f;
         playerScale = assMan.playerScale;
         obstacleScale = assMan.obstacleScale;
         buffScale = assMan.buffScale;
@@ -249,12 +246,11 @@ public class IRModel {
         // If found expired or both active, turn them off as they cancel each other
         for (int i = 0; i < 4; i++){
             // Would exists where in same category, exact expire and obtain new buff/debuff, new buff/debuff would be cancelled, let it slip as it would be very computationaly expensive to handle
-            if (TimeUtils.timeSinceMillis(effectTime[i]) > 10000){
+            if (effectActive[i] && TimeUtils.timeSinceMillis(effectTime[i]) > 10000){
                 buffActive[i] = false;
                 debuffActive[i] = false;
                 effectActive[i] = false;    
                 effectCancellation(i);
-                effectTime[i] = TimeUtils.millis();
             }
       
             if (buffActive[i] && debuffActive[i]){
@@ -269,7 +265,7 @@ public class IRModel {
         // Change speed of obstacle logic 
         if (effectActive[SPEED]){
             if (buffActive[BUSINESS_MAN_1_AI]){
-                setSpeed(-10);
+                setSpeed(-14);
                 main.spawnInterval = 4000;
             }
             else if (debuffActive[SPORTS_SCIENCE_MAJOR]){
@@ -281,9 +277,9 @@ public class IRModel {
         // Change size of obstacle logic 
         if (effectActive[SIZE]){
             if (buffActive[NUTRITION_MAJOR])
-                setSize(0.0058f);
+                setSize(0.0054f, player);
             else if (debuffActive[CULINARY_MAJOR])
-                setSize(0.0082f);
+                setSize(0.0082f, player);
         }
 
         // Enable immunity of player
@@ -302,7 +298,7 @@ public class IRModel {
                 break;
 
             case SIZE:
-                setSize(0.007f);
+                setSize(0.007f, player);
                 break;
 
             case JUMP:
@@ -323,29 +319,46 @@ public class IRModel {
             osbtacle.setLinearVelocity((float) velocity, 0);
     }
 
-    private void setSize(float scale){
+    private void setSize(float scale, Body lastPlayer){
         // Change playerScale that MainScreen uses to render texture of player
         assMan.playerScale = scale;
 
+        float lastPlayerPosY = player.getPosition().y;
+        Vector2 lastPlayerVelocity = player.getLinearVelocity();
+            
         setBodyObjectType(regularPlayer, "SLEEP_PLAYER");
         regularPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), regularPlayer.getAngle());
         setBodyObjectType(smallPlayer, "SLEEP_PLAYER");
         smallPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), smallPlayer.getAngle());
         setBodyObjectType(bigPlayer, "SLEEP_PLAYER");
         bigPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), bigPlayer.getAngle());
-            
-        // Set player to different sizes depending on parameter
-        if (scale == 0.0058f)
+
+       // Set player to different sizes depending on parameter
+        if (scale == 0.0054f){
             player = smallPlayer;
-        else if (scale == 0.007f)
+            NORMAL = 85;
+            HIGH = 120;
+            LOW = 48;
+        }
+        else if (scale == 0.007f){
             player = regularPlayer;
-        else if (scale == 0.0082f)
+            NORMAL = 125;
+            HIGH = 150;
+            LOW = 80;
+        }
+
+        else if (scale == 0.0082f){
             player = bigPlayer;
+            NORMAL = 145;
+            HIGH = 170;
+            LOW = 100;
+        }
         else 
             System.out.println("Some error has occured while changing sizes.");
 
         setBodyObjectType(player, "PLAYER");
-        player.setTransform(-14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), player.getAngle());
+        player.setTransform(-14f, lastPlayerPosY, player.getAngle());
+        player.setLinearVelocity(lastPlayerVelocity);
      }
 
     private void passThrough(Body bod) {
@@ -380,6 +393,8 @@ public class IRModel {
         bodyDef.fixedRotation = true;
         // Create new Body of player in World
         regularPlayer = world.createBody(bodyDef);
+        // Change position to right for small and big player
+        bodyDef.position.set(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001));    // Complex polygon, pos is set to lower left.  Get center of floor and add with half height to get max height of floor, add 0.001 as buffer to avoid clipping
         smallPlayer = world.createBody(bodyDef);
         bigPlayer = world.createBody(bodyDef);
 
@@ -400,7 +415,7 @@ public class IRModel {
         // Load and createFixture with polygons to player Body
         // Load with respect to scale declared in asset manager
         playerLoader.attachFixture(regularPlayer, playerImage, fixtureDef, playerScale);    // Name is the name set when making complex polygon. For all, all is image file name
-        playerLoader.attachFixture(smallPlayer, playerImage, fixtureDef, 0.0058f);    // Name is the name set when making complex polygon. For all, all is image file name
+        playerLoader.attachFixture(smallPlayer, playerImage, fixtureDef, 0.0054f);    // Name is the name set when making complex polygon. For all, all is image file name
         playerLoader.attachFixture(bigPlayer, playerImage, fixtureDef, 0.0082f);    // Name is the name set when making complex polygon. For all, all is image file name
 
         // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
@@ -557,5 +572,15 @@ public class IRModel {
     // Used to check what texture Body is using (mostly for obstacle, buff, debuff) (mostly used for hitbox and rendering)
     public int getTextureId(Body bod){
         return ((BodyData) bod.getUserData()).textureId;
+    }
+
+    public void removeCollidedObstacle(){
+        collideObstacle.setTransform(-27f, collideObstacle.getPosition().y, collideObstacle.getAngle());
+    }
+
+    public void resetImmune(){
+        effectActive[DEAN] = false;
+        buffActive[DEAN] = false;
+        immunity = false;
     }
 }

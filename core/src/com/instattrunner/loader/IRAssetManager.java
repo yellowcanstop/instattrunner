@@ -48,7 +48,7 @@ public class IRAssetManager {
     public final Vector2[] debuffWidHei = new Vector2[] {new Vector2(809.0f, 467.0f), new Vector2(364.0f, 935.0f), new Vector2(360.0f, 468.0f)};
 
     // Scale of category of body
-    public float playerScale = 0.007f;
+    public float playerScale;
     public final float obstacleScale = 0.011f;
     public final float buffScale = 0.006f;
     public final float debuffScale = 0.006f;

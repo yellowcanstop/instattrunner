@@ -13,23 +13,6 @@ public class IRContactListener implements ContactListener {
     public final String[] buffTypes = {"Business man 1 (AI)", "Nutrition major", "Coffee", "Dean"};
     public final String[] debuffTypes = {"Sports science major", "Culinary major", "Beer"};
 
-    // might not need this 
-
-    // Enum for obstacle, buff, debuff
-    // obstacle
-    public static final int CAT = IRAssetManager.CAT;
-    public static final int GOOSE = IRAssetManager.GOOSE;
-    public static final int LAKE = IRAssetManager.LAKE;
-    public static final int STAIRS = IRAssetManager.STAIRS;
-    // buff
-    public static final int BUSINESS_MAN_1_AI = IRAssetManager.BUSINESS_MAN_1_AI;
-    public static final int NUTRITION_MAJOR = IRAssetManager.NUTRITION_MAJOR;
-    public static final int DEAN = IRAssetManager.DEAN;
-    public static final int COFFEE = IRAssetManager.COFFEE;
-    // debuff
-    public static final int SPORTS_SCIENCE_MAJOR = IRAssetManager.SPORTS_SCIENCE_MAJOR;
-    public static final int CULINARY_MAJOR = IRAssetManager.CULINARY_MAJOR;
-    public static final int BEER = IRAssetManager.BEER;
 
     // Just to temporary hold id of buff/debuff
     private int tempTextureId;
@@ -48,6 +31,11 @@ public class IRContactListener implements ContactListener {
         // Check player collide with obstacle
         if ((parent.getBodyObjectType(fa.getBody()) == "OBSTACLE" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "OBSTACLE" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.println("Player hit obstacle");
+            if (parent.getBodyObjectType(fa.getBody()) == "OBSTACLE")
+                parent.collideObstacle = fa.getBody();
+            else 
+                parent.collideObstacle = fb.getBody();
+
             parent.isDead = true; // triggers change to end screen from render() in main
             return;
         }

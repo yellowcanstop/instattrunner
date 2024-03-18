@@ -173,13 +173,17 @@ public class MainScreen implements Screen {
         sb.end();
 
         if (model.isDead) {
-            if (!model.immunity){
+            if (model.immunity){
+                model.removeCollidedObstacle();
+                model.resetImmune();
+            }
+
+            else {
                 parent.finalScore = model.score;
                 parent.changeScreen(InstattRunner.END);
-                model.isDead = false;
             }
-            else 
-                model.isDead = false;
+
+            model.isDead = false;
        }
     }
 

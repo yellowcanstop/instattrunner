@@ -30,6 +30,9 @@ public class IRModel {
 
     // Bodies (yes bodies, just not human bodies, although we have a player BODY)
     public Body player;
+    public Body regularPlayer;
+    public Body smallPlayer;    // Pre-build as very computationaly intensive, tends to crash game when done during run time
+    public Body bigPlayer;
     public Body floor;
     public Array<Body> obstacles = new Array<Body>();
     public Array<Body> buffs = new Array<Body>();
@@ -117,7 +120,7 @@ public class IRModel {
     // public boolean jumpHigh = false;
     
     // enum for jump
-    public static int NORMAL = 225;
+    public static int NORMAL = 125;
     public static int HIGH = 160;
     public static int LOW = 80;
 
@@ -321,24 +324,29 @@ public class IRModel {
     }
 
     private void setSize(float scale){
+        // Change playerScale that MainScreen uses to render texture of player
         assMan.playerScale = scale;
-        // Get array of all fixture in player
-        Array<Fixture> playerFixtures = new Array<Fixture>();
-        player.getFixtureList();
 
-        // Destroy all fixtures in player body
-        for (Fixture fixture : playerFixtures)
-            player.destroyFixture(fixture);
-        
-        // Create new FixtureDef for player Body
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 1.9f;
-        fixtureDef.friction = 1f;
-        fixtureDef.restitution = 0f; // bounciness
+        setBodyObjectType(regularPlayer, "SLEEP_PLAYER");
+        regularPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), regularPlayer.getAngle());
+        setBodyObjectType(smallPlayer, "SLEEP_PLAYER");
+        smallPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), smallPlayer.getAngle());
+        setBodyObjectType(bigPlayer, "SLEEP_PLAYER");
+        bigPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), bigPlayer.getAngle());
+            
+        // Set player to different sizes depending on parameter
+        if (scale == 0.0058f)
+            player = smallPlayer;
+        else if (scale == 0.007f)
+            player = regularPlayer;
+        else if (scale == 0.0082f)
+            player = bigPlayer;
+        else 
+            System.out.println("Some error has occured while changing sizes.");
 
-        // Load FixtureDefs to player Body
-        playerLoader.attachFixture(player, playerImage, fixtureDef, scale);    // Name is the name set when making complex polygon. For all, all is image file name
-    }
+        setBodyObjectType(player, "PLAYER");
+        player.setTransform(-14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), player.getAngle());
+     }
 
     private void passThrough(Body bod) {
         for (Fixture fix : bod.getFixtureList()) {
@@ -371,7 +379,9 @@ public class IRModel {
         bodyDef.position.set(-14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001));    // Complex polygon, pos is set to lower left.  Get center of floor and add with half height to get max height of floor, add 0.001 as buffer to avoid clipping
         bodyDef.fixedRotation = true;
         // Create new Body of player in World
-        player = world.createBody(bodyDef);
+        regularPlayer = world.createBody(bodyDef);
+        smallPlayer = world.createBody(bodyDef);
+        bigPlayer = world.createBody(bodyDef);
 
         // Create new FixtureDef for player Body
         FixtureDef fixtureDef = new FixtureDef();
@@ -387,13 +397,18 @@ public class IRModel {
         // Each FixtureDef is .createFixture to Body
         // All done in BodyEditorLoader through method .attachFixture
         // Scale is scale of shape 
-    
         // Load and createFixture with polygons to player Body
         // Load with respect to scale declared in asset manager
-        playerLoader.attachFixture(player, playerImage, fixtureDef, playerScale);    // Name is the name set when making complex polygon. For all, all is image file name
+        playerLoader.attachFixture(regularPlayer, playerImage, fixtureDef, playerScale);    // Name is the name set when making complex polygon. For all, all is image file name
+        playerLoader.attachFixture(smallPlayer, playerImage, fixtureDef, 0.0058f);    // Name is the name set when making complex polygon. For all, all is image file name
+        playerLoader.attachFixture(bigPlayer, playerImage, fixtureDef, 0.0082f);    // Name is the name set when making complex polygon. For all, all is image file name
 
         // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
-        player.setUserData(new BodyData("PLAYER", 0));
+        regularPlayer.setUserData(new BodyData("PLAYER", 0));
+        smallPlayer.setUserData(new BodyData("SLEEP_PLAYER", 0));
+        bigPlayer.setUserData(new BodyData("SLEEP_PLAYER", 0));
+
+        player = regularPlayer;
     }
 
 
@@ -421,6 +436,8 @@ public class IRModel {
         obstacle.setLinearVelocity(v, 0);
         // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
         obstacle.setUserData(new BodyData("OBSTACLE", tempTextureId));
+
+        passThrough(obstacle);
         
         return obstacle;
     }
@@ -526,6 +543,13 @@ public class IRModel {
     // Used to check what Body it is (mostly in contact listener)
     public String getBodyObjectType(Body bod){
         return ((BodyData) bod.getUserData()).bodyObjectType;
+    }
+
+    // Takes Body, bodyObjectType
+    // Sets bodyObjectType to BodyData (SLEEP_PLAYER, PLAYER)
+    // Used to manipulate which body to use
+    public void setBodyObjectType(Body bod, String bodObjType){
+        ((BodyData) bod.getUserData()).bodyObjectType = bodObjType;
     }
 
     // Takes Body

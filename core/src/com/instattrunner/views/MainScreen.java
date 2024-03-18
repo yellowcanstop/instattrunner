@@ -187,8 +187,6 @@ public class MainScreen implements Screen {
             model.isDead = false;
         }
 
-            System.out.printf("%b %b %b %b\n", model.buffActive[0], model.buffActive[1], model.buffActive[2], model.buffActive[3]);
-            System.out.printf("%b %b %b %b\n", model.debuffActive[0], model.debuffActive[1], model.debuffActive[2], model.debuffActive[3]);
     }
 
     @Override

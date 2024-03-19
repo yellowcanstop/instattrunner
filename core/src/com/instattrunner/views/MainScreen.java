@@ -26,7 +26,6 @@ import com.instattrunner.InstattRunner;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
 
-import java.util.Iterator;
 import java.util.Random;
 
 
@@ -74,7 +73,7 @@ public class MainScreen implements Screen {
         parent = instattRunner;
 
         IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
-        assMan = parent.assetMan;
+        assMan = new IRAssetManager();
 
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);

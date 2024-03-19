@@ -63,6 +63,9 @@ public class IRModel {
     // Declare width and height of floor for computation
     private Vector2 floorWidHei;
 
+    //Declare width and height of largest obstacle
+    private Vector2 stairsWidHei;
+
     // Scale of category of body
     private float playerScale;
     private float obstacleScale;
@@ -172,14 +175,17 @@ public class IRModel {
 
         // Load width and height of floor
         floorWidHei = assMan.floorWidHei;
+        //Load width and height of largest obstacle
+        stairsWidHei = assMan.obstacleWidHei[3];
+        
         
         // Load scale of body of different category
-        assMan.playerScale = 0.007f;
         playerScale = assMan.playerScale;
         obstacleScale = assMan.obstacleScale;
         buffScale = assMan.buffScale;
         debuffScale = assMan.debuffScale;
 
+        
         // Create floor and player of game 
         createFloor();
         createPlayer();
@@ -210,6 +216,8 @@ public class IRModel {
     }
 
 
+
+
     // todo ensure player cannot jump outside of view
     // logic method to run logic part of the model
     public void logicStep(float delta) {
@@ -232,7 +240,6 @@ public class IRModel {
            }
         }
 
-
         if (controller.space) {
             jumped = true;
             tweakJump(NORMAL);
@@ -245,7 +252,7 @@ public class IRModel {
 
         // for loop goes through all buff debuff category 
         // Check if they are expired, or both active
-        // If found expired or both active, turn them off as they cancel each other
+        // If found expired or both active(cancel each other), turn them off 
         for (int i = 0; i < 4; i++){
             // Would exists where in same category, exact expire and obtain new buff/debuff, new buff/debuff would be cancelled, let it slip as it would be very computationaly expensive to handle
             if (effectActive[i] && TimeUtils.timeSinceMillis(effectTime[i]) > 10000){
@@ -262,8 +269,8 @@ public class IRModel {
                 effectCancellation(i);
             }
         }
+
         // Move on to process active buff/debuff and enable their effects
-        
         // Change speed of obstacle logic 
         if (effectActive[SPEED]){
             if (buffActive[BUSINESS_MAN_1_AI]){
@@ -279,14 +286,16 @@ public class IRModel {
         // Change size of obstacle logic 
         if (effectActive[SIZE]){
             if (buffActive[NUTRITION_MAJOR])
-                setSize(0.0054f, player);
+                setSize(0.0054f);
             else if (debuffActive[CULINARY_MAJOR])
-                setSize(0.0082f, player);
+                setSize(0.0082f);
         }
 
         // Enable immunity of player
         if (effectActive[IMMUNE])
             immunity = true;
+
+
 
 
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
@@ -300,7 +309,7 @@ public class IRModel {
                 break;
 
             case SIZE:
-                setSize(0.007f, player);
+                setSize(assMan.REFplayerScale);
                 break;
 
             case JUMP:
@@ -321,7 +330,7 @@ public class IRModel {
             osbtacle.setLinearVelocity((float) velocity, 0);
     }
 
-    private void setSize(float scale, Body lastPlayer){
+    private void setSize(float scale){
         // Change playerScale that MainScreen uses to render texture of player
         assMan.playerScale = scale;
 
@@ -361,7 +370,10 @@ public class IRModel {
         setBodyObjectType(player, "PLAYER");
         player.setTransform(-14f, lastPlayerPosY, player.getAngle());
         player.setLinearVelocity(lastPlayerVelocity);
-     }
+    }
+
+
+
 
     private void passThrough(Body bod) {
         for (Fixture fix : bod.getFixtureList()) {
@@ -385,7 +397,6 @@ public class IRModel {
 
         shape.dispose();
     }
-
 
     private void createPlayer() {
         // Create new BodyDef for player Body
@@ -428,7 +439,6 @@ public class IRModel {
         player = regularPlayer;
     }
 
-
     private Body createObstacle(float v) {
         // Generate random int from 0 to size of arraylist unused - 1
         // To pick element from unused list
@@ -467,14 +477,12 @@ public class IRModel {
         return obstacle;
     }
 
-
-
     private Body createBuff() {
         int tempTextureId = random.nextInt(4);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 11.5));
+        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + (stairsWidHei.y*obstacleScale) + 8*random.nextFloat()));
 
         Body buff = world.createBody(bodyDef);
 
@@ -496,7 +504,7 @@ public class IRModel {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 11.5));
+        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + (stairsWidHei.y*obstacleScale) + 8*random.nextFloat()));
 
         Body debuff = world.createBody(bodyDef);
 
@@ -512,6 +520,9 @@ public class IRModel {
 
         return debuff;
     }
+
+
+
 
     public void spawnObstacles(float v) {
         obstacles.add(createObstacle(v));
@@ -557,6 +568,9 @@ public class IRModel {
         }
     }
 
+
+
+
     public void playSound(int sound) {
         switch(sound) {
             case JUMP_SOUND:
@@ -567,6 +581,9 @@ public class IRModel {
                 break;
         }
     }
+
+
+
 
     // Takes Body
     // Returns BodyObjectType (player, obstacle, buff, debuff)
@@ -588,6 +605,9 @@ public class IRModel {
     public int getTextureId(Body bod){
         return ((BodyData) bod.getUserData()).textureId;
     }
+
+
+
 
     public void removeCollidedObstacle(){
         collideObstacle.setTransform(-27f, collideObstacle.getPosition().y, collideObstacle.getAngle());

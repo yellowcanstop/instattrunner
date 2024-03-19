@@ -2,6 +2,7 @@ package com.instattrunner.views;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,16 +11,20 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.instattrunner.BodyData;
 import com.instattrunner.IRModel;
 import com.instattrunner.InstattRunner;
 import com.instattrunner.controller.KeyboardController;
+import com.instattrunner.loader.IRAssetManager;
 
 import java.util.Iterator;
 
@@ -32,37 +37,82 @@ public class MainScreen implements Screen {
     Box2DDebugRenderer debugRenderer;
     boolean debug = true; // tweak if want to debug
     KeyboardController controller;
+
+    // Declare Texture var for all Body in game
+    Texture floorTex;
     Texture playerTex;
     Texture bgTex;
-    Texture obTex;
-    Texture coffeeTex, beerTex;
-    Texture sportsMajorTex, bizMajorTex;
+    Array<Texture> obTexs = new Array<Texture>();
+    Array<Texture> buffTexs = new Array<Texture>();
+    Array<Texture> debuffTexs = new Array<Texture>();
+  
     SpriteBatch sb;
     BitmapFont font = new BitmapFont();
+
+    // Declare array to store width and height of different player, obstacle, buff and debuff
+    private Vector2 floorWidHei;
+    private Vector2 playerWidHei;
+    private Vector2[] obstacleWidHei;
+    private Vector2[] buffWidHei;
+    private Vector2[] debuffWidHei; 
+
+    // Scale of category of body
+    private final float obstacleScale;
+    private final float buffScale;
+    private final float debuffScale;
+
+    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
+    public long spawnInterval = 2000;
+
 
 
     public MainScreen(InstattRunner instattRunner) {
         parent = instattRunner;
+
+        IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
+        assMan = parent.assetMan;
+
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
-
-        parent.assetMan.queueAddImages();
-        parent.assetMan.manager.finishLoading();
-
-        playerTex = parent.assetMan.manager.get("images/droplet.png");
-        obTex = parent.assetMan.manager.get("images/bucket.png");
-        coffeeTex = parent.assetMan.manager.get("images/test_coffee.png");
-        beerTex = parent.assetMan.manager.get("images/test_beer.png");
-        bgTex = parent.assetMan.manager.get("images/bg.jpg");
-        sportsMajorTex = parent.assetMan.manager.get("images/test_sports.png");
-        bizMajorTex = parent.assetMan.manager.get("images/test_biz.png");
 
         sb = new SpriteBatch();
         sb.setProjectionMatrix(cam.combined);
 
         controller = new KeyboardController();
-        model = new IRModel(controller, cam, parent.assetMan);
+        model = new IRModel(controller, cam, assMan, this);
+    
+        assMan.queueAddImages();
+        assMan.manager.finishLoading();
 
+
+        // Load name of obstacle, buff, debuff image files from asset manager
+        String[] obstacleImages = assMan.obstacleImages;
+        String[] buffImages = assMan.buffImages;
+        String[] debuffImages = assMan.debuffImages;
+
+        // Gets images as Texture from asset manager (indivdual Texture for player and background)
+        // Load images as Texture into array of Texture (obstacle, buff, debuff as there are multiple options)
+        floorTex = assMan.manager.get(assMan.floorImage);
+        playerTex = assMan.manager.get(assMan.playerImage);
+        bgTex = assMan.manager.get("images/bg.jpg");
+        for (String obstacleImage : obstacleImages)
+            obTexs.add(assMan.manager.get(obstacleImage));
+        for (String buffImage : buffImages)
+            buffTexs.add(assMan.manager.get(buffImage));
+        for (String debuffImage : debuffImages)
+            debuffTexs.add(assMan.manager.get(debuffImage));
+
+        // Load width and heigth of player, obstacle, buff and debuff
+        floorWidHei = assMan.floorWidHei;
+        playerWidHei = assMan.playerWidHei;
+        obstacleWidHei = assMan.obstacleWidHei;
+        buffWidHei = assMan.buffWidHei;
+        debuffWidHei = assMan.debuffWidHei;
+
+        // Load scale of category of Body
+        obstacleScale = assMan.obstacleScale;
+        buffScale = assMan.buffScale;
+        debuffScale = assMan.debuffScale;
     }
 
 
@@ -71,20 +121,6 @@ public class MainScreen implements Screen {
         Gdx.input.setInputProcessor(controller);
     }
 
-    // todo: buggy rendering when switch between fast, regular, slow
-    private void renderObstacles() {
-        if(TimeUtils.millis() - model.lastTime > 2000) {
-            if (model.speedUp && !model.slowDown) {
-                model.spawnObstacles(model.fast);
-            }
-            else if (model.slowDown && !model.speedUp) {
-                model.spawnObstacles(model.slow);
-            }
-            else {
-                model.spawnObstacles(model.regular);
-            }
-        }
-    }
 
     @Override
     public void render(float delta) {
@@ -100,98 +136,57 @@ public class MainScreen implements Screen {
 
         /* START DRAWING */
         sb.begin();
-        /*
-        // player only 2 units wide so set width and height at 2
-        // sb draws images from the corner vs box2d bodies positioned centre
-        // have to position texture 1/2 the width to left and 1/2 the height down
-        // todo: need to store the player class in the body's userdata?
-        // which will contain the size, and use hat to get correct offset needed (not just -1)
+ 
+        // Draw all objects
+        // Draw player 
+        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * parent.assetMan.playerScale, playerWidHei.y * parent.assetMan.playerScale);
+        // Draw floor
+        sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
+        // Draw all obstacles, buffs, debuffs
+        loopDraw(model.obstacles, obTexs, obstacleWidHei, obstacleScale);
+        loopDraw(model.buffs, buffTexs, buffWidHei, buffScale);
+        loopDraw(model.debuffs, debuffTexs, debuffWidHei, debuffScale);
 
-         */
 
-        sb.draw(playerTex, model.player.getPosition().x-2, model.player.getPosition().y-1, 3, 3);
-
-        // Draw image onto body
-        for (Iterator<Body> iter = model.obstacles.iterator(); iter.hasNext(); ) {
-            Body obstacle = iter.next();
-            sb.draw(obTex, obstacle.getPosition().x-2, obstacle.getPosition().y-1, 3, 3);
-        }
-
-        for (Iterator<Body> iter = model.coffeeArray.iterator(); iter.hasNext(); ) {
-            Body buff = iter.next();
-            sb.draw(coffeeTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
-        }
-
-        for (Iterator<Body> iter = model.beerArray.iterator(); iter.hasNext(); ) {
-            Body debuff = iter.next();
-            sb.draw(beerTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
-        }
-
-        for (Iterator<Body> iter = model.sportsArray.iterator(); iter.hasNext(); ) {
-            Body buff = iter.next();
-            sb.draw(sportsMajorTex, buff.getPosition().x-2, buff.getPosition().y-1, 3, 3);
-        }
-
-        for (Iterator<Body> iter = model.bizArray.iterator(); iter.hasNext(); ) {
-            Body debuff = iter.next();
-            sb.draw(bizMajorTex, debuff.getPosition().x-2, debuff.getPosition().y-1, 3, 3);
-        }
-
-        // Score counter needs to look better. potential status bar
         font.getData().setScale(0.05f);
         font.draw(sb, "Score: " + model.score, 12, 10);
 
-        // Obstacles
-        renderObstacles();
-        model.trackObstacles(); // track score
 
-        // testing randomizing buffs and debuffs spawning
-        int choice = MathUtils.random(3);
-        switch(choice) {
-            case 0:
-                if (TimeUtils.millis() - model.buffTime > 2000) model.spawnCoffee();
-                break;
-            case 1:
-                if(TimeUtils.millis() - model.buffTime > 2000) model.spawnBeer();
-                break;
-            case 2:
-                if(TimeUtils.millis() - model.buffTime > 2000) model.spawnSports();
-                break;
-            case 3:
-                if(TimeUtils.millis() - model.buffTime > 2000) model.spawnBiz();
-                break;
-        }
+        // have to change as this is not how its supposed to work 
+        // Spawn obstacle based on speed var determiner 
+        if(TimeUtils.millis() - model.obstacleTime > spawnInterval) 
+            model.spawnObstacles(model.regular);
+   
+        model.trackObstacles();
 
-        // deactivate debuff effect for beer
-        if (model.beerActive && TimeUtils.timeSinceMillis(model.beerTime) > 10000) {
-            model.jumpLow = false;
-            model.beerActive = false;
-        }
-        // deactivate buff effect for coffee
-        if (model.coffeeActive && TimeUtils.timeSinceMillis(model.coffeeTime) > 10000) {
-            model.jumpHigh = false;
-            model.coffeeActive = false;
-        }
-        // deactivate debuff effect for sports major
-        if (model.sportsActive && TimeUtils.timeSinceMillis(model.sportsTime) > 10000) {
-            model.speedUp = false;
-            model.sportsActive = false;
-        }
-        // deactivate buff effect for biz major
-        if (model.bizActive && TimeUtils.timeSinceMillis(model.bizTime) > 10000) {
-            model.slowDown = false;
-            model.bizActive = false;
-        }
+        // Randomly choose to spawn buff or debuff every 2 seconds 
+        // Type of buff/debuff will be randomly choosen by .create method in IRModel
+        int choice = MathUtils.random(0, 1); // 0 or 1
 
+        if (TimeUtils.timeSinceMillis(model.buffTime) > spawnInterval){
+            if (choice == 0) 
+                model.spawnBuffs();
+            else if (choice == 1)
+                model.spawnDebuffs();
+        }
+        model.trackBuffsDebuffs();
 
         sb.end();
-        /* END DRAWING */
 
         if (model.isDead) {
-            parent.finalScore = model.score;
-            parent.changeScreen(InstattRunner.END);
+            if (model.immunity){
+                model.removeCollidedObstacle();
+                model.resetImmune();
+            }
+
+            else {
+                parent.finalScore = model.score;
+                parent.changeScreen(InstattRunner.END);
+            }
+
             model.isDead = false;
         }
+
     }
 
     @Override
@@ -218,7 +213,26 @@ public class MainScreen implements Screen {
     public void dispose() {
         playerTex.dispose();
         bgTex.dispose();
-        obTex.dispose();
+        for (Texture obTex : obTexs)
+            obTex.dispose();
+        for (Texture buffTex : buffTexs)
+            buffTex.dispose();
+        for (Texture debuffTex : debuffTexs)
+            debuffTex.dispose();
         sb.dispose();
     }
+
+    // Just trying to reduce repeated code
+    private void loopDraw(Array<Body> bodys, Array<Texture> bodyTexs, Vector2[] bodyWidHei, float bodyScale) {
+        int tempTextureId;
+        Vector2 tempWidHei;
+
+        for (Body body : bodys) {
+            // .getTextureId return texture id of particular model and use it as index on the texture array 
+            // .getPosition returns bottom left coord as these are complex polygon (only floor .getPosition return center)
+            tempTextureId = model.getTextureId(body);
+            tempWidHei = bodyWidHei[tempTextureId];
+            sb.draw(bodyTexs.get(tempTextureId), body.getPosition().x, body.getPosition().y, tempWidHei.x* bodyScale, tempWidHei.y * bodyScale);
+        }
+   }
 }

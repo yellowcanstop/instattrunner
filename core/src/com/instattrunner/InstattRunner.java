@@ -24,7 +24,7 @@ public class InstattRunner extends Game {
 	public int finalScore = 0; // set value when player dies
 
 	public final static int VIEW_WIDTH = 800;
-	public final static int VIEW_HEIGHT = 480;
+	public final static int VIEW_HEIGHT = 600;
 
 
 	public final static int MENU = 0;
@@ -63,8 +63,7 @@ public class InstattRunner extends Game {
 		setScreen(menuScreen);
 
 
-		//testing
-		// load music 
+		// Load and play music 
 		assetMan.queueAddMusic();
 		assetMan.manager.finishLoading();
 		bgMusic = assetMan.manager.get("music/rain.mp3");

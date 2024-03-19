@@ -1,13 +1,23 @@
 package com.instattrunner;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.instattrunner.loader.IRAssetManager;
 
 // contact listener to react to collisions in world
 // everytime two bodies collide, beginContact is run
 public class IRContactListener implements ContactListener {
     private IRModel parent;
+
+    // For output to terminal for debugging
+    public final String[] buffTypes = {"Business man 1 (AI)", "Nutrition major", "Coffee", "Dean"};
+    public final String[] debuffTypes = {"Sports science major", "Culinary major", "Beer"};
+
+
+    // Just to temporary hold id of buff/debuff
+    private int tempTextureId;
+
+    // Constructor
     public IRContactListener(IRModel parent) {
         this.parent = parent;
     }
@@ -17,107 +27,59 @@ public class IRContactListener implements ContactListener {
     public void beginContact(Contact contact) {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
-        // check collision with obstacle
-        if ((fa.getBody().getUserData() == "OBSTACLE" && fb.getBody().getUserData() == "PLAYER") || (fb.getBody().getUserData() == "OBSTACLE" && fa.getBody().getUserData() == "PLAYER")) {
+
+        // Check player collide with obstacle
+        if ((parent.getBodyObjectType(fa.getBody()) == "OBSTACLE" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "OBSTACLE" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.println("Player hit obstacle");
+            if (parent.getBodyObjectType(fa.getBody()) == "OBSTACLE")
+                parent.collideObstacle = fa.getBody();
+            else 
+                parent.collideObstacle = fb.getBody();
+
             parent.isDead = true; // triggers change to end screen from render() in main
             return;
         }
 
-
-        if (fa.getBody().getUserData() == "FLOOR" && fb.getBody().getUserData() == "PLAYER" || fb.getBody().getUserData() == "FLOOR" && fa.getBody().getUserData() == "PLAYER") {
+        // Check player collide with ground to determine whether player on ground or not 
+        if ((parent.getBodyObjectType(fa.getBody()) == "FLOOR" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "FLOOR" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.printf("Player is on ground at %f\n", fa.getBody().getPosition().y);
             parent.resetJump();
+            return;
+        }
+
+        // Check player collide with buff and produce relevant effect 
+        if (parent.getBodyObjectType(fa.getBody()) == "BUFF" || parent.getBodyObjectType(fb.getBody()) == "BUFF") {
+            // Get TextureId of buff
+            if (parent.getBodyObjectType(fa.getBody()) == "BUFF")
+                tempTextureId = parent.getTextureId(fa.getBody());
+            else    
+                tempTextureId = parent.getTextureId(fb.getBody());
             
+            System.out.printf("Buff : %s\n", buffTypes[tempTextureId]);
+            parent.playSound(IRModel.COLLECT_SOUND);
+            parent.effectTime[tempTextureId] = TimeUtils.millis();
+            parent.effectActive[tempTextureId] = true;
+            parent.buffActive[tempTextureId] = true;
+
             return;
         }
 
+        // Check player collide with debuff and produce relevant effect 
+        if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF" || parent.getBodyObjectType(fb.getBody()) == "DEBUFF") {
+            // Get TextureId of buff
+            if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF")
+                tempTextureId = parent.getTextureId(fa.getBody());
+            else    
+                tempTextureId = parent.getTextureId(fb.getBody());
 
-        // check collision with coffee
-        if (fa.getBody().getUserData() == "COFFEE" || fb.getBody().getUserData() == "COFFEE") {
-            this.triggerCoffee();
+            System.out.printf("Debuff : %s\n", debuffTypes[tempTextureId]);
+            parent.playSound(IRModel.COLLECT_SOUND);
+            parent.effectTime[tempTextureId] = TimeUtils.millis();
+            parent.effectActive[tempTextureId] = true;
+            parent.debuffActive[tempTextureId] = true;
+
             return;
         }
-        // check collision with beer
-        if (fa.getBody().getUserData() == "BEER" || fb.getBody().getUserData() == "BEER") {
-            this.triggerBeer();
-            return;
-        }
-        /*
-        // check collision with fattening
-        if (fa.getBody().getUserData() == "FAT" || fb.getBody().getUserData() == "FAT") {
-            this.triggerFat();
-            return;
-        }
-
-         */
-        // check collision with sports major
-        if (fa.getBody().getUserData() == "SPORTS" || fb.getBody().getUserData() == "SPORTS") {
-            this.triggerSports();
-            return;
-        }
-        // check collision with biz major
-        if (fa.getBody().getUserData() == "BIZ" || fb.getBody().getUserData() == "BIZ") {
-            this.triggerBiz();
-            return;
-        }
-    }
-
-    // sports major increases speed of gameplay for 10 seconds
-    private void triggerSports() {
-        System.out.println("Speed up obstacles");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.speedUp = true;
-        parent.sportsActive = true;
-        parent.sportsTime = TimeUtils.millis();
-    }
-
-    // biz major decreases speed of gameplay for 10 seconds
-    private void triggerBiz() {
-        System.out.println("Slow down obstacles");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.slowDown = true;
-        parent.bizActive = true;
-        parent.bizTime = TimeUtils.millis();
-    }
-
-    /*
-    // trigger heaviness
-    private void triggerFat() {
-        System.out.println("Fattened");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        long fatTime = TimeUtils.millis();
-        effectFat(10f);
-        if(TimeUtils.millis() - fatTime > 2000) {
-            effectFat(5f);
-        }
-    }
-
-    private void effectFat(float density) {
-        for (Fixture fix : parent.player.getFixtureList()) {
-            fix.setDensity(density);
-            parent.player.resetMassData();
-        }
-    }
-
-     */
-
-    // activate buff effect (deactivated in MainScreen after x seconds)
-    private void triggerCoffee() {
-        System.out.println("Coffee collected");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.jumpHigh = true;
-        parent.coffeeActive = true;
-        parent.coffeeTime = TimeUtils.millis();
-    }
-
-    // activate debuff effect (deactivated in MainScreen after x seconds)
-    public void triggerBeer() {
-        System.out.println("Beer collected");
-        parent.playSound(IRModel.COLLECT_SOUND);
-        parent.jumpLow = true;
-        parent.beerActive = true;
-        parent.beerTime = TimeUtils.millis();
     }
 
     @Override

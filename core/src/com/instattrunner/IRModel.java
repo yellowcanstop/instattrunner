@@ -21,6 +21,7 @@ import com.instattrunner.BodyData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Random;
 
 // Controls all logic in game
 public class IRModel {
@@ -57,6 +58,9 @@ public class IRModel {
 
     // Declare width and height of floor for computation
     private Vector2 floorWidHei;
+
+    //Declare width and height of largest obstacle
+    private Vector2 stairsWidHei;
 
     // Scale of category of body
     private float playerScale;
@@ -171,6 +175,10 @@ public class IRModel {
 
         // Load width and height of floor
         floorWidHei = assMan.floorWidHei;
+
+        //Load width and height of largest obstacle
+        stairsWidHei = assMan.obstacleWidHei[3];
+        
         
         // Load scale of body of different category
         assMan.playerScale = 0.007f;
@@ -178,6 +186,8 @@ public class IRModel {
         obstacleScale = assMan.obstacleScale;
         buffScale = assMan.buffScale;
         debuffScale = assMan.debuffScale;
+
+        
 
         // Create floor and player of game 
         createFloor();
@@ -465,12 +475,16 @@ public class IRModel {
         return obstacle;
     }
 
+
+
     private Body createBuff() {
         int tempTextureId = MathUtils.random(0, 3);
+        
+        Random rand = new Random();
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 11.5));
+        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + (stairsWidHei.y*obstacleScale) + 8*rand.nextFloat()));
 
         Body buff = world.createBody(bodyDef);
 
@@ -490,9 +504,11 @@ public class IRModel {
     private Body createDebuff() {
         int tempTextureId = MathUtils.random(0, 2);
 
+        Random rand = new Random();
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 11.5));
+        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + (stairsWidHei.y*obstacleScale) + 8*rand.nextFloat()));
 
         Body debuff = world.createBody(bodyDef);
 

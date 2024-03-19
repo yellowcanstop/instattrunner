@@ -21,6 +21,7 @@ import com.instattrunner.BodyData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Random;
 
 // Controls all logic in game
 public class IRModel {
@@ -29,6 +30,10 @@ public class IRModel {
     private KeyboardController controller;
     private MainScreen main;
     private IRAssetManager assMan;
+
+    // Random generator
+    // To be moved around later 
+    Random random = new Random(TimeUtils.millis());
 
     // Bodies (yes bodies, just not human bodies, although we have a player BODY)
     public Body player;
@@ -114,9 +119,6 @@ public class IRModel {
     // xTime to store time when collided 
     // xActive to determine whether buff/debuff is still active (becomes false after currentTime - xTime > x)
 
-    // tweak height of jump
-    /* Coffee: jump higher; Beer: jump lower; Otherwise: normal */
-
     public long[] effectTime = new long[4];            // effect(buff and debuff of same category) start time
     public boolean[] effectActive = new boolean[4];    // effect(buff and debuff of same category) active or not 
     public boolean[] buffActive = new boolean[4];      // whether buff is active or not 
@@ -132,7 +134,6 @@ public class IRModel {
     public float regular = -20f;
     public float fast = -40f;
     public float slow = -5f;
-
 
 
 
@@ -267,11 +268,11 @@ public class IRModel {
         if (effectActive[SPEED]){
             if (buffActive[BUSINESS_MAN_1_AI]){
                 setSpeed(-14);
-                main.spawnInterval = 3500;
+                main.minSpawnInterval = 1600;
             }
             else if (debuffActive[SPORTS_SCIENCE_MAJOR]){
                 setSpeed(-30);
-                main.spawnInterval = 1500;
+                main.minSpawnInterval = 850;
             }
         }
 
@@ -295,7 +296,7 @@ public class IRModel {
         switch (effectType) {
             case SPEED:
                 setSpeed(-20);
-                main.spawnInterval = 2000;
+                main.minSpawnInterval = 1000;
                 break;
 
             case SIZE:
@@ -437,7 +438,8 @@ public class IRModel {
             obstacleSpawnUnused = obstacleSpawnUsed;
             obstacleSpawnUsed = temp;
         }
-        int tempTextureId = obstacleSpawnUnused.remove(MathUtils.random(0, obstacleSpawnUnused.size() - 1));
+        int tempTextureId = obstacleSpawnUnused.remove(random.nextInt(obstacleSpawnUnused.size()));
+        // int tempTextureId = obstacleSpawnUnused.remove(MathUtils.random(0, obstacleSpawnUnused.size() - 1));
         obstacleSpawnUsed.add(tempTextureId);
 
         // Create new BodyDef 
@@ -465,8 +467,10 @@ public class IRModel {
         return obstacle;
     }
 
+
+
     private Body createBuff() {
-        int tempTextureId = MathUtils.random(0, 3);
+        int tempTextureId = random.nextInt(4);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
@@ -488,7 +492,7 @@ public class IRModel {
     }
 
     private Body createDebuff() {
-        int tempTextureId = MathUtils.random(0, 2);
+        int tempTextureId = random.nextInt(3);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
@@ -512,6 +516,7 @@ public class IRModel {
     public void spawnObstacles(float v) {
         obstacles.add(createObstacle(v));
         obstacleTime = TimeUtils.millis();
+        main.obstacleSpawnInterval = main.minSpawnInterval + (300 * random.nextInt(6));
     }
 
     public void trackObstacles() {
@@ -528,11 +533,13 @@ public class IRModel {
     public void spawnBuffs() {
         buffs.add(createBuff());
         buffTime = TimeUtils.millis();
+        main.buffSpawnInterval = (long)(main.minSpawnInterval * 1.5) + (300 * random.nextInt(6));
     }
 
     public void spawnDebuffs() {
         debuffs.add(createDebuff());
         buffTime = TimeUtils.millis();
+        main.buffSpawnInterval = (long)(main.minSpawnInterval * 1.5) + (300 * random.nextInt(6));
     }
 
     // Check if buff/debuff is out of screen

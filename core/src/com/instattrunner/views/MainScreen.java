@@ -27,6 +27,7 @@ import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
 
 import java.util.Iterator;
+import java.util.Random;
 
 
 // Screen which shows the game play
@@ -62,7 +63,10 @@ public class MainScreen implements Screen {
     private final float debuffScale;
 
     // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
-    public long spawnInterval = 2000;
+    public long minSpawnInterval = 1000;
+    public long obstacleSpawnInterval = minSpawnInterval;
+    public long buffSpawnInterval = minSpawnInterval;
+    Random random = new Random(TimeUtils.millis());
 
 
 
@@ -154,16 +158,14 @@ public class MainScreen implements Screen {
 
         // have to change as this is not how its supposed to work 
         // Spawn obstacle based on speed var determiner 
-        if(TimeUtils.millis() - model.obstacleTime > spawnInterval) 
+        if(TimeUtils.millis() - model.obstacleTime > obstacleSpawnInterval) 
             model.spawnObstacles(model.regular);
-   
         model.trackObstacles();
 
         // Randomly choose to spawn buff or debuff every 2 seconds 
         // Type of buff/debuff will be randomly choosen by .create method in IRModel
-        int choice = MathUtils.random(0, 1); // 0 or 1
-
-        if (TimeUtils.timeSinceMillis(model.buffTime) > spawnInterval){
+        int choice = random.nextInt(2);
+        if (TimeUtils.timeSinceMillis(model.buffTime) > buffSpawnInterval){
             if (choice == 0) 
                 model.spawnBuffs();
             else if (choice == 1)

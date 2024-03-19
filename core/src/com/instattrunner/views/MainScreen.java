@@ -37,6 +37,7 @@ public class MainScreen implements Screen {
     Box2DDebugRenderer debugRenderer;
     boolean debug = true; // tweak if want to debug
     KeyboardController controller;
+    IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
 
     // Declare Texture var for all Body in game
     Texture floorTex;
@@ -72,7 +73,6 @@ public class MainScreen implements Screen {
     public MainScreen(InstattRunner instattRunner) {
         parent = instattRunner;
 
-        IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
         assMan = new IRAssetManager();
 
         cam = new OrthographicCamera(32, 24);
@@ -142,7 +142,7 @@ public class MainScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * parent.assetMan.playerScale, playerWidHei.y * parent.assetMan.playerScale);
+        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * assMan.playerScale, playerWidHei.y * assMan.playerScale);
         // Draw floor
         sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs

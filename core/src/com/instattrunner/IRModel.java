@@ -94,6 +94,7 @@ public class IRModel {
     public boolean isDead = false;
     public boolean immunity = false;
     public int score = 0;
+    public int velocityIncrement = 0;
 
 
     // Enum for obstacle, buff, debuff
@@ -276,11 +277,11 @@ public class IRModel {
         // Change speed of obstacle logic 
         if (effectActive[SPEED]){
             if (buffActive[BUSINESS_MAN_1_AI]){
-                setSpeed(-14);
+                setSpeed(velocityIncrement + (-14));
                 main.minSpawnInterval = 1600;
             }
             else if (debuffActive[SPORTS_SCIENCE_MAJOR]){
-                setSpeed(-30);
+                setSpeed(velocityIncrement + (-30));
                 main.minSpawnInterval = 850;
             }
         }
@@ -298,6 +299,9 @@ public class IRModel {
             immunity = true;
 
 
+        velocityIncrement = (int)(score / 10) * 3;
+
+
 
 
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
@@ -306,7 +310,7 @@ public class IRModel {
     private void effectCancellation(int effectType){
         switch (effectType) {
             case SPEED:
-                setSpeed(-20);
+                setSpeed(velocityIncrement + (-20));
                 main.minSpawnInterval = 1000;
                 break;
 

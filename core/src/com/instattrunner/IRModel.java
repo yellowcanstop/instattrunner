@@ -128,9 +128,10 @@ public class IRModel {
     public boolean[] debuffActive = new boolean[4];    // whether debuff is active or not (last one is a place holder to counter Dean buff)
 
     // enum for jump
-    public static int NORMAL = 115;
-    public static int HIGH = 135;
-    public static int LOW = 73;
+    public int NORMAL = 115;
+    public int HIGH = 135;
+    public int LOW = 73;
+
 
     // tweak speed of obstacles
     /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
@@ -145,6 +146,7 @@ public class IRModel {
     // world to keep all physical objects in the game
     public IRModel(KeyboardController cont, OrthographicCamera cam, IRAssetManager assetMan, MainScreen mainScreen) {
         System.out.println("New Model Created.");
+
         controller = cont;
         camera = cam;
         main = mainScreen;

@@ -41,7 +41,10 @@ public class InstattRunner extends Game {
 				this.setScreen(menuScreen);
 				break;
 			case PLAY:
-				if (mainScreen == null) mainScreen = new MainScreen(this);
+				if (mainScreen == null) {
+                    mainScreen = new MainScreen(this);
+                    System.out.println("new main");
+                }
 				this.setScreen(mainScreen);
 				break;
 			case HELP:

@@ -51,6 +51,7 @@ public class MenuScreen implements Screen {
         Label titleLabel = new Label("Instatt Runner", skin);
         TextButton play = new TextButton("Start Game", skin);
         TextButton help = new TextButton("How to Play", skin);
+        TextButton highscore = new TextButton("Highscore", skin);
         TextButton exit = new TextButton("Quit", skin);
 
 
@@ -61,6 +62,8 @@ public class MenuScreen implements Screen {
         table.row().pad(10, 0, 10, 0);
         table.add(help).fillX().uniformX();
         table.row().pad(10, 0, 10, 0);
+        table.add(highscore).fillX().uniformX();
+        table.row().pad(10, 0, 10, 0);
         table.add(exit).fillX().uniformX();
 
         // Action for exit button
@@ -68,6 +71,14 @@ public class MenuScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.exit();
+            }
+        });
+
+        // Action for help button
+        highscore.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.changeScreen(InstattRunner.HIGHSCORE);
             }
         });
 

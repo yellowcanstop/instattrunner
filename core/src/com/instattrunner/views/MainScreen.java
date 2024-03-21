@@ -3,6 +3,7 @@ package com.instattrunner.views;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -26,7 +27,7 @@ import com.instattrunner.InstattRunner;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
 
-import java.util.Random;
+import java.util.Iterator;
 
 
 // Screen which shows the game play
@@ -37,7 +38,6 @@ public class MainScreen implements Screen {
     Box2DDebugRenderer debugRenderer;
     boolean debug = true; // tweak if want to debug
     KeyboardController controller;
-    IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
 
     // Declare Texture var for all Body in game
     Texture floorTex;
@@ -63,17 +63,34 @@ public class MainScreen implements Screen {
     private final float debuffScale;
 
     // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
-    public long minSpawnInterval = 1000;
-    public long obstacleSpawnInterval = minSpawnInterval;
-    public long buffSpawnInterval = minSpawnInterval;
-    Random random = new Random(TimeUtils.millis());
+    public long spawnInterval = 2000;
+    int highScore;
+    public int loadTextFile(){
+        // Load the file using a FileHandle
+        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
+
+        // Read the contents of the file into a String
+        String highScoreString = fileHandle.readString();
+
+        int score=0;
+        // Parse the String to an integer
+        try {
+            score = Integer.parseInt(highScoreString.trim());
+        } catch (NumberFormatException e) {
+            // Handle parsing error (e.g., file contents are not a valid integer)
+            e.printStackTrace();
+        }
+
+        return score;
+    }
 
 
 
     public MainScreen(InstattRunner instattRunner) {
         parent = instattRunner;
 
-        assMan = new IRAssetManager();
+        IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
+        assMan = parent.assetMan;
 
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
@@ -142,7 +159,7 @@ public class MainScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * assMan.playerScale, playerWidHei.y * assMan.playerScale);
+        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * parent.assetMan.playerScale, playerWidHei.y * parent.assetMan.playerScale);
         // Draw floor
         sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs
@@ -151,20 +168,38 @@ public class MainScreen implements Screen {
         loopDraw(model.debuffs, debuffTexs, debuffWidHei, debuffScale);
 
 
-        font.getData().setScale(0.05f);
-        font.draw(sb, "Score: " + model.score, 12, 10);
+// Set the font size for the "Score" text
+        font.getData().setScale(0.12f);
+// Draw the "Score" text
+        font.draw(sb, "Score: " + model.score, 4, 11);
+
+// Set the font size for the "HighScore" text
+        font.getData().setScale(0.1f);
+// Estimate the average width of characters in the font
+        float averageCharWidth = font.getCapHeight() * 0.4f; // Adjust as needed
+// Estimate the width of the "HighScore" text based on the number of characters
+        float highScoreTextWidth = ("HighScore: " + highScore).length() * averageCharWidth; // Adjust as needed
+// Calculate the x-coordinate for the "HighScore" text to prevent overlapping
+        float highScoreX = -1 + highScoreTextWidth; // Adjust as needed
+// Calculate the y-coordinate for the "HighScore" text
+        float highScoreY = 8 + font.getLineHeight(); // Adjust as needed
+// Draw the "HighScore" text
+        font.draw(sb, "HighScore" + highScore, highScoreX,highScoreY);
 
 
-        // have to change as this is not how its supposed to work 
-        // Spawn obstacle based on speed var determiner 
-        if(TimeUtils.millis() - model.obstacleTime > obstacleSpawnInterval) 
+
+        // have to change as this is not how its supposed to work
+        // Spawn obstacle based on speed var determiner
+        if(TimeUtils.millis() - model.obstacleTime > spawnInterval) 
             model.spawnObstacles(model.regular);
+   
         model.trackObstacles();
 
         // Randomly choose to spawn buff or debuff every 2 seconds 
         // Type of buff/debuff will be randomly choosen by .create method in IRModel
-        int choice = random.nextInt(2);
-        if (TimeUtils.timeSinceMillis(model.buffTime) > buffSpawnInterval){
+        int choice = MathUtils.random(0, 1); // 0 or 1
+
+        if (TimeUtils.timeSinceMillis(model.buffTime) > spawnInterval){
             if (choice == 0) 
                 model.spawnBuffs();
             else if (choice == 1)
@@ -173,6 +208,7 @@ public class MainScreen implements Screen {
         model.trackBuffsDebuffs();
 
         sb.end();
+        highScore = loadTextFile();
 
         if (model.isDead) {
             if (model.immunity){
@@ -181,6 +217,13 @@ public class MainScreen implements Screen {
             }
 
             else {
+                if (highScore < model.score) {
+                    highScore = model.score;
+                    System.out.println("new high score obtain");
+                    System.out.println(highScore);
+//                highscore = highScore.loadTextFile();
+                    updateHighScore(highScore);
+                }
                 parent.finalScore = model.score;
                 parent.changeScreen(InstattRunner.END);
             }
@@ -188,6 +231,14 @@ public class MainScreen implements Screen {
             model.isDead = false;
         }
 
+    }
+
+    private void updateHighScore(int newHighScore) {
+        FileHandle fileHandle = Gdx.files.local("score/HighScore.txt");
+        String stringHighScore = Integer.toString(newHighScore);
+        fileHandle.writeString(stringHighScore, false);
+
+        System.out.println("highscoreadded");
     }
 
     @Override

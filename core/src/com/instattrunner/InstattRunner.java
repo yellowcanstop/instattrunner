@@ -35,6 +35,20 @@ public class InstattRunner extends Game {
 	public final static int HIGHSCORE =4;
 	public final static int END = 3;
 
+	// Set default screen when application opens
+	@Override
+	public void create() {
+		menuScreen = new MenuScreen(this);
+		setScreen(menuScreen);
+
+
+		// Load and play music
+		assetMan.queueAddMusic();
+		assetMan.manager.finishLoading();
+		bgMusic = assetMan.manager.get("music/rain.mp3");
+		bgMusic.play();
+
+	}
 
 	// Method to swap between screens
 	public void changeScreen(int screen) {
@@ -45,6 +59,7 @@ public class InstattRunner extends Game {
 				break;
 			case PLAY:
 				if (mainScreen == null) mainScreen = new MainScreen(this);
+				bgMusic.stop();
 				this.setScreen(mainScreen);
 				break;
 			case HELP:
@@ -60,23 +75,11 @@ public class InstattRunner extends Game {
 				if (endScreen == null) endScreen = new EndScreen(this);
 				mainScreen = null;
 				this.setScreen(endScreen);
+				bgMusic.play();
 				break;
 		}
 	}
 
-	// Set default screen when application opens
-	@Override
-	public void create() {
-		menuScreen = new MenuScreen(this);
-		setScreen(menuScreen);
-
-
-		// Load and play music 
-		assetMan.queueAddMusic();
-		assetMan.manager.finishLoading();
-		bgMusic = assetMan.manager.get("music/rain.mp3");
-		bgMusic.play();
-	}
 
 	@Override
 	public void dispose() {

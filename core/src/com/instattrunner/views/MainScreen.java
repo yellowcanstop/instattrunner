@@ -27,7 +27,7 @@ import com.instattrunner.InstattRunner;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
 
-import java.util.Iterator;
+import java.util.Random;
 
 
 // Screen which shows the game play
@@ -38,6 +38,7 @@ public class MainScreen implements Screen {
     Box2DDebugRenderer debugRenderer;
     boolean debug = true; // tweak if want to debug
     KeyboardController controller;
+    IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
 
     // Declare Texture var for all Body in game
     Texture floorTex;
@@ -63,7 +64,11 @@ public class MainScreen implements Screen {
     private final float debuffScale;
 
     // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
-    public long spawnInterval = 2000;
+    public long minSpawnInterval = 1000;
+    public long obstacleSpawnInterval = minSpawnInterval;
+    public long buffSpawnInterval = minSpawnInterval;
+    Random random = new Random(TimeUtils.millis());
+
     int highScore;
     public int loadTextFile(){
         // Load the file using a FileHandle
@@ -89,8 +94,8 @@ public class MainScreen implements Screen {
     public MainScreen(InstattRunner instattRunner) {
         parent = instattRunner;
 
-        IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
-        assMan = parent.assetMan;
+        // For now oonly
+        assMan = new IRAssetManager();
 
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
@@ -159,7 +164,7 @@ public class MainScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * parent.assetMan.playerScale, playerWidHei.y * parent.assetMan.playerScale);
+        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * assMan.playerScale, playerWidHei.y * assMan.playerScale);
         // Draw floor
         sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs
@@ -188,18 +193,16 @@ public class MainScreen implements Screen {
 
 
 
-        // have to change as this is not how its supposed to work
-        // Spawn obstacle based on speed var determiner
-        if(TimeUtils.millis() - model.obstacleTime > spawnInterval) 
+        // Spawn obstacle based on speed var determiner 
+        if(TimeUtils.millis() - model.obstacleTime > obstacleSpawnInterval) 
             model.spawnObstacles(model.regular);
    
         model.trackObstacles();
 
         // Randomly choose to spawn buff or debuff every 2 seconds 
         // Type of buff/debuff will be randomly choosen by .create method in IRModel
-        int choice = MathUtils.random(0, 1); // 0 or 1
-
-        if (TimeUtils.timeSinceMillis(model.buffTime) > spawnInterval){
+        int choice = random.nextInt(2);
+        if (TimeUtils.timeSinceMillis(model.buffTime) > buffSpawnInterval){
             if (choice == 0) 
                 model.spawnBuffs();
             else if (choice == 1)

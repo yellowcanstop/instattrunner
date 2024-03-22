@@ -2,6 +2,7 @@ package com.instattrunner.views;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -27,6 +28,26 @@ public class EndScreen implements Screen {
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
     }
 
+    int highScore;
+    public int loadTextFile(){
+        // Load the file using a FileHandle
+        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
+
+        // Read the contents of the file into a String
+        String highScoreString = fileHandle.readString();
+
+        int score=0;
+        // Parse the String to an integer
+        try {
+            score = Integer.parseInt(highScoreString.trim());
+        } catch (NumberFormatException e) {
+            // Handle parsing error (e.g., file contents are not a valid integer)
+            e.printStackTrace();
+        }
+
+        return score;
+    }
+
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
@@ -38,11 +59,12 @@ public class EndScreen implements Screen {
         table.setFillParent(true);
         table.setDebug(true);
 
-
         // Create button and label
+        highScore = loadTextFile();
         skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
         Label l1 = new Label("Oh no you didn't make it in time!\nInstatt is locked again.", skin);
         Label l2 = new Label("lol i guess you managed to score " + parent.finalScore + " tho...", skin);
+        Label l3 = new Label("Your high score is " + highScore,skin);
 
         // Go back to menu
         TextButton menu = new TextButton("Back to Menu", skin);
@@ -57,6 +79,8 @@ public class EndScreen implements Screen {
         table.row().pad(10, 0, 10, 0);
         table.add(l2).colspan(2);
         table.row().padTop(50);
+        table.add(l3).colspan(2);
+        table.row().padTop(50);
         table.add(menu).colspan(2);
 
         stage.addActor(table);
@@ -65,7 +89,7 @@ public class EndScreen implements Screen {
     @Override
     public void render(float delta) {
         // Clear screen before start drawing the next screen
-        Gdx.gl.glClearColor(118/255f, 57/255f, 49/255f, 1);
+        Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();

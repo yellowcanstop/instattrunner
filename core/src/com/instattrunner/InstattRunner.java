@@ -8,6 +8,7 @@ import com.instattrunner.views.EndScreen;
 import com.instattrunner.views.HelpScreen;
 import com.instattrunner.views.MainScreen;
 import com.instattrunner.views.MenuScreen;
+import com.instattrunner.views.HighscoreScreen;
 
 /* This class is parent of model, views, controllers:
 - model for game data and logic processing
@@ -18,6 +19,7 @@ public class InstattRunner extends Game {
 	private MainScreen mainScreen;
 	private HelpScreen helpScreen;
 	private EndScreen endScreen;
+	private HighscoreScreen highscorescreen;
 	public IRAssetManager assetMan = new IRAssetManager();
 	public OrthographicCamera gameCam = new OrthographicCamera();
 	private Music bgMusic;
@@ -30,8 +32,23 @@ public class InstattRunner extends Game {
 	public final static int MENU = 0;
 	public final static int PLAY = 1;
 	public final static int HELP = 2;
+	public final static int HIGHSCORE =4;
 	public final static int END = 3;
 
+	// Set default screen when application opens
+	@Override
+	public void create() {
+		menuScreen = new MenuScreen(this);
+		setScreen(menuScreen);
+
+
+		// Load and play music
+		assetMan.queueAddMusic();
+		assetMan.manager.finishLoading();
+		bgMusic = assetMan.manager.get("music/rain.mp3");
+		bgMusic.play();
+
+	}
 
 	// Method to swap between screens
 	public void changeScreen(int screen) {
@@ -41,37 +58,28 @@ public class InstattRunner extends Game {
 				this.setScreen(menuScreen);
 				break;
 			case PLAY:
-				if (mainScreen == null) {
-                    mainScreen = new MainScreen(this);
-                    System.out.println("new main");
-                }
+				if (mainScreen == null) mainScreen = new MainScreen(this);
+				bgMusic.stop();
 				this.setScreen(mainScreen);
 				break;
 			case HELP:
 				if (helpScreen == null) helpScreen = new HelpScreen(this);
 				this.setScreen(helpScreen);
 				break;
+			case HIGHSCORE:
+				if (highscorescreen == null) highscorescreen = new HighscoreScreen(this);
+				this.setScreen(highscorescreen);
+				break;
+
 			case END:
 				if (endScreen == null) endScreen = new EndScreen(this);
 				mainScreen = null;
 				this.setScreen(endScreen);
+				bgMusic.play();
 				break;
 		}
 	}
 
-	// Set default screen when application opens
-	@Override
-	public void create() {
-		menuScreen = new MenuScreen(this);
-		setScreen(menuScreen);
-
-
-		// Load and play music 
-		assetMan.queueAddMusic();
-		assetMan.manager.finishLoading();
-		bgMusic = assetMan.manager.get("music/rain.mp3");
-		bgMusic.play();
-	}
 
 	@Override
 	public void dispose() {

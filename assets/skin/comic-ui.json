@@ -80,7 +80,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 		background: narration-box
 	}
 	big: {
-		font: big
+		font: button
 		fontColor: black
 	}
 	title: {

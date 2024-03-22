@@ -89,6 +89,26 @@ public class MainScreen implements Screen {
         return score;
     }
 
+    int highScore;
+    public int loadTextFile(){
+        // Load the file using a FileHandle
+        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
+
+        // Read the contents of the file into a String
+        String highScoreString = fileHandle.readString();
+
+        int score=0;
+        // Parse the String to an integer
+        try {
+            score = Integer.parseInt(highScoreString.trim());
+        } catch (NumberFormatException e) {
+            // Handle parsing error (e.g., file contents are not a valid integer)
+            e.printStackTrace();
+        }
+
+        return score;
+    }
+
 
 
     public MainScreen(InstattRunner instattRunner) {
@@ -164,7 +184,7 @@ public class MainScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * parent.assetMan.playerScale, playerWidHei.y * parent.assetMan.playerScale);
+        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * assMan.playerScale, playerWidHei.y * assMan.playerScale);
         // Draw floor
         sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs

@@ -8,16 +8,25 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+
+
 
 public class MenuScreen implements Screen {
     private InstattRunner parent;
     private Stage stage;
     private Skin skin;
+
+    private TextureRegion backgroundRegion;
 
     public MenuScreen(InstattRunner instattRunner) {
         parent = instattRunner;
@@ -27,6 +36,8 @@ public class MenuScreen implements Screen {
         parent.assetMan.queueAddSkin();
         parent.assetMan.manager.finishLoading();
         skin = parent.assetMan.manager.get("skin/comic-ui.json");
+
+        backgroundRegion = new TextureRegion(new Texture(Gdx.files.internal("pic/background.jpg")));
 
 
     }
@@ -40,31 +51,39 @@ public class MenuScreen implements Screen {
         // Add table (which holds buttons) to the stage
         Table table = new Table();
         table.setFillParent(true);
+        TiledDrawable tiledBackground = new TiledDrawable(backgroundRegion);
+        table.setBackground(tiledBackground);
         table.setDebug(true);
-
-
 
         stage.addActor(table);
 
         // Create labels and buttons
-        //skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
-        Label titleLabel = new Label("Instatt Runner", skin);
-        TextButton play = new TextButton("Start Game", skin);
-        TextButton help = new TextButton("How to Play", skin);
+        // SHOULD NOT NEED THIS 
+        // skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
+
+        // Assuming you have a style defined in your skin
+        LabelStyle bigLabelStyle = skin.get("big", LabelStyle.class);
+        bigLabelStyle.font.getData().setScale(2); // Set font scale to 2, making it twice as big
+
+        // Now you can apply this style to your label
+        Label titleLabel = new Label("Instatt Runner", bigLabelStyle);
+        TextButton play = new TextButton("Start Game",skin);
+        TextButton help = new TextButton("How to Play",skin);
         TextButton highscore = new TextButton("Highscore", skin);
-        TextButton exit = new TextButton("Quit", skin);
+        TextButton exit = new TextButton("Quit",skin);
+
 
 
         // Add buttons to table
         table.add(titleLabel);
         table.row().pad(50, 0, 10, 0);
-        table.add(play).fillX().uniformX();
+        table.add(play).uniformX();
         table.row().pad(10, 0, 10, 0);
-        table.add(help).fillX().uniformX();
+        table.add(help).uniformX();
         table.row().pad(10, 0, 10, 0);
-        table.add(highscore).fillX().uniformX();
+        table.add(highscore).uniformX();
         table.row().pad(10, 0, 10, 0);
-        table.add(exit).fillX().uniformX();
+        table.add(exit).uniformX();
 
         // Action for exit button
         exit.addListener(new ChangeListener() {
@@ -74,7 +93,7 @@ public class MenuScreen implements Screen {
             }
         });
 
-        // Action for help button
+        // Action for highscore button`:
         highscore.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

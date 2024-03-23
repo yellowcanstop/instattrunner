@@ -5,8 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -21,11 +23,13 @@ public class HighscoreScreen implements Screen {
     private InstattRunner parent;
     private Stage stage;
     private Skin skin;
+    private Texture backgroundTexture;
 
     public HighscoreScreen(InstattRunner instattRunner) {
         parent = instattRunner;
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
+        backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path
     }
 
     int highScore;
@@ -50,6 +54,12 @@ public class HighscoreScreen implements Screen {
 
     @Override
     public void show() {
+        // Set the background image
+        Image background = new Image(backgroundTexture);
+        background.setFillParent(true);
+        stage.addActor(background);
+
+
         Gdx.input.setInputProcessor(stage);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
@@ -124,5 +134,6 @@ public class HighscoreScreen implements Screen {
     public void dispose() {
         stage.dispose();
         // skin disposed via asset manager
+        backgroundTexture.dispose();
     }
 }

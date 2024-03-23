@@ -9,6 +9,9 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	title: {
 		file: font-title-export.fnt
 	}
+	big:  {
+		file: font-button-export.fnt
+	}
 }
 com.badlogic.gdx.graphics.Color: {
 	black: {
@@ -80,7 +83,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 		background: narration-box
 	}
 	big: {
-		font: button
+		font: big
 		fontColor: black
 	}
 	title: {

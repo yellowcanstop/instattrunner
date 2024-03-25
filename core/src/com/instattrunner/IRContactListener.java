@@ -48,7 +48,7 @@ public class IRContactListener implements ContactListener {
         }
 
         // Check player collide with buff and produce relevant effect 
-        if (parent.getBodyObjectType(fa.getBody()) == "BUFF" || parent.getBodyObjectType(fb.getBody()) == "BUFF") {
+        if ((parent.getBodyObjectType(fa.getBody()) == "BUFF" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "BUFF" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             // Get TextureId of buff
             if (parent.getBodyObjectType(fa.getBody()) == "BUFF")
                 tempTextureId = parent.getTextureId(fa.getBody());
@@ -65,7 +65,7 @@ public class IRContactListener implements ContactListener {
         }
 
         // Check player collide with debuff and produce relevant effect 
-        if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF" || parent.getBodyObjectType(fb.getBody()) == "DEBUFF") {
+        if ((parent.getBodyObjectType(fa.getBody()) == "DEBUFF" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "DEBUFF" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             // Get TextureId of buff
             if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF")
                 tempTextureId = parent.getTextureId(fa.getBody());

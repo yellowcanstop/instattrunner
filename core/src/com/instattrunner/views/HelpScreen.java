@@ -158,7 +158,6 @@ public class HelpScreen implements Screen {
                 // When clicked, make detailPage boolean false(negation of previous state which is true)
                 // Then call show() method which refreshes HelpScreen
                 public void clicked(InputEvent event, float x, float y) {
-                    System.out.println("Label clicked!");
                     detailPage = !detailPage;
                     show();
                 }

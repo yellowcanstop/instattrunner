@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -23,7 +24,7 @@ public class EndScreen implements Screen {
     private InstattRunner parent;
     private Stage stage;
     private Skin skin;
-    private TextureRegion backgroundRegion;
+    private Texture backgroundTexture;
 
     public EndScreen(InstattRunner instattRunner) {
         parent = instattRunner;
@@ -31,7 +32,7 @@ public class EndScreen implements Screen {
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
 
         // Load the background image
-        backgroundRegion = new TextureRegion(new Texture(Gdx.files.internal("pic/background.jpg")));
+        backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path
     }
 
     int highScore;
@@ -60,11 +61,14 @@ public class EndScreen implements Screen {
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
 
+        // Set the background image
+        Image background = new Image(backgroundTexture);
+        background.setFillParent(true);
+        stage.addActor(background);
+
         // Create table (which holds buttons) and set background
         Table table = new Table();
         table.setFillParent(true);
-        TiledDrawable tiledBackground = new TiledDrawable(backgroundRegion);
-        table.setBackground(tiledBackground);
         table.setDebug(true);
 
         // Create button and label
@@ -129,6 +133,6 @@ public class EndScreen implements Screen {
     public void dispose() {
         stage.dispose();
         // skin disposed via asset manager
-        backgroundRegion.getTexture().dispose();
+        backgroundTexture.dispose();
     }
 }

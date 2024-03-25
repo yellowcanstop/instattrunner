@@ -26,7 +26,7 @@ public class MenuScreen implements Screen {
     private Stage stage;
     private Skin skin;
 
-    private TextureRegion backgroundRegion;
+    private Texture backgroundTexture;
 
     public MenuScreen(InstattRunner instattRunner) {
         parent = instattRunner;
@@ -37,13 +37,16 @@ public class MenuScreen implements Screen {
         parent.assetMan.manager.finishLoading();
         skin = parent.assetMan.manager.get("skin/comic-ui.json");
 
-        backgroundRegion = new TextureRegion(new Texture(Gdx.files.internal("pic/background.jpg")));
-
-
+        backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path
     }
 
     @Override
     public void show() {
+        // Set the background image
+        Image background = new Image(backgroundTexture);
+        background.setFillParent(true);
+        stage.addActor(background);
+
         Gdx.input.setInputProcessor(stage);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
@@ -51,16 +54,11 @@ public class MenuScreen implements Screen {
         // Add table (which holds buttons) to the stage
         Table table = new Table();
         table.setFillParent(true);
-        TiledDrawable tiledBackground = new TiledDrawable(backgroundRegion);
-        table.setBackground(tiledBackground);
         table.setDebug(true);
 
         stage.addActor(table);
 
         // Create labels and buttons
-        // SHOULD NOT NEED THIS 
-        // skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
-
         // Assuming you have a style defined in your skin
         LabelStyle bigLabelStyle = skin.get("big", LabelStyle.class);
         bigLabelStyle.font.getData().setScale(2); // Set font scale to 2, making it twice as big
@@ -73,17 +71,16 @@ public class MenuScreen implements Screen {
         TextButton exit = new TextButton("Quit",skin);
 
 
-
         // Add buttons to table
         table.add(titleLabel);
         table.row().pad(50, 0, 10, 0);
-        table.add(play).uniformX();
+        table.add(play).width(help.getWidth()).height(help.getHeight());
         table.row().pad(10, 0, 10, 0);
-        table.add(help).uniformX();
+        table.add(help).width(help.getWidth()).height(help.getHeight());
         table.row().pad(10, 0, 10, 0);
-        table.add(highscore).uniformX();
+        table.add(highscore).width(help.getWidth()).height(help.getHeight());
         table.row().pad(10, 0, 10, 0);
-        table.add(exit).uniformX();
+        table.add(exit);
 
         // Action for exit button
         exit.addListener(new ChangeListener() {
@@ -93,7 +90,7 @@ public class MenuScreen implements Screen {
             }
         });
 
-        // Action for highscore button`:
+        // Action for highscore button:
         highscore.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -153,5 +150,6 @@ public class MenuScreen implements Screen {
     public void dispose() {
         stage.dispose();
         // skin disposed via asset manager
+        backgroundTexture.dispose();
     }
 }

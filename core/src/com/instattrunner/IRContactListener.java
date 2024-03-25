@@ -48,36 +48,42 @@ public class IRContactListener implements ContactListener {
         }
 
         // Check player collide with buff and produce relevant effect 
-        if (parent.getBodyObjectType(fa.getBody()) == "BUFF" || parent.getBodyObjectType(fb.getBody()) == "BUFF") {
+        if ((parent.getBodyObjectType(fa.getBody()) == "BUFF" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "BUFF" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             // Get TextureId of buff
-            if (parent.getBodyObjectType(fa.getBody()) == "BUFF")
+            if (parent.getBodyObjectType(fa.getBody()) == "BUFF") {
                 tempTextureId = parent.getTextureId(fa.getBody());
-            else    
+                parent.collideDeBuff = fa.getBody();
+            }
+            else {   
                 tempTextureId = parent.getTextureId(fb.getBody());
+                parent.collideDeBuff = fb.getBody();
+            }
             
             System.out.printf("Buff : %s\n", buffTypes[tempTextureId]);
             parent.playSound(IRModel.COLLECT_SOUND);
             parent.effectTime[tempTextureId] = TimeUtils.millis();
             parent.effectActive[tempTextureId] = true;
             parent.buffActive[tempTextureId] = true;
-
             return;
         }
 
         // Check player collide with debuff and produce relevant effect 
-        if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF" || parent.getBodyObjectType(fb.getBody()) == "DEBUFF") {
+        if ((parent.getBodyObjectType(fa.getBody()) == "DEBUFF" && parent.getBodyObjectType(fb.getBody()) == "PLAYER") || (parent.getBodyObjectType(fb.getBody()) == "DEBUFF" && parent.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             // Get TextureId of buff
-            if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF")
+            if (parent.getBodyObjectType(fa.getBody()) == "DEBUFF"){
                 tempTextureId = parent.getTextureId(fa.getBody());
-            else    
+                parent.collideDeBuff = fa.getBody();
+            }
+            else {
                 tempTextureId = parent.getTextureId(fb.getBody());
+                parent.collideDeBuff = fb.getBody();
+            }
 
             System.out.printf("Debuff : %s\n", debuffTypes[tempTextureId]);
             parent.playSound(IRModel.COLLECT_SOUND);
             parent.effectTime[tempTextureId] = TimeUtils.millis();
             parent.effectActive[tempTextureId] = true;
             parent.debuffActive[tempTextureId] = true;
-
             return;
         }
     }

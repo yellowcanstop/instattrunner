@@ -89,8 +89,8 @@ public class IRModel {
     public static final int COLLECT_SOUND = 1;
 
     // Vars for environment
-    public long obstacleTime;    // Time since last obstacle spawn
-    public long buffTime;    // Time since last buff/debuff spawn
+    public long obstacleTime = TimeUtils.millis() - 1200;    // Time since last obstacle spawn
+    public long buffTime = TimeUtils.millis() - 1200;    // Time since last buff/debuff spawn
     public boolean isDead = false;
     public boolean immunity = false;
     public int score = 0;
@@ -550,13 +550,13 @@ public class IRModel {
     public void spawnBuffs() {
         buffs.add(createBuff());
         buffTime = TimeUtils.millis();
-        main.buffSpawnInterval = (long)(main.minSpawnInterval * 1.5) + (300 * random.nextInt(6));
+        main.buffSpawnInterval = (long)(main.minSpawnInterval * 3) + (300 * random.nextInt(6));
     }
 
     public void spawnDebuffs() {
         debuffs.add(createDebuff());
         buffTime = TimeUtils.millis();
-        main.buffSpawnInterval = (long)(main.minSpawnInterval * 1.5) + (300 * random.nextInt(6));
+        main.buffSpawnInterval = (long)(main.minSpawnInterval * 3) + (300 * random.nextInt(6));
     }
 
     // Check if buff/debuff is out of screen

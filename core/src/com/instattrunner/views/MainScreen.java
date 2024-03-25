@@ -17,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -28,6 +27,7 @@ import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.IRAssetManager;
 
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 
 
 // Screen which shows the game play
@@ -64,30 +64,16 @@ public class MainScreen implements Screen {
     private final float debuffScale;
 
     // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
-    public long minSpawnInterval = 1000;
+    public long minSpawnInterval = 1200;
     public long obstacleSpawnInterval = minSpawnInterval;
-    public long buffSpawnInterval = minSpawnInterval;
+    public long buffSpawnInterval = minSpawnInterval * 2;
     Random random = new Random(TimeUtils.millis());
+    private int highScore;
 
-    int highScore;
-    public int loadTextFile(){
-        // Load the file using a FileHandle
-        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
 
-        // Read the contents of the file into a String
-        String highScoreString = fileHandle.readString();
 
-        int score=0;
-        // Parse the String to an integer
-        try {
-            score = Integer.parseInt(highScoreString.trim());
-        } catch (NumberFormatException e) {
-            // Handle parsing error (e.g., file contents are not a valid integer)
-            e.printStackTrace();
-        }
+    private float tempScale = 0.005f;
 
-        return score;
-    }
 
 
 
@@ -108,7 +94,6 @@ public class MainScreen implements Screen {
     
         assMan.queueAddImages();
         assMan.manager.finishLoading();
-
 
         // Load name of obstacle, buff, debuff image files from asset manager
         String[] obstacleImages = assMan.obstacleImages;
@@ -149,13 +134,10 @@ public class MainScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        model.logicStep(delta); // move game logic forward; use if to pause game
-
         Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //sb.setProjectionMatrix(StatusBar.stage.getCamera().combined);
-        //StatusBar.stage.draw();
+        model.logicStep(delta); // move game logic forward; use if to pause game
 
         if (debug) debugRenderer.render(model.world, cam.combined);
 
@@ -173,29 +155,52 @@ public class MainScreen implements Screen {
         loopDraw(model.debuffs, debuffTexs, debuffWidHei, debuffScale);
 
 
-// Set the font size for the "Score" text
-        font.getData().setScale(0.12f);
-// Draw the "Score" text
-        font.draw(sb, "Score: " + model.score, 4, 11);
+        float tempLocBuff = model.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
+        float tempLocDebuff = model.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
+        for (int i = 0; i < 4; i++){
+            if (model.buffActive[i]){
+                if (buffWidHei[i].x > buffWidHei[i].y)
+                    sb.draw(buffTexs.get(i), tempLocBuff, 9.8f, 1.5f, 1.5f / buffWidHei[i].x * buffWidHei[i].y);
+                else
+                    sb.draw(buffTexs.get(i), tempLocBuff, 9.5f, 2 / buffWidHei[i].y * buffWidHei[i].x, 2);
+                tempLocBuff += 2f;
+            }
+            if (model.debuffActive[i]){
+                if (debuffWidHei[i].x > debuffWidHei[i].y)
+                    sb.draw(debuffTexs.get(i), tempLocDebuff,7.1f, 1.5f, 1.5f / debuffWidHei[i].x * debuffWidHei[i].y);
+                else
+                    sb.draw(debuffTexs.get(i), tempLocDebuff, 7.1f, 2 / debuffWidHei[i].y * debuffWidHei[i].x, 2);
+                tempLocDebuff += 2f;
+            }
 
-// Set the font size for the "HighScore" text
+        }
+
+        System.out.printf("  Buff : %b   %b   %b   %b\n", model.buffActive[0], model.buffActive[1], model.buffActive[2], model.buffActive[3]);
+        System.out.printf("Debuff : %b   %b   %b   %b\n\n", model.debuffActive[0], model.debuffActive[1], model.debuffActive[2], model.debuffActive[3]);
+
+
+        // Set the font size for the "Score" text
+        font.getData().setScale(0.12f);
+        // Draw the "Score" text
+        font.draw(sb, "Score: " + model.score, 4, 11);
+        // Set the font size for the "HighScore" text
         font.getData().setScale(0.1f);
-// Estimate the average width of characters in the font
+        // Estimate the average width of characters in the font
         float averageCharWidth = font.getCapHeight() * 0.4f; // Adjust as needed
-// Estimate the width of the "HighScore" text based on the number of characters
+        // Estimate the width of the "HighScore" text based on the number of characters
         float highScoreTextWidth = ("HighScore: " + highScore).length() * averageCharWidth; // Adjust as needed
-// Calculate the x-coordinate for the "HighScore" text to prevent overlapping
+        // Calculate the x-coordinate for the "HighScore" text to prevent overlapping
         float highScoreX = -1 + highScoreTextWidth; // Adjust as needed
-// Calculate the y-coordinate for the "HighScore" text
+        // Calculate the y-coordinate for the "HighScore" text
         float highScoreY = 8 + font.getLineHeight(); // Adjust as needed
-// Draw the "HighScore" text
+        // Draw the "HighScore" text
         font.draw(sb, "HighScore" + highScore, highScoreX,highScoreY);
 
 
 
         // Spawn obstacle based on speed var determiner 
-        if(TimeUtils.millis() - model.obstacleTime > obstacleSpawnInterval) 
-            model.spawnObstacles(model.regular);
+        if(TimeUtils.timeSinceMillis(model.obstacleTime) > obstacleSpawnInterval) 
+            // model.spawnObstacles(model.regular);
    
         model.trackObstacles();
 
@@ -211,6 +216,7 @@ public class MainScreen implements Screen {
         model.trackBuffsDebuffs();
 
         sb.end();
+
         highScore = loadTextFile();
 
         if (model.isDead) {
@@ -224,7 +230,6 @@ public class MainScreen implements Screen {
                     highScore = model.score;
                     System.out.println("new high score obtain");
                     System.out.println(highScore);
-//                highscore = highScore.loadTextFile();
                     updateHighScore(highScore);
                 }
                 parent.finalScore = model.score;
@@ -233,35 +238,23 @@ public class MainScreen implements Screen {
 
             model.isDead = false;
         }
-
     }
 
-    private void updateHighScore(int newHighScore) {
-        FileHandle fileHandle = Gdx.files.local("score/HighScore.txt");
-        String stringHighScore = Integer.toString(newHighScore);
-        fileHandle.writeString(stringHighScore, false);
-
-        System.out.println("highscoreadded");
-    }
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
@@ -276,6 +269,35 @@ public class MainScreen implements Screen {
             debuffTex.dispose();
         sb.dispose();
     }
+
+
+    // both to be removed
+    public int loadTextFile(){
+        // Load the file using a FileHandle
+        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
+
+        // Read the contents of the file into a String
+        String highScoreString = fileHandle.readString();
+
+        int score=0;
+        // Parse the String to an integer
+        try {
+            score = Integer.parseInt(highScoreString.trim());
+        } catch (NumberFormatException e) {
+            // Handle parsing error (e.g., file contents are not a valid integer)
+            e.printStackTrace();
+        }
+
+        return score;
+    }
+    private void updateHighScore(int newHighScore) {
+        FileHandle fileHandle = Gdx.files.local("score/HighScore.txt");
+        String stringHighScore = Integer.toString(newHighScore);
+        fileHandle.writeString(stringHighScore, false);
+
+        System.out.println("highscoreadded");
+    }
+
 
     // Just trying to reduce repeated code
     private void loopDraw(Array<Body> bodys, Array<Texture> bodyTexs, Vector2[] bodyWidHei, float bodyScale) {

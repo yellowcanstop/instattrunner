@@ -50,7 +50,7 @@ public class IRAssetManager {
     // Scale of category of body
     public final float REFplayerScale = 0.007f;    // Used to store a reference copy (constant) of playerScale as playerScale will be changed throughout the game
     public float playerScale = REFplayerScale;
-    public final float obstacleScale = 0.011f;
+    public final float obstacleScale = 0.009f;
     public final float buffScale = 0.006f;
     public final float debuffScale = 0.0073f;
 

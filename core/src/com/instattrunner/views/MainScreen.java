@@ -200,7 +200,7 @@ public class MainScreen implements Screen {
 
         // Spawn obstacle based on speed var determiner 
         if(TimeUtils.timeSinceMillis(model.obstacleTime) > obstacleSpawnInterval) 
-            // model.spawnObstacles(model.regular);
+            model.spawnObstacles(model.regular);
    
         model.trackObstacles();
 

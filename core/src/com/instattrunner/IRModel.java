@@ -42,6 +42,7 @@ public class IRModel {
     public Body bigPlayer;
     public Body floor;
     public Body collideObstacle;
+    public Body collideDeBuff;
     public Array<Body> obstacles = new Array<Body>();
     public Array<Body> buffs = new Array<Body>();
     public Array<Body> debuffs = new Array<Body>();
@@ -89,8 +90,8 @@ public class IRModel {
     public static final int COLLECT_SOUND = 1;
 
     // Vars for environment
-    public long obstacleTime;    // Time since last obstacle spawn
-    public long buffTime;    // Time since last buff/debuff spawn
+    public long obstacleTime = TimeUtils.millis() - 1200;    // Time since last obstacle spawn
+    public long buffTime = TimeUtils.millis() - 1200;    // Time since last buff/debuff spawn
     public boolean isDead = false;
     public boolean immunity = false;
     public int score = 0;
@@ -188,6 +189,8 @@ public class IRModel {
         buffScale = assMan.buffScale;
         debuffScale = assMan.debuffScale;
 
+        collideDeBuff = null;
+
         
         // Create floor and player of game 
         createFloor();
@@ -253,6 +256,9 @@ public class IRModel {
         }
 
 
+        if (collideDeBuff != null)
+            removeCollidedDeBuff();
+
         // for loop goes through all buff debuff category 
         // Check if they are expired, or both active
         // If found expired or both active(cancel each other), turn them off 
@@ -300,8 +306,6 @@ public class IRModel {
 
 
         velocityIncrement = (int)(score / 10) * 3;
-
-
 
 
         world.step(delta, 3, 3); // tell Box2D world to move forward in time
@@ -550,13 +554,13 @@ public class IRModel {
     public void spawnBuffs() {
         buffs.add(createBuff());
         buffTime = TimeUtils.millis();
-        main.buffSpawnInterval = (long)(main.minSpawnInterval * 1.5) + (300 * random.nextInt(6));
+        main.buffSpawnInterval = (long)(main.minSpawnInterval * 3) + (300 * random.nextInt(6));
     }
 
     public void spawnDebuffs() {
         debuffs.add(createDebuff());
         buffTime = TimeUtils.millis();
-        main.buffSpawnInterval = (long)(main.minSpawnInterval * 1.5) + (300 * random.nextInt(6));
+        main.buffSpawnInterval = (long)(main.minSpawnInterval * 3) + (300 * random.nextInt(6));
     }
 
     // Check if buff/debuff is out of screen
@@ -623,5 +627,10 @@ public class IRModel {
         effectActive[DEAN] = false;
         buffActive[DEAN] = false;
         immunity = false;
+    }
+
+    public void removeCollidedDeBuff(){
+        collideDeBuff.setTransform(-27f, collideDeBuff.getPosition().y, collideDeBuff.getAngle());
+        collideDeBuff = null;
     }
 }

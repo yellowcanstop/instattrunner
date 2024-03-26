@@ -43,21 +43,21 @@ public class GameAssetManager {
 
     // Load sounds
     public void queueAddSounds() {
-        manager.load(locCHub.jumpSound, Sound.class);
-        manager.load(locCHub.collectSound, Sound.class);
+        manager.load(locCHub.jumpSoundName, Sound.class);
+        manager.load(locCHub.collectSoundName, Sound.class);
     }
 
 
     // Load music
     public void queueAddMusic() {
-        manager.load(locCHub.bgSound, Music.class);
-        manager.load(locCHub.gmSound, Music.class);
+        manager.load(locCHub.bgMusicName, Music.class);
+        manager.load(locCHub.gmMusicName, Music.class);
     }
 
 
     // Load skin
     public void queueAddSkin() {
         SkinParameter params = new SkinParameter("skin/comic-ui.atlas");
-        manager.load(locCHub.skin, Skin.class, params);
+        manager.load(locCHub.skinName, Skin.class, params);
     }
 }

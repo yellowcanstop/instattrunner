@@ -1,9 +1,5 @@
 package com.instattrunner;
 
-import com.badlogic.gdx.Game; // game class used to delegate between different screens
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.instattrunner.loader.IRAssetManager;
 import com.instattrunner.views.EndScreen;
 import com.instattrunner.views.HelpScreen;
 import com.instattrunner.views.MainScreen;
@@ -18,8 +14,9 @@ public class InstattRunner extends Game {
 	private MenuScreen menuScreen;
 	private MainScreen mainScreen;
 	private HelpScreen helpScreen;
-	private EndScreen endScreen;
+    private EndScreen endScreen;
 	private HighscoreScreen highscorescreen;
+
 	public IRAssetManager assetMan = new IRAssetManager();
 	public OrthographicCamera gameCam = new OrthographicCamera();
 	private Music bgMusic;
@@ -75,7 +72,7 @@ public class InstattRunner extends Game {
 
 			case END:
 				if (endScreen == null) endScreen = new EndScreen(this);
-				mainScreen = null;
+                mainScreen = null;
 				this.setScreen(endScreen);
 				gmMusic.stop();
 				bgMusic.play();

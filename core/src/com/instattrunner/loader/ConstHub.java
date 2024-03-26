@@ -45,13 +45,13 @@ public class ConstHub {
     public final float debuffScale = 0.0073f;
 
     // Sound effect files
-    public final String jumpSound = "sounds/drop.wav";
-    public final String collectSound = "sounds/drop.wav";
+    public final String jumpSoundName = "sounds/drop.wav";
+    public final String collectSoundName = "sounds/drop.wav";
 
     // Music file
-    public final String bgSound = "music/rain.mp3";
-    public final String gmSound = "music/game.mp3";
+    public final String bgMusicName = "music/rain.mp3";
+    public final String gmMusicName = "music/game.mp3";
  
     // Texture file
-    public final String skin = "skin/comic-ui.json";
+    public final String skinName = "skin/comic-ui.json";
 }

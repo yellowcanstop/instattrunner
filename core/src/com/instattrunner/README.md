@@ -19,3 +19,7 @@ finished GameAssetManager and ConstHub
 now going through all screens in button order
 skipping help screen as jeeeeyvi is still working on 
 menu screen migration completed
+end screen done 
+score screen done 
+working on help screen
+

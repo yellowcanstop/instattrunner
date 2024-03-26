@@ -1,7 +1,5 @@
 package com.instattrunner.views;
 
-import javax.swing.event.ChangeEvent;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,52 +11,71 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
 import com.instattrunner.ScreenManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.graphics.Texture;
 
 
 public class HelpScreen implements Screen {
+    // ScreenManager as Parent
     private ScreenManager parent;
+
+    // Create Stage to store ui elements and skin for button skins
     private Stage stage;
     private Skin skin;
-    private Texture backgroundTexture;
+
+    // Image of background
+    private Image backgroundImage;
+
+    // Table to store ui elements in it and then only pass the table to stage
+    private Table table;
+
+    // Boolean to determine whether to display detailed help page or not 
     private boolean detailPage = false;
 
+    
     public HelpScreen(ScreenManager screenManager) {
         parent = screenManager;
+
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
-        backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path
+
+        // Load skin using asset manager
+        parent.assMan.queueAddSkin();
+        parent.assMan.manager.finishLoading();
+        skin = parent.assMan.manager.get(parent.constHub.skinName);
+
+        // Create Image from backgroundTexture from ScreenManager
+        backgroundImage = new Image(parent.backgroundTexture);
     }
+
 
     @Override
     public void show() {
         // Set the background image
-        Image background = new Image(backgroundTexture);
-        background.setFillParent(true);
-        stage.addActor(background);
+        backgroundImage.setFillParent(true);
+        stage.addActor(backgroundImage);
 
-        // Your existing code here
+        // Push input to stage
         Gdx.input.setInputProcessor(stage);
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        stage.draw();
+        // should not need
+        // stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        // stage.draw();
 
         // Add table (which holds buttons) to the stage
-        Table table = new Table();
+        table = new Table();
         table.setFillParent(true);
-        //table.setDebug(true);
+        table.setDebug(true);
 
         // Create buttons
         skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
 
 
+        // Check to see if boolean is true or false (boolean changed by clicking the label)
+        // if false, then show not detail
         if (!detailPage){
             Label titleLabel = new Label("How to Play", skin, "big");
 
@@ -83,7 +100,6 @@ public class HelpScreen implements Screen {
                     show();
                 }
             });
-
 
             menu.addListener(new ChangeListener() {
                 @Override
@@ -111,8 +127,8 @@ public class HelpScreen implements Screen {
             table.add(menu).colspan(3).padTop(50).center();
         }
 
+        // Else, if detail button is clicked, boolean true
         else {
-            // PUT DETAIL CODE HERE
             Label buffsLabel = new Label("Buffs:", skin, "big");
             Label debuffsLabel = new Label("Debuffs:", skin, "big");
 
@@ -125,10 +141,7 @@ public class HelpScreen implements Screen {
             Label debuff2 = new Label("Culinary Major Sprite : Player size increases for 10 seconds", skin);
             Label debuff3 = new Label("Beer Icon : Player jumps lower for 10 seconds", skin);
 
-            //Label detail = new Label("Less Detail", skin);
             Label detail = new Label("Back to How to Play", skin,"boxed");
-
-
 
             // Add padding between buttons
             table.add(buffsLabel).colspan(3).padBottom(20).center();
@@ -152,7 +165,6 @@ public class HelpScreen implements Screen {
             table.row();
             table.add(detail).colspan(3).padBottom(20).center(); // Use colspan to span across all columns
 
-
             // Listen for click on the Less Detail prompt
             detail.addListener(new ClickListener() {
                 @Override
@@ -164,8 +176,10 @@ public class HelpScreen implements Screen {
                 }
             });
         }
+
        stage.addActor(table);
     }
+
 
     @Override
     public void render(float delta) {
@@ -176,31 +190,35 @@ public class HelpScreen implements Screen {
         stage.draw();
     }
 
+
     @Override
     public void resize(int width, int height) {
         // recalculate viewport each time window is resized
         stage.getViewport().update(width, height, true);
     }
 
+
     @Override
     public void pause() {
 
     }
+
 
     @Override
     public void resume() {
 
     }
 
+
     @Override
     public void hide() {
 
     }
 
+
     @Override
     public void dispose() {
         stage.dispose();
-        backgroundTexture.dispose(); // Dispose the background texture
-        // skin disposed via asset manager
+        skin.dispose();
     }
 }

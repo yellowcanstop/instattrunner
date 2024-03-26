@@ -8,3 +8,6 @@ After everyone agrees on stoping, will start to migrate calls to the seperate cl
 Temp classes 
 - ScoreManager
 
+
+
+- ScoreScreen is the same as HighscoreScreen

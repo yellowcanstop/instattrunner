@@ -5,72 +5,89 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.instattrunner.InstattRunner;
 import com.instattrunner.ScreenManager;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.instattrunner.loader.ConstHub;
 
-
-
-
+/* displays the menu screen to the user
+for them to decide what action to take next
+ */
 public class MenuScreen implements Screen {
+    // ScreenManager as Parent and Constants Hub 
     private ScreenManager parent;
+    private ConstHub locCHub;
+
+    // Create Stage to store ui elements and skin for button skins
     private Stage stage;
     private Skin skin;
 
+    // Texture of background image
     private Texture backgroundTexture;
+    private Image backgroundImage;
+    private Table table;
+
 
     public MenuScreen(ScreenManager screenManager) {
         parent = screenManager;
+        locCHub = parent.constHub;
+
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
-        // load skin using asset manager
-        parent.assetMan.queueAddSkin();
-        parent.assetMan.manager.finishLoading();
-        skin = parent.assetMan.manager.get("skin/comic-ui.json");
 
-        backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path
+        // load skin using asset manager
+        parent.assMan.queueAddSkin();
+        parent.assMan.manager.finishLoading();
+        skin = parent.assMan.manager.get(locCHub.skinName);
+
+        // Retrieve background texture from asset manager
+        backgroundTexture = parent.backgroundTexture;
+        backgroundImage = new Image(backgroundTexture);
     }
+
 
     @Override
     public void show() {
         // Set the background image
-        Image background = new Image(backgroundTexture);
-        background.setFillParent(true);
-        stage.addActor(background);
+        backgroundImage.setFillParent(true);
+        stage.addActor(backgroundImage);
 
+        // Push input to stage
         Gdx.input.setInputProcessor(stage);
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        stage.draw();
+
+        // should not need
+        // stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        // stage.draw();
 
         // Add table (which holds buttons) to the stage
-        Table table = new Table();
+        table = new Table();
         table.setFillParent(true);
         table.setDebug(true);
-
         stage.addActor(table);
 
-        // Create labels and buttons
-        // Assuming you have a style defined in your skin
+        // Create LabelStyle for labels
         LabelStyle bigLabelStyle = skin.get("big", LabelStyle.class);
         bigLabelStyle.font.getData().setScale(2); // Set font scale to 2, making it twice as big
 
-        // Now you can apply this style to your label
+        // Create labels and buttons
         Label titleLabel = new Label("Instatt Runner", bigLabelStyle);
         TextButton play = new TextButton("Start Game",skin);
         TextButton help = new TextButton("How to Play",skin);
         TextButton highscore = new TextButton("Highscore", skin);
         TextButton exit = new TextButton("Quit",skin);
-
 
         // Add buttons to table
         table.add(titleLabel);
@@ -83,19 +100,11 @@ public class MenuScreen implements Screen {
         table.row().pad(10, 0, 10, 0);
         table.add(exit);
 
-        // Action for exit button
-        exit.addListener(new ChangeListener() {
+        // Action for play button
+        play.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.exit();
-            }
-        });
-
-        // Action for highscore button:
-        highscore.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(InstattRunner.HIGHSCORE);
+                parent.changeScreen(ScreenManager.PLAY);
             }
         });
 
@@ -103,19 +112,27 @@ public class MenuScreen implements Screen {
         help.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(InstattRunner.HELP);
+                parent.changeScreen(ScreenManager.HELP);
             }
         });
-
-        // Action for play button
-        play.addListener(new ChangeListener() {
+ 
+        // Action for highscore button:
+        highscore.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(InstattRunner.PLAY);
+                parent.changeScreen(ScreenManager.SCORE);
             }
         });
 
+        // Action for exit button
+        exit.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.exit();
+            }
+        });
     }
+
 
     @Override
     public void render(float delta) {
@@ -126,31 +143,34 @@ public class MenuScreen implements Screen {
         stage.draw();
     }
 
+
     @Override
     public void resize(int width, int height) {
         // recalculate viewport each time window is resized
         stage.getViewport().update(width, height, true);
     }
 
+
     @Override
     public void pause() {
 
     }
+
 
     @Override
     public void resume() {
 
     }
 
+    
     @Override
     public void hide() {
 
     }
 
+
     @Override
     public void dispose() {
         stage.dispose();
-        // skin disposed via asset manager
-        backgroundTexture.dispose();
     }
 }

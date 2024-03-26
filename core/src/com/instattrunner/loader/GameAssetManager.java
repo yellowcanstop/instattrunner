@@ -23,12 +23,17 @@ public class GameAssetManager {
     }
 
 
+    // Load background image
+    public void queueAddBackground(){
+        manager.load(locCHub.bgImageName, Texture.class);
+    }
+
+
     // Load images
     // Loop to loop through all value of string array which has all path of obstacles and buff
     public void queueAddImages(){
         manager.load(locCHub.floorImage, Texture.class);
         manager.load(locCHub.playerImage, Texture.class);
-        manager.load(locCHub.bgImage, Texture.class);
 
         for (String obstacleImage : locCHub.obstacleImages)
             manager.load(obstacleImage, Texture.class);

@@ -3,6 +3,7 @@ package com.instattrunner;
 import com.badlogic.gdx.Game; // game class used to delegate between different screens
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.instattrunner.loader.ConstHub;
 import com.instattrunner.loader.GameAssetManager;
 import com.instattrunner.views.EndScreen;
@@ -38,16 +39,18 @@ public class ScreenManager extends Game {
 	public final static int SCORE = 4;
 	public final static int END = 3;
 
+    // Background texture
+    public Texture backgroundTexture;
 
 
 
 
 	public int finalScore = 0; // set value when player dies
 
-	public final static int VIEW_WIDTH = 800;
-	public final static int VIEW_HEIGHT = 600;
+	public final int VIEW_WIDTH = 800;
+	public final int VIEW_HEIGHT = 600;
 
-
+    
 
 
 	// Set default screen when application opens
@@ -56,12 +59,17 @@ public class ScreenManager extends Game {
 		menuScreen = new MenuScreen(this);
 		setScreen(menuScreen);
 
-		// Load and play music
-		assMan.queueAddMusic();
+        // Load and play music
+        assMan.queueAddMusic();
 		assMan.manager.finishLoading();
 		bgMusic = assMan.manager.get(constHub.bgMusicName);
 		gmMusic = assMan.manager.get(constHub.gmMusicName);
 		bgMusic.play();
+
+        // Load background for all other screens
+        assMan.queueAddBackground();
+        assMan.manager.finishLoading();
+        backgroundTexture = assMan.manager.get(constHub.bgImageName)
 	}
 
 
@@ -100,6 +108,7 @@ public class ScreenManager extends Game {
 
 	@Override
 	public void dispose() {
+        System.out.println("dispspsspsppssppsoooooossseeeddd");
 		assMan.manager.dispose();
 		bgMusic.dispose();
         gmMusic.dispose();

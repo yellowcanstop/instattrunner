@@ -22,9 +22,9 @@ public class ConstHub {
 
 
     // Images file names
+    public final String bgImageName = "pic/background.jpg";
     public final String floorImage = "pic/Floor.png";
     public final String playerImage = "pic/Sprite.png";
-    public final String bgImage = "images/bg.jpg";
     public final String[] obstacleImages = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
     public final String[] buffImages = {"pic/Business man 1 (AI).png", "pic/Nutrition major.png", "pic/Coffee.png", "pic/Dean.png"};
     public final String[] debuffImages = {"pic/Sports science major.png", "pic/Culinary major.png", "pic/Beer.png"};

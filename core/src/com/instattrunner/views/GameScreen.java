@@ -21,9 +21,10 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.BodyData;
-import com.instattrunner.IRModel;
-import com.instattrunner.InstattRunner;
+import com.instattrunner.GameWorld;
+import com.instattrunner.ScreenManager;
 import com.instattrunner.controller.KeyboardController;
+import com.instattrunner.loader.ConstHub;
 import com.instattrunner.loader.IRAssetManager;
 
 import java.util.Random;
@@ -31,25 +32,26 @@ import java.util.concurrent.TimeoutException;
 
 
 // Screen which shows the game play
-public class MainScreen implements Screen {
-    private InstattRunner parent;
-    IRModel model;
-    OrthographicCamera cam;
-    Box2DDebugRenderer debugRenderer;
-    boolean debug = true; // tweak if want to debug
-    KeyboardController controller;
-    IRAssetManager assMan;   // Yes, I did it on purpose (I just followed the tutorial, not my fault :) )
+public class GameScreen implements Screen {
+    // ScreenManager as Parent
+    private ScreenManager parent;
+    private OrthographicCamera cam;
+    private KeyboardController controller;
+    private ConstHub locCHub;
+    private GameWorld gameWorld;
+    private SpriteBatch sb;
+    private BitmapFont font = new BitmapFont();
 
+    private Box2DDebugRenderer debugRenderer;
+    private boolean debug = true; // tweak if want to debug
+    
     // Declare Texture var for all Body in game
-    Texture floorTex;
-    Texture playerTex;
-    Texture bgTex;
-    Array<Texture> obTexs = new Array<Texture>();
-    Array<Texture> buffTexs = new Array<Texture>();
-    Array<Texture> debuffTexs = new Array<Texture>();
-  
-    SpriteBatch sb;
-    BitmapFont font = new BitmapFont();
+    private Texture floorTex;
+    private Texture playerTex;
+    private Texture bgTex;
+    private Array<Texture> obTexs = new Array<Texture>();
+    private Array<Texture> buffTexs = new Array<Texture>();
+    private Array<Texture> debuffTexs = new Array<Texture>();
 
     // Declare array to store width and height of different player, obstacle, buff and debuff
     private Vector2 floorWidHei;
@@ -72,16 +74,10 @@ public class MainScreen implements Screen {
 
 
 
-    private float tempScale = 0.005f;
 
-
-
-
-    public MainScreen(InstattRunner instattRunner) {
-        parent = instattRunner;
-
-        // For now oonly
-        assMan = new IRAssetManager();
+    public GameScreen(ScreenManager screenManager) {
+        parent = screenManager;
+        locCHub = parent.constHub;
 
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
@@ -90,39 +86,38 @@ public class MainScreen implements Screen {
         sb.setProjectionMatrix(cam.combined);
 
         controller = new KeyboardController();
-        model = new IRModel(controller, cam, assMan, this);
-    
-        assMan.queueAddImages();
-        assMan.manager.finishLoading();
 
-        // Load name of obstacle, buff, debuff image files from asset manager
-        String[] obstacleImages = assMan.obstacleImages;
-        String[] buffImages = assMan.buffImages;
-        String[] debuffImages = assMan.debuffImages;
+        // Reset all constHub's values changed
+        locCHub.playerScale = locCHub.REFplayerScale;
+
+
+        gameWorld = new GameWorld(controller, parent.assMan, this);
+    
+        parent.assMan.queueAddImages();
+        parent.assMan.manager.finishLoading();
 
         // Gets images as Texture from asset manager (indivdual Texture for player and background)
         // Load images as Texture into array of Texture (obstacle, buff, debuff as there are multiple options)
-        floorTex = assMan.manager.get(assMan.floorImage);
-        playerTex = assMan.manager.get(assMan.playerImage);
-        bgTex = assMan.manager.get("images/bg.jpg");
-        for (String obstacleImage : obstacleImages)
-            obTexs.add(assMan.manager.get(obstacleImage));
-        for (String buffImage : buffImages)
-            buffTexs.add(assMan.manager.get(buffImage));
-        for (String debuffImage : debuffImages)
-            debuffTexs.add(assMan.manager.get(debuffImage));
+        floorTex = parent.assMan.manager.get(locCHub.floorImageName);
+        playerTex = parent.assMan.manager.get(locCHub.playerImageName);
+        for (String obstacleImage : locCHub.obstacleImagesName)
+            obTexs.add(parent.assMan.manager.get(obstacleImage));
+        for (String buffImage : locCHub.buffImagesName)
+            buffTexs.add(parent.assMan.manager.get(buffImage));
+        for (String debuffImage : locCHub.debuffImagesName)
+            debuffTexs.add(parent.assMan.manager.get(debuffImage));
 
         // Load width and heigth of player, obstacle, buff and debuff
-        floorWidHei = assMan.floorWidHei;
-        playerWidHei = assMan.playerWidHei;
-        obstacleWidHei = assMan.obstacleWidHei;
-        buffWidHei = assMan.buffWidHei;
-        debuffWidHei = assMan.debuffWidHei;
+        floorWidHei = locCHub.floorWidHei;
+        playerWidHei = locCHub.playerWidHei;
+        obstacleWidHei = locCHub.obstacleWidHei;
+        buffWidHei = locCHub.buffWidHei;
+        debuffWidHei = locCHub.debuffWidHei;
 
         // Load scale of category of Body
-        obstacleScale = assMan.obstacleScale;
-        buffScale = assMan.buffScale;
-        debuffScale = assMan.debuffScale;
+        obstacleScale = locCHub.obstacleScale;
+        buffScale = locCHub.buffScale;
+        debuffScale = locCHub.debuffScale;
     }
 
 
@@ -137,16 +132,16 @@ public class MainScreen implements Screen {
         Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        model.logicStep(delta); // move game logic forward; use if to pause game
+        gameWorld.logicStep(delta); // move game logic forward; use if to pause game
 
-        if (debug) debugRenderer.render(model.world, cam.combined);
+        if (debug) debugRenderer.render(gameWorld.world, cam.combined);
 
         /* START DRAWING */
         sb.begin();
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, model.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * assMan.playerScale, playerWidHei.y * assMan.playerScale);
+        sb.draw(playerTex, gameWorld.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * assMan.playerScale, playerWidHei.y * assMan.playerScale);
         // Draw floor
         sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs

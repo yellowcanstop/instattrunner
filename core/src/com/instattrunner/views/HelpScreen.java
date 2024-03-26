@@ -24,7 +24,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.graphics.Texture;
 
 
-
 public class HelpScreen implements Screen {
     private ScreenManager parent;
     private Stage stage;
@@ -54,7 +53,7 @@ public class HelpScreen implements Screen {
         // Add table (which holds buttons) to the stage
         Table table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        //table.setDebug(true);
 
         // Create buttons
         skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
@@ -69,7 +68,7 @@ public class HelpScreen implements Screen {
             Label b1 = new Label("Collect buffs and debuffs", skin, "big");
             Label b2 = new Label("which are represented by students of other majors", skin, "big");
 
-            Label detail = new Label("See Buffs and Debuffs detailed description", skin, "default");
+            Label detail = new Label("See Buffs and Debuffs detailed description", skin,"boxed");
 
             // Go back to menu
             TextButton menu = new TextButton("Back to Menu", skin);
@@ -117,16 +116,17 @@ public class HelpScreen implements Screen {
             Label buffsLabel = new Label("Buffs:", skin, "big");
             Label debuffsLabel = new Label("Debuffs:", skin, "big");
 
-            Label buff1 = new Label("Player Sprite hits Business Major Sprite during the game: Player speed decreases for 10 seconds", skin);
-            Label buff2 = new Label("Player Sprite hits Nutrition Major Sprite during the game: Player size decreases for 10 seconds", skin);
-            Label buff3 = new Label("Player Sprite hits Dean Sprite during the game: Player is immune to 1 obstacle for 5 seconds", skin);
-            Label buff4 = new Label("Player Sprite hits Coffee Icon during the game: Player jumps higher for 10 seconds", skin);
+            Label buff1 = new Label("Business Major Sprite : Player speed decreases for 10 seconds", skin);
+            Label buff2 = new Label("Nutrition Major Sprite: Player size decreases for 10 seconds", skin);
+            Label buff3 = new Label("Dean Sprite: Player is immune to 1 obstacle for 5 seconds", skin);
+            Label buff4 = new Label("Coffee Icon: Player jumps higher for 10 seconds", skin);
 
-            Label debuff1 = new Label("Player Sprite hits Sports Science Major Sprite during the game: Player speed increases for 10 seconds", skin);
-            Label debuff2 = new Label("Player Sprite hits Culinary Major Sprite during the game: Player size increases for 10 seconds", skin);
-            Label debuff3 = new Label("Player Sprite hits Beer Icon during the game: Player jumps lower for 10 seconds", skin);
+            Label debuff1 = new Label("Sports Science Major Sprite : Player speed increases for 10 seconds", skin);
+            Label debuff2 = new Label("Culinary Major Sprite : Player size increases for 10 seconds", skin);
+            Label debuff3 = new Label("Beer Icon : Player jumps lower for 10 seconds", skin);
 
-            Label detail = new Label("Less Detail", skin);
+            //Label detail = new Label("Less Detail", skin);
+            Label detail = new Label("Back to How to Play", skin,"boxed");
 
 
 
@@ -164,8 +164,6 @@ public class HelpScreen implements Screen {
                 }
             });
         }
-
-
        stage.addActor(table);
     }
 

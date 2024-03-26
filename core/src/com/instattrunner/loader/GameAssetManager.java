@@ -32,16 +32,16 @@ public class GameAssetManager {
     // Load images
     // Loop to loop through all value of string array which has all path of obstacles and buff
     public void queueAddImages(){
-        manager.load(locCHub.floorImage, Texture.class);
-        manager.load(locCHub.playerImage, Texture.class);
+        manager.load(locCHub.floorImageName, Texture.class);
+        manager.load(locCHub.playerImageName, Texture.class);
 
-        for (String obstacleImage : locCHub.obstacleImages)
+        for (String obstacleImage : locCHub.obstacleImagesName)
             manager.load(obstacleImage, Texture.class);
 
-        for (String buffImage : locCHub.buffImages)
+        for (String buffImage : locCHub.buffImagesName)
             manager.load(buffImage, Texture.class);
 
-        for (String debuffImage : locCHub.debuffImages)
+        for (String debuffImage : locCHub.debuffImagesName)
             manager.load(debuffImage, Texture.class);
     }
 

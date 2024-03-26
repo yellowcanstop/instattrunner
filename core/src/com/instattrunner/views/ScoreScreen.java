@@ -52,6 +52,7 @@ public class ScoreScreen implements Screen {
         backgroundImage = new Image(parent.backgroundTexture);
 
         // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
+        scoreManager = new ScoreManager();
         highscore = scoreManager.loadTextFile();
     }
 

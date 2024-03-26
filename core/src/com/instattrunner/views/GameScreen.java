@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.BodyData;
 import com.instattrunner.GameWorld;
+import com.instattrunner.ScoreManager;
 import com.instattrunner.ScreenManager;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.ConstHub;
@@ -35,12 +36,13 @@ import java.util.concurrent.TimeoutException;
 public class GameScreen implements Screen {
     // ScreenManager as Parent
     private ScreenManager parent;
+    private ScoreManager scoreManager;
     private OrthographicCamera cam;
     private KeyboardController controller;
     private ConstHub locCHub;
     private GameWorld gameWorld;
     private SpriteBatch sb;
-    private BitmapFont font = new BitmapFont();
+    private BitmapFont font;
 
     private Box2DDebugRenderer debugRenderer;
     private boolean debug = true; // tweak if want to debug
@@ -69,10 +71,12 @@ public class GameScreen implements Screen {
     public long minSpawnInterval = 1200;
     public long obstacleSpawnInterval = minSpawnInterval;
     public long buffSpawnInterval = minSpawnInterval * 2;
+
+    // Create random object to get random numbers
     Random random = new Random(TimeUtils.millis());
-    private int highScore;
 
-
+    // Store high score value
+    private int highscore;
 
 
     public GameScreen(ScreenManager screenManager) {
@@ -118,6 +122,10 @@ public class GameScreen implements Screen {
         obstacleScale = locCHub.obstacleScale;
         buffScale = locCHub.buffScale;
         debuffScale = locCHub.debuffScale;
+
+        font = new BitmapFont(Gdx.files.internal("skin/score.fnt"));
+        scoreManager = new ScoreManager();
+        highscore = scoreManager.loadTextFile();
     }
 
 
@@ -141,26 +149,26 @@ public class GameScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, gameWorld.player.getPosition().x, model.player.getPosition().y, playerWidHei.x * assMan.playerScale, playerWidHei.y * assMan.playerScale);
+        sb.draw(playerTex, gameWorld.player.getPosition().x, gameWorld.player.getPosition().y, playerWidHei.x * locCHub.playerScale, playerWidHei.y * locCHub.playerScale);
         // Draw floor
-        sb.draw(floorTex, model.floor.getPosition().x - (floorWidHei.x / 2), model.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
+        sb.draw(floorTex, gameWorld.floor.getPosition().x - (floorWidHei.x / 2), gameWorld.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs
-        loopDraw(model.obstacles, obTexs, obstacleWidHei, obstacleScale);
-        loopDraw(model.buffs, buffTexs, buffWidHei, buffScale);
-        loopDraw(model.debuffs, debuffTexs, debuffWidHei, debuffScale);
+        loopDraw(gameWorld.obstacles, obTexs, obstacleWidHei, obstacleScale);
+        loopDraw(gameWorld.buffs, buffTexs, buffWidHei, buffScale);
+        loopDraw(gameWorld.debuffs, debuffTexs, debuffWidHei, debuffScale);
 
 
-        float tempLocBuff = model.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
-        float tempLocDebuff = model.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
+        float tempLocBuff = gameWorld.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
+        float tempLocDebuff = gameWorld.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
         for (int i = 0; i < 4; i++){
-            if (model.buffActive[i]){
+            if (gameWorld.buffActive[i]){
                 if (buffWidHei[i].x > buffWidHei[i].y)
                     sb.draw(buffTexs.get(i), tempLocBuff, 9.8f, 1.5f, 1.5f / buffWidHei[i].x * buffWidHei[i].y);
                 else
                     sb.draw(buffTexs.get(i), tempLocBuff, 9.5f, 2 / buffWidHei[i].y * buffWidHei[i].x, 2);
                 tempLocBuff += 2f;
             }
-            if (model.debuffActive[i]){
+            if (gameWorld.debuffActive[i]){
                 if (debuffWidHei[i].x > debuffWidHei[i].y)
                     sb.draw(debuffTexs.get(i), tempLocDebuff,7.1f, 1.5f, 1.5f / debuffWidHei[i].x * debuffWidHei[i].y);
                 else
@@ -170,67 +178,60 @@ public class GameScreen implements Screen {
 
         }
 
-        // System.out.printf("  Buff : %b   %b   %b   %b\n", model.buffActive[0], model.buffActive[1], model.buffActive[2], model.buffActive[3]);
-        // System.out.printf("Debuff : %b   %b   %b   %b\n\n", model.debuffActive[0], model.debuffActive[1], model.debuffActive[2], model.debuffActive[3]);
-
-        BitmapFont font = new BitmapFont(Gdx.files.internal("skin/score.fnt"));
         // Set the font size for the "Score" text
         font.getData().setScale(0.03f);
-// Draw the "Score" text
+        // Draw the "Score" text
         font.draw(sb, "Score", 5, 11);
 
         // Set the font size for the "Score" text
         font.getData().setScale(0.03f);
-// Draw the "Score" text
-        font.draw(sb, String.format("%04d", model.score), 6, 9);
+        // Draw the "Score" text
+        font.draw(sb, String.format("%04d", gameWorld.score), 6, 9);
 
-// Set the font size for the "HighScore" text
+        // Set the font size for the "HighScore" text
         font.getData().setScale(0.03f);
         font.draw(sb, "H1ghscore", -10,11);
 
         font.getData().setScale(0.03f);
-        font.draw(sb, String.format("%04d", highScore), -8,9);
-
+        font.draw(sb, String.format("%04d", highscore), -8,9);
 
         // Spawn obstacle based on speed var determiner 
-        if(TimeUtils.timeSinceMillis(model.obstacleTime) > obstacleSpawnInterval) 
-            model.spawnObstacles(model.regular);
-   
-        model.trackObstacles();
+        if(TimeUtils.timeSinceMillis(gameWorld.obstacleTime) > obstacleSpawnInterval) 
+            gameWorld.spawnObstacles(gameWorld.regular);
+        gameWorld.trackObstacles();
 
-        // Randomly choose to spawn buff or debuff every 2 seconds 
-        // Type of buff/debuff will be randomly choosen by .create method in IRModel
+        // Randomly choose to spawn buff or debuff  
+        // Type of buff/debuff will be randomly choosen by .create method in GameWorld
         int choice = random.nextInt(2);
-        if (TimeUtils.timeSinceMillis(model.buffTime) > buffSpawnInterval){
+        if (TimeUtils.timeSinceMillis(gameWorld.buffTime) > buffSpawnInterval){
             if (choice == 0) 
-                model.spawnBuffs();
+                gameWorld.spawnBuffs();
             else if (choice == 1)
-                model.spawnDebuffs();
+                gameWorld.spawnDebuffs();
         }
-        model.trackBuffsDebuffs();
+        gameWorld.trackBuffsDebuffs();
 
+        // End sprite batch
         sb.end();
 
-        highScore = loadTextFile();
-
-        if (model.isDead) {
-            if (model.immunity){
-                model.removeCollidedObstacle();
-                model.resetImmune();
+        if (gameWorld.isDead) {
+            if (gameWorld.immunity){
+                gameWorld.removeCollidedObstacle();
+                gameWorld.resetImmune();
             }
 
             else {
-                if (highScore < model.score) {
-                    highScore = model.score;
-                    System.out.println("new high score obtain");
-                    System.out.println(highScore);
-                    updateHighScore(highScore);
+                if (highscore < gameWorld.score) {
+                    highscore = gameWorld.score;
+                    System.out.print("new high score obtain  :  ");
+                    System.out.println(highscore);
+                    scoreManager.updateHighScore(highscore); 
                 }
-                parent.finalScore = model.score;
-                parent.changeScreen(InstattRunner.END);
+                parent.finalScore = gameWorld.score;
+                parent.changeScreen(ScreenManager.END);
             }
 
-            model.isDead = false;
+            gameWorld.isDead = false;
         }
     }
 
@@ -239,18 +240,22 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
     }
 
+
     @Override
     public void pause() {
     }
+
 
     @Override
     public void resume() {
     }
 
+
     @Override
     public void hide() {
     }
 
+    
     @Override
     public void dispose() {
         playerTex.dispose();
@@ -265,34 +270,6 @@ public class GameScreen implements Screen {
     }
 
 
-    // both to be removed
-    public int loadTextFile(){
-        // Load the file using a FileHandle
-        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
-
-        // Read the contents of the file into a String
-        String highScoreString = fileHandle.readString();
-
-        int score=0;
-        // Parse the String to an integer
-        try {
-            score = Integer.parseInt(highScoreString.trim());
-        } catch (NumberFormatException e) {
-            // Handle parsing error (e.g., file contents are not a valid integer)
-            e.printStackTrace();
-        }
-
-        return score;
-    }
-    private void updateHighScore(int newHighScore) {
-        FileHandle fileHandle = Gdx.files.local("score/HighScore.txt");
-        String stringHighScore = Integer.toString(newHighScore);
-        fileHandle.writeString(stringHighScore, false);
-
-        System.out.println("highscoreadded");
-    }
-
-
     // Just trying to reduce repeated code
     private void loopDraw(Array<Body> bodys, Array<Texture> bodyTexs, Vector2[] bodyWidHei, float bodyScale) {
         int tempTextureId;
@@ -301,7 +278,7 @@ public class GameScreen implements Screen {
         for (Body body : bodys) {
             // .getTextureId return texture id of particular model and use it as index on the texture array 
             // .getPosition returns bottom left coord as these are complex polygon (only floor .getPosition return center)
-            tempTextureId = model.getTextureId(body);
+            tempTextureId = gameWorld.getTextureId(body);
             tempWidHei = bodyWidHei[tempTextureId];
             sb.draw(bodyTexs.get(tempTextureId), body.getPosition().x, body.getPosition().y, tempWidHei.x* bodyScale, tempWidHei.y * bodyScale);
         }

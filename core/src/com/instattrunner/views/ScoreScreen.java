@@ -2,10 +2,8 @@ package com.instattrunner.views;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -15,13 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.instattrunner.InstattRunner;
+import com.instattrunner.ScoreManager;
 import com.instattrunner.ScreenManager;
-import com.instattrunner.loader.ConstHub;
 
 public class ScoreScreen implements Screen {
     // ScreenManager as Parent 
     private ScreenManager parent;
+
+    // Use to call load and store score methods
+    private ScoreManager scoreManager; 
  
     // Create Stage to store ui elements and skin for button skins
     private Stage stage;
@@ -32,6 +32,9 @@ public class ScoreScreen implements Screen {
 
     // Table to store ui elements in it and then only pass the table to stage
     private Table table;
+
+    // Store highscore value
+    private int highscore;
 
 
     public ScoreScreen(ScreenManager screenManager) {
@@ -47,6 +50,9 @@ public class ScoreScreen implements Screen {
 
         // Create Image from backgroundTexture from ScreenManager
         backgroundImage = new Image(parent.backgroundTexture);
+
+        // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
+        highscore = scoreManager.loadTextFile();
     }
 
 
@@ -67,11 +73,10 @@ public class ScoreScreen implements Screen {
         table.setFillParent(true);
         table.setDebug(true);
 
-        highScore = loadTextFile();
 
         // Create labels
         Label titleLabel = new Label("High Score", skin,"big");
-        Label i1 = new Label("" + highScore, skin,"big");
+        Label i1 = new Label("" + highscore, skin,"big");
 
         // Create Text Buttons to go back to menu
         TextButton menu = new TextButton("Back to Menu", skin);
@@ -135,27 +140,5 @@ public class ScoreScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-    }
-
-
-
-    int highScore;
-    public int loadTextFile(){
-        // Load the file using a FileHandle
-        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
-
-        // Read the contents of the file into a String
-        String highScoreString = fileHandle.readString();
-
-        int score=0;
-        // Parse the String to an integer
-        try {
-            score = Integer.parseInt(highScoreString.trim());
-        } catch (NumberFormatException e) {
-            // Handle parsing error (e.g., file contents are not a valid integer)
-            e.printStackTrace();
-        }
-
-        return score;
     }
 }

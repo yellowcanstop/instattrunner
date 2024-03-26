@@ -43,13 +43,11 @@ public class ScreenManager extends Game {
     // Background texture to pass to screens
     public Texture backgroundTexture;
 
-
-
-
-	public int finalScore = 0; // set value when player dies
-
+    // Set size of screen
 	public final int VIEW_WIDTH = 800;
 	public final int VIEW_HEIGHT = 600;
+
+	public int finalScore = 0; // set value when player dies
 
     
 

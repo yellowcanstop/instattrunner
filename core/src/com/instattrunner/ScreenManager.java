@@ -3,6 +3,7 @@ package com.instattrunner;
 import com.badlogic.gdx.Game; // game class used to delegate between different screens
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.instattrunner.loader.ConstHub;
 import com.instattrunner.loader.GameAssetManager;
 import com.instattrunner.views.EndScreen;
 import com.instattrunner.views.GameScreen;
@@ -17,6 +18,11 @@ import com.instattrunner.views.HighscoreScreen;
 - views for displaying and rendering
 - controllers for mapping user input to methods in model */
 public class ScreenManager extends Game {
+    // Constants Hub
+    public ConstHub constHub = new ConstHub();
+    // Asset Manager
+    public GameAssetManager assMan = new GameAssetManager(this);
+
     // Screens
 	private MenuScreen menuScreen;
     private GameScreen gameScreen;
@@ -24,11 +30,14 @@ public class ScreenManager extends Game {
     private ScoreScreen scoreScreen;
 	private EndScreen endScreen;
 
-    // Asset Manager
-    public GameAssetManager assMan = new GameAssetManager();
-
+    // Background Music
 	private Music bgMusic;
 	private Music gmMusic;
+
+
+
+
+
 	public int finalScore = 0; // set value when player dies
 
 	public final static int VIEW_WIDTH = 800;

@@ -4,22 +4,22 @@ import com.badlogic.gdx.math.Vector2;
 
 
 public class ConstHub {
-
     // Enum for obstacle, buff, debuff
     // obstacle
-    public static final int CAT = 0;
-    public static final int GOOSE = 1;
-    public static final int LAKE = 2;
-    public static final int STAIRS = 3;
+    public final int CAT = 0;
+    public final int GOOSE = 1;
+    public final int LAKE = 2;
+    public final int STAIRS = 3;
     // buff
-    public static final int BUSINESS_MAN_1_AI = 0;
-    public static final int NUTRITION_MAJOR = 1;
-    public static final int COFFEE = 2;
-    public static final int DEAN = 3;
+    public final int BUSINESS_MAN_1_AI = 0;
+    public final int NUTRITION_MAJOR = 1;
+    public final int COFFEE = 2;
+    public final int DEAN = 3;
     // debuff
-    public static final int SPORTS_SCIENCE_MAJOR = 0;
-    public static final int CULINARY_MAJOR = 1;
-    public static final int BEER = 2;
+    public final int SPORTS_SCIENCE_MAJOR = 0;
+    public final int CULINARY_MAJOR = 1;
+    public final int BEER = 2;
+
 
     // Images file names
     public final String floorImage = "pic/Floor.png";

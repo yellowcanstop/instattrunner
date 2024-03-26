@@ -28,7 +28,6 @@ import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.ConstHub;
 
 import java.util.Random;
-import java.util.concurrent.TimeoutException;
 
 
 // Screen which shows the game play
@@ -91,7 +90,7 @@ public class GameScreen implements Screen {
         controller = new KeyboardController();
 
         // Reset all constHub's values changed
-        locCHub.regularPlayerScale = locCHub.REFplayerScale;
+        locCHub.renderPlayerScale = locCHub.REFplayerScale;
 
 
         gameWorld = new GameWorld(controller, parent.assMan, this);
@@ -148,7 +147,7 @@ public class GameScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, gameWorld.player.getPosition().x, gameWorld.player.getPosition().y, playerWidHei.x * locCHub.playerScale, playerWidHei.y * locCHub.playerScale);
+        sb.draw(playerTex, gameWorld.player.getPosition().x, gameWorld.player.getPosition().y, playerWidHei.x * locCHub.renderPlayerScale, playerWidHei.y * locCHub.renderPlayerScale);
         // Draw floor
         sb.draw(floorTex, gameWorld.floor.getPosition().x - (floorWidHei.x / 2), gameWorld.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs

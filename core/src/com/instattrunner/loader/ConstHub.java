@@ -39,9 +39,10 @@ public class ConstHub {
 
     // Scale of category of body
     public final float REFplayerScale = 0.007f;    // Used to store a reference copy (constant) of playerScale as playerScale will be changed throughout the game
-    public float regularPlayerScale = REFplayerScale;
-    public float smallPlayerScale = 0.0054f;
-    public float bigPlayerScale = 0.0082f;
+    public float renderPlayerScale = REFplayerScale;
+    public final float regularPlayerScale = 0.007f;
+    public final float smallPlayerScale = 0.0054f;
+    public final float bigPlayerScale = 0.0082f;
     public final float obstacleScale = 0.009f;
     public final float buffScale = 0.006f;
     public final float debuffScale = 0.0073f;

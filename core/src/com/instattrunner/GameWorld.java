@@ -30,7 +30,7 @@ public class GameWorld {
     public World world;
     private KeyboardController controller;
     private GameScreen gameScreen;
-    private GameAssetManager assMan;
+    public GameAssetManager assMan;
     public ConstHub locCHub;
 
     // Random generator
@@ -68,14 +68,6 @@ public class GameWorld {
     private ArrayList<Integer> buffSpawnUsed = new ArrayList<>();
     private ArrayList<Integer> debuffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2));
     private ArrayList<Integer> debuffSpawnUsed = new ArrayList<>();
-
-    // Declare object Sound to store sound loaded from asset manager
-    private Sound jump;
-    private Sound collect;
-
-    // enum for sound 
-    public static final int JUMP_SOUND = 0;
-    public static final int COLLECT_SOUND = 1;
 
     // Vars for environment
     public long obstacleTime = TimeUtils.millis() - 1200;    // Time since last obstacle spawn
@@ -139,28 +131,11 @@ public class GameWorld {
         // Init different type of Body classes
         floorClass = new Floor(this);
         playerClass = new Player(this);
-
-        // load sounds into model
-        assMan.queueAddSounds();
-        assMan.manager.finishLoading();
-        jump = assMan.manager.get("sounds/drop.wav");
-        collect = assMan.manager.get("sounds/drop.wav");
-
-        // Init BodyEditorLoader
-
-
-        //Load width and height of largest obstacle
-        stairsWidHei = assMan.obstacleWidHei[3];
-        
-        
-        // Load scale of body of different category
-        playerScale = assMan.playerScale;
-        obstacleScale = assMan.obstacleScale;
-        buffScale = assMan.buffScale;
-        debuffScale = assMan.debuffScale;
+        obstacleClass = new Obstacle(this);
+        buffClass = new Buff(this);
+        debuffClass = new Debuff(this);
 
         collideDeBuff = null;
-
         
         // Create floor and player of game 
         floorClass.createFloor();
@@ -367,7 +342,7 @@ public class GameWorld {
 
 
     public void spawnObstacles(float v) {
-        obstacles.add(createObstacle(v));
+        obstacles.add(obstacleClass.createObstacle(v));
         obstacleTime = TimeUtils.millis();
         main.obstacleSpawnInterval = main.minSpawnInterval + (300 * random.nextInt(6));
     }
@@ -384,13 +359,13 @@ public class GameWorld {
     }
 
     public void spawnBuffs() {
-        buffs.add(createBuff());
+        buffs.add(buffClass.createBuff());
         buffTime = TimeUtils.millis();
         main.buffSpawnInterval = (long)(main.minSpawnInterval * 3) + (300 * random.nextInt(6));
     }
 
     public void spawnDebuffs() {
-        debuffs.add(createDebuff());
+        debuffs.add(debuffClass.createDebuff());
         buffTime = TimeUtils.millis();
         main.buffSpawnInterval = (long)(main.minSpawnInterval * 3) + (300 * random.nextInt(6));
     }
@@ -413,16 +388,6 @@ public class GameWorld {
 
 
 
-    public void playSound(int sound) {
-        switch(sound) {
-            case JUMP_SOUND:
-                jump.play();
-                break;
-            case COLLECT_SOUND:
-                collect.play();
-                break;
-        }
-    }
 
 
 

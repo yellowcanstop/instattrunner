@@ -2,12 +2,9 @@ package com.instattrunner.views;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -17,9 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.ScreenManager;
 import com.instattrunner.loader.ConstHub;
 
@@ -27,35 +22,33 @@ import com.instattrunner.loader.ConstHub;
 for them to decide what action to take next
  */
 public class MenuScreen implements Screen {
-    // ScreenManager as Parent and Constants Hub 
+    // ScreenManager as Parent
     private ScreenManager parent;
-    private ConstHub locCHub;
 
     // Create Stage to store ui elements and skin for button skins
     private Stage stage;
     private Skin skin;
 
-    // Texture of background image
-    private Texture backgroundTexture;
+    // Image of background
     private Image backgroundImage;
+
+    // Table to store ui elements in it and then only pass the table to stage
     private Table table;
 
 
     public MenuScreen(ScreenManager screenManager) {
         parent = screenManager;
-        locCHub = parent.constHub;
 
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
 
-        // load skin using asset manager
+        // Load skin using asset manager
         parent.assMan.queueAddSkin();
         parent.assMan.manager.finishLoading();
-        skin = parent.assMan.manager.get(locCHub.skinName);
+        skin = parent.assMan.manager.get(parent.constHub.skinName);
 
-        // Retrieve background texture from asset manager
-        backgroundTexture = parent.backgroundTexture;
-        backgroundImage = new Image(backgroundTexture);
+        // Create Image from backgroundTexture from ScreenManager
+        backgroundImage = new Image(parent.backgroundTexture);
     }
 
 
@@ -76,7 +69,6 @@ public class MenuScreen implements Screen {
         table = new Table();
         table.setFillParent(true);
         table.setDebug(true);
-        stage.addActor(table);
 
         // Create LabelStyle for labels
         LabelStyle bigLabelStyle = skin.get("big", LabelStyle.class);
@@ -131,6 +123,8 @@ public class MenuScreen implements Screen {
                 Gdx.app.exit();
             }
         });
+
+        stage.addActor(table);
     }
 
 
@@ -172,5 +166,6 @@ public class MenuScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        skin.dispose();
     }
 }

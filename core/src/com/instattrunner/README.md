@@ -12,3 +12,10 @@ Temp classes
 
 - ScoreScreen is the same as HighscoreScreen
 
+
+working on the different classes
+started from instattrunner to screenn manageer
+finished GameAssetManager and ConstHub
+now going through all screens in button order
+skipping help screen as jeeeeyvi is still working on 
+menu screen migration completed

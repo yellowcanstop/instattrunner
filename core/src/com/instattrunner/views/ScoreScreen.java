@@ -14,24 +14,130 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
 import com.instattrunner.ScreenManager;
+import com.instattrunner.loader.ConstHub;
 
 public class ScoreScreen implements Screen {
+    // ScreenManager as Parent 
     private ScreenManager parent;
+ 
+    // Create Stage to store ui elements and skin for button skins
     private Stage stage;
     private Skin skin;
-    private Texture backgroundTexture;
+
+    // Image of background
+    private Image backgroundImage;
+
+    // Table to store ui elements in it and then only pass the table to stage
+    private Table table;
+
 
     public ScoreScreen(ScreenManager screenManager) {
         parent = screenManager;
+
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
-        backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path
+
+        // Load skin using asset manager
+        parent.assMan.queueAddSkin();
+        parent.assMan.manager.finishLoading();
+        skin = parent.assMan.manager.get(parent.constHub.skinName);
+
+        // Create Image from backgroundTexture from ScreenManager
+        backgroundImage = new Image(parent.backgroundTexture);
     }
+
+
+    @Override
+    public void show() {
+        // Set the background image
+        backgroundImage.setFillParent(true);
+        stage.addActor(backgroundImage);
+
+        // Push input to stage
+        Gdx.input.setInputProcessor(stage);
+        // Should not need
+        // stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        // stage.draw();
+
+        // Add table (which holds buttons) to the stage
+        table = new Table();
+        table.setFillParent(true);
+        table.setDebug(true);
+
+        highScore = loadTextFile();
+
+        // Create labels
+        Label titleLabel = new Label("High Score", skin,"big");
+        Label i1 = new Label("" + highScore, skin,"big");
+
+        // Create Text Buttons to go back to menu
+        TextButton menu = new TextButton("Back to Menu", skin);
+
+        // Action for menu button
+        menu.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.changeScreen(ScreenManager.MENU);
+            }
+        });
+
+        table.add(titleLabel).colspan(2);
+        table.row().pad(10, 0, 10, 0);
+        table.row().pad(10, 0, 10, 0);
+        table.add(titleLabel).colspan(2);
+        table.row().pad(10, 0, 10, 0);
+        table.add(i1).colspan(2);
+        table.row().padTop(10);
+        table.add(menu).colspan(2);
+
+        stage.addActor(table);
+    }
+
+
+    @Override
+    public void render(float delta) {
+        // Clear screen before start drawing the next screen
+        Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.draw();
+    }
+
+
+    @Override
+    public void resize(int width, int height) {
+        // recalculate viewport each time window is resized
+        stage.getViewport().update(width, height, true);
+    }
+
+
+    @Override
+    public void pause() {
+
+    }
+
+
+    @Override
+    public void resume() {
+
+    }
+
+
+    @Override
+    public void hide() {
+
+    }
+
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
+
+
 
     int highScore;
     public int loadTextFile(){
@@ -51,90 +157,5 @@ public class ScoreScreen implements Screen {
         }
 
         return score;
-    }
-
-    @Override
-    public void show() {
-        // Set the background image
-        Image background = new Image(backgroundTexture);
-        background.setFillParent(true);
-        stage.addActor(background);
-
-
-        Gdx.input.setInputProcessor(stage);
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        stage.draw();
-
-        // Add table (which holds buttons) to the stage
-        Table table = new Table();
-        table.setFillParent(true);
-        table.setDebug(true);
-
-        // Create buttons
-        skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
-        Label titleLabel = new Label("High Score", skin,"big");
-        highScore = loadTextFile();
-        Label i1 = new Label(""+highScore, skin,"big");
-
-
-
-        // Go back to menu
-        TextButton menu = new TextButton("Back to Menu", skin);
-        menu.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(InstattRunner.MENU);
-            }
-        });
-
-        table.add(titleLabel).colspan(2);
-        table.row().pad(10, 0, 10, 0);
-
-        table.row().pad(10, 0, 10, 0);
-
-        table.add(titleLabel).colspan(2);
-        table.row().pad(10, 0, 10, 0);
-        table.add(i1).colspan(2);
-        table.row().padTop(10);
-        table.add(menu).colspan(2);
-
-        stage.addActor(table);
-    }
-
-    @Override
-    public void render(float delta) {
-        // Clear screen before start drawing the next screen
-        Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        // recalculate viewport each time window is resized
-        stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
-        // skin disposed via asset manager
-        backgroundTexture.dispose();
     }
 }

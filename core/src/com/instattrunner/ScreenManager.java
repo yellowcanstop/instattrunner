@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game; // game class used to delegate between different s
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.instattrunner.loader.ConstHub;
 import com.instattrunner.loader.GameAssetManager;
 import com.instattrunner.views.EndScreen;
@@ -39,7 +40,7 @@ public class ScreenManager extends Game {
 	public final static int SCORE = 4;
 	public final static int END = 3;
 
-    // Background texture
+    // Background texture to pass to screens
     public Texture backgroundTexture;
 
 
@@ -69,7 +70,7 @@ public class ScreenManager extends Game {
         // Load background for all other screens
         assMan.queueAddBackground();
         assMan.manager.finishLoading();
-        backgroundTexture = assMan.manager.get(constHub.bgImageName)
+        backgroundTexture = assMan.manager.get(constHub.bgImageName);
 	}
 
 

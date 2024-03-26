@@ -23,11 +23,11 @@ public class InstattRunner extends Game {
 	public IRAssetManager assetMan = new IRAssetManager();
 	public OrthographicCamera gameCam = new OrthographicCamera();
 	private Music bgMusic;
+	private Music gmMusic;
 	public int finalScore = 0; // set value when player dies
 
 	public final static int VIEW_WIDTH = 800;
 	public final static int VIEW_HEIGHT = 600;
-
 
 	public final static int MENU = 0;
 	public final static int PLAY = 1;
@@ -46,6 +46,7 @@ public class InstattRunner extends Game {
 		assetMan.queueAddMusic();
 		assetMan.manager.finishLoading();
 		bgMusic = assetMan.manager.get("music/rain.mp3");
+		gmMusic = assetMan.manager.get("music/game.mp3");
 		bgMusic.play();
 
 	}
@@ -60,6 +61,7 @@ public class InstattRunner extends Game {
 			case PLAY:
 				if (mainScreen == null) mainScreen = new MainScreen(this);
 				bgMusic.stop();
+				gmMusic.play();
 				this.setScreen(mainScreen);
 				break;
 			case HELP:
@@ -75,6 +77,7 @@ public class InstattRunner extends Game {
 				if (endScreen == null) endScreen = new EndScreen(this);
 				mainScreen = null;
 				this.setScreen(endScreen);
+				gmMusic.stop();
 				bgMusic.play();
 				break;
 		}

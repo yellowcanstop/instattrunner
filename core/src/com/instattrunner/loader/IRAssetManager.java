@@ -60,6 +60,7 @@ public class IRAssetManager {
 
     // Music file
     public final String bgSound = "music/rain.mp3";
+    public final String gmSound = "music/game.mp3";
  
     // Texture file
     public final String skin = "skin/comic-ui.json";
@@ -87,8 +88,8 @@ public class IRAssetManager {
     // Load music
     public void queueAddMusic() {
         manager.load(bgSound, Music.class);
+        manager.load(gmSound, Music.class);
     }
-
     // Load skin
     public void queueAddSkin() {
         SkinParameter params = new SkinParameter("skin/comic-ui.atlas");

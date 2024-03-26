@@ -76,7 +76,7 @@ public class EndScreen implements Screen {
         skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
         Label l1 = new Label("Oh no you didn't make it in time!\nInstatt is locked again.", skin, "big");
         Label l2 = new Label("Your score: " + parent.finalScore, skin, "big");
-        Label l3 = new Label("Your high score is " + highScore,skin);
+        Label l3 = new Label("Your high score is " + highScore,skin, "big");
 
         // Go back to menu
         TextButton menu = new TextButton("Back to Menu", skin);

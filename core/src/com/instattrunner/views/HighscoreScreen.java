@@ -71,9 +71,9 @@ public class HighscoreScreen implements Screen {
 
         // Create buttons
         skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
-        Label titleLabel = new Label("High Score", skin);
+        Label titleLabel = new Label("High Score", skin,"big");
         highScore = loadTextFile();
-        Label i1 = new Label(""+highScore, skin);
+        Label i1 = new Label(""+highScore, skin,"big");
 
 
 

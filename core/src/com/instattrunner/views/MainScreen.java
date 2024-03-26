@@ -178,24 +178,23 @@ public class MainScreen implements Screen {
         // System.out.printf("  Buff : %b   %b   %b   %b\n", model.buffActive[0], model.buffActive[1], model.buffActive[2], model.buffActive[3]);
         // System.out.printf("Debuff : %b   %b   %b   %b\n\n", model.debuffActive[0], model.debuffActive[1], model.debuffActive[2], model.debuffActive[3]);
 
+        BitmapFont font = new BitmapFont(Gdx.files.internal("skin/score.fnt"));
+        // Set the font size for the "Score" text
+        font.getData().setScale(0.03f);
+// Draw the "Score" text
+        font.draw(sb, "Score", 5, 11);
 
         // Set the font size for the "Score" text
-        font.getData().setScale(0.12f);
-        // Draw the "Score" text
-        font.draw(sb, "Score: " + model.score, 4, 11);
-        // Set the font size for the "HighScore" text
-        font.getData().setScale(0.1f);
-        // Estimate the average width of characters in the font
-        float averageCharWidth = font.getCapHeight() * 0.4f; // Adjust as needed
-        // Estimate the width of the "HighScore" text based on the number of characters
-        float highScoreTextWidth = ("HighScore: " + highScore).length() * averageCharWidth; // Adjust as needed
-        // Calculate the x-coordinate for the "HighScore" text to prevent overlapping
-        float highScoreX = -1 + highScoreTextWidth; // Adjust as needed
-        // Calculate the y-coordinate for the "HighScore" text
-        float highScoreY = 8 + font.getLineHeight(); // Adjust as needed
-        // Draw the "HighScore" text
-        font.draw(sb, "HighScore" + highScore, highScoreX,highScoreY);
+        font.getData().setScale(0.03f);
+// Draw the "Score" text
+        font.draw(sb, String.format("%04d", model.score), 6, 9);
 
+// Set the font size for the "HighScore" text
+        font.getData().setScale(0.03f);
+        font.draw(sb, "H1ghscore", -10,11);
+
+        font.getData().setScale(0.03f);
+        font.draw(sb, String.format("%04d", highScore), -8,9);
 
 
         // Spawn obstacle based on speed var determiner 

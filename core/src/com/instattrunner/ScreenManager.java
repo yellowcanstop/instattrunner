@@ -18,9 +18,8 @@ import com.instattrunner.views.HighscoreScreen;
 - views for displaying and rendering
 - controllers for mapping user input to methods in model */
 public class ScreenManager extends Game {
-    // Constants Hub
+    // Constants Hub and Asset Manager
     public ConstHub constHub = new ConstHub();
-    // Asset Manager
     public GameAssetManager assMan = new GameAssetManager(this);
 
     // Screens
@@ -30,13 +29,14 @@ public class ScreenManager extends Game {
     private ScoreScreen scoreScreen;
 	private EndScreen endScreen;
 
+
+
+
+
+
     // Background Music
 	private Music bgMusic;
 	private Music gmMusic;
-
-
-
-
 
 	public int finalScore = 0; // set value when player dies
 
@@ -46,8 +46,11 @@ public class ScreenManager extends Game {
 	public final static int MENU = 0;
 	public final static int PLAY = 1;
 	public final static int HELP = 2;
-	public final static int HIGHSCORE =4;
+	public final static int SCORE = 4;
 	public final static int END = 3;
+
+
+
 
 	// Set default screen when application opens
 	@Override

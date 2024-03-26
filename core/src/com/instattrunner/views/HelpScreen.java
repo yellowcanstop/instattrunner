@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
+import com.instattrunner.ScreenManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -25,14 +26,14 @@ import com.badlogic.gdx.graphics.Texture;
 
 
 public class HelpScreen implements Screen {
-    private InstattRunner parent;
+    private ScreenManager parent;
     private Stage stage;
     private Skin skin;
     private Texture backgroundTexture;
     private boolean detailPage = false;
 
-    public HelpScreen(InstattRunner instattRunner) {
-        parent = instattRunner;
+    public HelpScreen(ScreenManager screenManager) {
+        parent = screenManager;
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
         backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path

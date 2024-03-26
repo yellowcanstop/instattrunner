@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
+import com.instattrunner.ScreenManager;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -22,14 +23,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 
 public class MenuScreen implements Screen {
-    private InstattRunner parent;
+    private ScreenManager parent;
     private Stage stage;
     private Skin skin;
 
     private Texture backgroundTexture;
 
-    public MenuScreen(InstattRunner instattRunner) {
-        parent = instattRunner;
+    public MenuScreen(ScreenManager screenManager) {
+        parent = screenManager;
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
         // load skin using asset manager

@@ -18,15 +18,16 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.instattrunner.InstattRunner;
+import com.instattrunner.ScreenManager;
 
 public class ScoreScreen implements Screen {
-    private InstattRunner parent;
+    private ScreenManager parent;
     private Stage stage;
     private Skin skin;
     private Texture backgroundTexture;
 
-    public ScoreScreen(InstattRunner instattRunner) {
-        parent = instattRunner;
+    public ScoreScreen(ScreenManager screenManager) {
+        parent = screenManager;
         OrthographicCamera gameCam  = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
         backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path

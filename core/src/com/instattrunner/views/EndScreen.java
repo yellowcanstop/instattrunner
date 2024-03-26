@@ -18,16 +18,17 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.instattrunner.InstattRunner;
+import com.instattrunner.ScreenManager;
 
 
 public class EndScreen implements Screen {
-    private InstattRunner parent;
+    private ScreenManager parent;
     private Stage stage;
     private Skin skin;
     private Texture backgroundTexture;
 
-    public EndScreen(InstattRunner instattRunner) {
-        parent = instattRunner;
+    public EndScreen(ScreenManager screenManager) {
+        parent = screenManager;
         OrthographicCamera gameCam = new OrthographicCamera();
         stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
 

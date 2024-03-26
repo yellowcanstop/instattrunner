@@ -26,7 +26,6 @@ import com.instattrunner.ScoreManager;
 import com.instattrunner.ScreenManager;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.ConstHub;
-import com.instattrunner.loader.IRAssetManager;
 
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
@@ -39,7 +38,7 @@ public class GameScreen implements Screen {
     private ScoreManager scoreManager;
     private OrthographicCamera cam;
     private KeyboardController controller;
-    private ConstHub locCHub;
+    public ConstHub locCHub;
     private GameWorld gameWorld;
     private SpriteBatch sb;
     private BitmapFont font;
@@ -92,7 +91,7 @@ public class GameScreen implements Screen {
         controller = new KeyboardController();
 
         // Reset all constHub's values changed
-        locCHub.playerScale = locCHub.REFplayerScale;
+        locCHub.regularPlayerScale = locCHub.REFplayerScale;
 
 
         gameWorld = new GameWorld(controller, parent.assMan, this);

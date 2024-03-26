@@ -10,9 +10,14 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.instattrunner.bodies.Buff;
+import com.instattrunner.bodies.Debuff;
+import com.instattrunner.bodies.Floor;
+import com.instattrunner.bodies.Obstacle;
+import com.instattrunner.bodies.Player;
 import com.instattrunner.controller.KeyboardController;
+import com.instattrunner.loader.ConstHub;
 import com.instattrunner.loader.GameAssetManager;
-import com.instattrunner.loader.IRAssetManager;
 import com.instattrunner.views.GameScreen;
 
 import java.util.ArrayList;
@@ -23,14 +28,13 @@ import java.util.Random;
 // Controls all logic in game
 public class GameWorld {
     public World world;
-    private OrthographicCamera camera;
     private KeyboardController controller;
     private GameScreen gameScreen;
-    private IRAssetManager assMan;
+    private GameAssetManager assMan;
+    public ConstHub locCHub;
 
     // Random generator
-    // To be moved around later 
-    Random random = new Random(TimeUtils.millis());
+    public Random random = new Random(TimeUtils.millis());
 
     // Bodies (yes bodies, just not human bodies, although we have a player BODY)
     public Body player;
@@ -44,31 +48,18 @@ public class GameWorld {
     public Array<Body> buffs = new Array<Body>();
     public Array<Body> debuffs = new Array<Body>();
 
+    // Declare different type of Body objects in order to access their methods
+    private Floor floorClass;
+    private Player playerClass;
+    private Obstacle obstacleClass;
+    private Buff buffClass;
+    private Debuff debuffClass;
+
+
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
     // Declared here (only obstacle, buff, debuff) as repeatedly called and used (player is only used once, hence not here)
-    private BodyEditorLoader playerLoader;
-    private BodyEditorLoader obstacleLoader;
     private BodyEditorLoader buffLoader;
     private BodyEditorLoader debuffLoader;
-
-    // Declare array to store name of images
-    // Will be used by BodyEditorLoader to load different complex polygons to FixtureDef based on image name
-    private final String playerImage;
-    private final String[] obstacleImages;
-    private final String[] buffImages;
-    private final String[] debuffImages;
-
-    // Declare width and height of floor for computation
-    private Vector2 floorWidHei;
-
-    //Declare width and height of largest obstacle
-    private Vector2 stairsWidHei;
-
-    // Scale of category of body
-    private float playerScale;
-    private float obstacleScale;
-    private float buffScale;
-    private float debuffScale;
 
     // ArrayList for spawn randomization
     private ArrayList<Integer> obstacleSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2,3));
@@ -96,31 +87,26 @@ public class GameWorld {
 
 
     // Enum for obstacle, buff, debuff
-    // obstacle
-    private static final int SPEED = IRAssetManager.BUSINESS_MAN_1_AI;
-    private static final int SIZE = IRAssetManager.NUTRITION_MAJOR;
-    private static final int JUMP = IRAssetManager.COFFEE;
-    private static final int IMMUNE = IRAssetManager.DEAN;
+    // buff/debuff category
+    private static final int SPEED = ConstHub.BUSINESS_MAN_1_AI;
+    private static final int SIZE = ConstHub.NUTRITION_MAJOR;
+    private static final int JUMP = ConstHub.COFFEE;
+    private static final int IMMUNE = ConstHub.DEAN;
     // buff
-    private static final int BUSINESS_MAN_1_AI = IRAssetManager.BUSINESS_MAN_1_AI;
-    private static final int NUTRITION_MAJOR = IRAssetManager.NUTRITION_MAJOR;
-    private static final int COFFEE = IRAssetManager.COFFEE;
-    private static final int DEAN = IRAssetManager.DEAN;
+    private static final int BUSINESS_MAN_1_AI = ConstHub.BUSINESS_MAN_1_AI;
+    private static final int NUTRITION_MAJOR = ConstHub.NUTRITION_MAJOR;
+    private static final int COFFEE = ConstHub.COFFEE;
+    private static final int DEAN = ConstHub.DEAN;
     // debuff
-    private static final int SPORTS_SCIENCE_MAJOR = IRAssetManager.SPORTS_SCIENCE_MAJOR;
-    private static final int CULINARY_MAJOR = IRAssetManager.CULINARY_MAJOR;
-    private static final int BEER = IRAssetManager.BEER;
-
-  
+    private static final int SPORTS_SCIENCE_MAJOR = ConstHub.SPORTS_SCIENCE_MAJOR;
+    private static final int CULINARY_MAJOR = ConstHub.CULINARY_MAJOR;
+    private static final int BEER = ConstHub.BEER;
 
     /* Individual Buff Debuff
     * variables are declared here in logic model,
     * variables are edited in contact listener,
     * effects are activated and processed deactivated after x seconds in logic model (sorry, had to change to logic model as i'll be using the Body(s) in main screen, didn't feel like importing again to contact listener)
     */
-    // xTime to store time when collided 
-    // xActive to determine whether buff/debuff is still active (becomes false after currentTime - xTime > x)
-
     public long[] effectTime = new long[4];            // effect(buff and debuff of same category) start time
     public boolean[] effectActive = new boolean[4];    // effect(buff and debuff of same category) active or not 
     public boolean[] buffActive = new boolean[4];      // whether buff is active or not 
@@ -131,7 +117,6 @@ public class GameWorld {
     public int HIGH = 135;
     public int LOW = 73;
 
-
     // tweak speed of obstacles
     /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
     public float regular = -20f;
@@ -139,21 +124,21 @@ public class GameWorld {
     public float slow = -5f;
 
 
-
-
     // Contructor
     // world to keep all physical objects in the game
-    public GameWorld(KeyboardController cont, GameAssetManager assetMan, GameScreen gameScreen) {
+    public GameWorld(KeyboardController cont, GameAssetManager assetMan, GameScreen gScreen) {
         System.out.println("New Model Created.");
 
         controller = cont;
-        main = mainScreen;
+        gameScreen = gScreen;
         assMan = assetMan;
+        locCHub = gScreen.locCHub;
         world = new World(new Vector2(0, -60f), true);
-        world.setContactListener(new IRContactListener(this));
+        world.setContactListener(new CollisionListener(this));
 
-        // get our body factory singleton and store it in bodyFactory
-        //BodyFactory bodyFactory = BodyFactory.getInstance(world);
+        // Init different type of Body classes
+        floorClass = new Floor(this);
+        playerClass = new Player(this);
 
         // load sounds into model
         assMan.queueAddSounds();
@@ -162,19 +147,8 @@ public class GameWorld {
         collect = assMan.manager.get("sounds/drop.wav");
 
         // Init BodyEditorLoader
-        playerLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygons.json"));
-        obstacleLoader = new BodyEditorLoader(Gdx.files.internal("obstacleComplexPolygons.json"));
-        buffLoader = new BodyEditorLoader(Gdx.files.internal("buffComplexPolygons.json"));
-        debuffLoader = new BodyEditorLoader(Gdx.files.internal("debuffComplexPolygons.json"));
 
-        // Load names of obstacle, buff and debuff images
-        playerImage = assMan.playerImage;
-        obstacleImages = assMan.obstacleImages;
-        buffImages = assMan.buffImages;
-        debuffImages = assMan.debuffImages;
 
-        // Load width and height of floor
-        floorWidHei = assMan.floorWidHei;
         //Load width and height of largest obstacle
         stairsWidHei = assMan.obstacleWidHei[3];
         
@@ -189,8 +163,8 @@ public class GameWorld {
 
         
         // Create floor and player of game 
-        createFloor();
-        createPlayer();
+        floorClass.createFloor();
+        playerClass.createPlayer();
     }
 
 
@@ -381,152 +355,14 @@ public class GameWorld {
 
 
 
-    private void passThrough(Body bod) {
+    public void passThrough(Body bod) {
         for (Fixture fix : bod.getFixtureList()) {
             fix.setSensor(true);
         }
     }
 
-//    to rearrange and comment later
-    private void createFloor() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(0f, -10.5f);    // Max floor height is y + hy = -9    ;    Here, rectangle is set to pos in center of rectangle
 
-        floor = world.createBody(bodyDef);
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(floorWidHei.x / 2, floorWidHei.y / 2);    //Divided by 2 as .setAsBox takes half width and half height
-
-        floor.createFixture(shape, 0f);
-        floor.setUserData(new BodyData("FLOOR", 0));
-
-        shape.dispose();
-    }
-
-    private void createPlayer() {
-        // Create new BodyDef for player Body
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyType.DynamicBody;
-        bodyDef.position.set(-14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001));    // Complex polygon, pos is set to lower left.  Get center of floor and add with half height to get max height of floor, add 0.001 as buffer to avoid clipping
-        bodyDef.fixedRotation = true;
-        // Create new Body of player in World
-        regularPlayer = world.createBody(bodyDef);
-        // Change position to right for small and big player
-        bodyDef.position.set(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001));    // Complex polygon, pos is set to lower left.  Get center of floor and add with half height to get max height of floor, add 0.001 as buffer to avoid clipping
-        smallPlayer = world.createBody(bodyDef);
-        bigPlayer = world.createBody(bodyDef);
-
-        // Create new FixtureDef for player Body
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 1.9f;
-        fixtureDef.friction = 1f;
-        fixtureDef.restitution = 0f; // bounciness
-
-        // Create new BodyEditorLoader (in declaration part) and load convex polygon using .json file
-        // Has complex polygon combo for player 
-        // Passes Body to BodyEditorLoader 
-        // BodyEditorLoader creates multiple convex polygon using .json file 
-        // 1 convex polygon, 1 FixtureDef
-        // Each FixtureDef is .createFixture to Body
-        // All done in BodyEditorLoader through method .attachFixture
-        // Scale is scale of shape 
-        // Load and createFixture with polygons to player Body
-        // Load with respect to scale declared in asset manager
-        playerLoader.attachFixture(regularPlayer, playerImage, fixtureDef, playerScale);    // Name is the name set when making complex polygon. For all, all is image file name
-        playerLoader.attachFixture(smallPlayer, playerImage, fixtureDef, 0.0054f);    // Name is the name set when making complex polygon. For all, all is image file name
-        playerLoader.attachFixture(bigPlayer, playerImage, fixtureDef, 0.0082f);    // Name is the name set when making complex polygon. For all, all is image file name
-
-        // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
-        regularPlayer.setUserData(new BodyData("PLAYER", 0));
-        smallPlayer.setUserData(new BodyData("SLEEP_PLAYER", 0));
-        bigPlayer.setUserData(new BodyData("SLEEP_PLAYER", 0));
-
-        player = regularPlayer;
-    }
-
-    private Body createObstacle(float v) {
-        // Generate random int from 0 to size of arraylist unused - 1
-        // To pick element from unused list
-        // int is id for texture declared (in IRAssetManager)
-        if (obstacleSpawnUnused.isEmpty()){
-            ArrayList<Integer> temp = obstacleSpawnUnused;
-            obstacleSpawnUnused = obstacleSpawnUsed;
-            obstacleSpawnUsed = temp;
-        }
-        int tempTextureId = obstacleSpawnUnused.remove(random.nextInt(obstacleSpawnUnused.size()));
-        // int tempTextureId = obstacleSpawnUnused.remove(MathUtils.random(0, obstacleSpawnUnused.size() - 1));
-        obstacleSpawnUsed.add(tempTextureId);
-
-        // Create new BodyDef 
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2)));
-        // Create new Body in World
-        Body obstacle = world.createBody(bodyDef);
-
-        // Create new FixtureDef
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 1f;
-
-        // Load and createFixture with polygons to player Body
-        // Load with respect to scale declared in asset manager
-        obstacleLoader.attachFixture(obstacle, obstacleImages[tempTextureId], fixtureDef, obstacleScale);
-
-        // Set obstacle to move with constant velocity of v
-        obstacle.setLinearVelocity(v, 0);
-        // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
-        obstacle.setUserData(new BodyData("OBSTACLE", tempTextureId));
-
-        passThrough(obstacle);
-        
-        return obstacle;
-    }
-
-    private Body createBuff() {
-        int tempTextureId = random.nextInt(4);
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + (stairsWidHei.y*obstacleScale) + 8*random.nextFloat()));
-
-        Body buff = world.createBody(bodyDef);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 1f;
-
-        buffLoader.attachFixture(buff, buffImages[tempTextureId], fixtureDef, buffScale);
-
-        buff.setLinearVelocity(-20f, 0);
-        buff.setUserData(new BodyData("BUFF", tempTextureId));
-
-        passThrough(buff);
-
-        return buff;
-    }
-
-    private Body createDebuff() {
-        int tempTextureId = random.nextInt(3);
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(floor.getPosition().y + (floorWidHei.y / 2) + (stairsWidHei.y*obstacleScale) + 8*random.nextFloat()));
-
-        Body debuff = world.createBody(bodyDef);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 1f;
-
-        debuffLoader.attachFixture(debuff, debuffImages[tempTextureId], fixtureDef, debuffScale);
-
-        debuff.setLinearVelocity(-20f, 0);
-        debuff.setUserData(new BodyData("DEBUFF", tempTextureId));
-
-        passThrough(debuff);
-
-        return debuff;
-    }
-
+ 
 
 
 

@@ -79,7 +79,7 @@ public class MenuScreen implements Screen {
         TextButton highscore = new TextButton("Highscore", skin);
         TextButton exit = new TextButton("Quit",skin);
 
-        // Add buttons to table
+        // Add labels and buttons to table
         table.add(titleLabel);
         table.row().pad(50, 0, 10, 0);
         table.add(play).width(help.getWidth()).height(help.getHeight());

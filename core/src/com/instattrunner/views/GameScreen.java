@@ -65,10 +65,6 @@ public class GameScreen implements Screen {
     private final float buffScale;
     private final float debuffScale;
 
-    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
-    public long minSpawnInterval = 1200;
-    public long obstacleSpawnInterval = minSpawnInterval;
-    public long buffSpawnInterval = minSpawnInterval * 2;
 
     // Create random object to get random numbers
     Random random = new Random(TimeUtils.millis());
@@ -90,7 +86,7 @@ public class GameScreen implements Screen {
         controller = new KeyboardController();
 
         // Reset all constHub's values changed
-        locCHub.renderPlayerScale = locCHub.REFplayerScale;
+        locCHub.renderPlayerScale = locCHub.regularPlayerScale;
 
 
         gameWorld = new GameWorld(controller, parent.assMan, this);
@@ -192,22 +188,6 @@ public class GameScreen implements Screen {
 
         font.getData().setScale(0.03f);
         font.draw(sb, String.format("%04d", highscore), -8,9);
-
-        // Spawn obstacle based on speed var determiner 
-        if(TimeUtils.timeSinceMillis(gameWorld.obstacleTime) > obstacleSpawnInterval) 
-            gameWorld.spawnObstacles(gameWorld.regular);
-        gameWorld.trackObstacles();
-
-        // Randomly choose to spawn buff or debuff  
-        // Type of buff/debuff will be randomly choosen by .create method in GameWorld
-        int choice = random.nextInt(2);
-        if (TimeUtils.timeSinceMillis(gameWorld.buffTime) > buffSpawnInterval){
-            if (choice == 0) 
-                gameWorld.spawnBuffs();
-            else if (choice == 1)
-                gameWorld.spawnDebuffs();
-        }
-        gameWorld.trackBuffsDebuffs();
 
         // End sprite batch
         sb.end();

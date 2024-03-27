@@ -54,28 +54,33 @@ public class GameWorld {
     private Obstacle obstacleClass;
     private Buff buffClass;
     private Debuff debuffClass;
+    
+    // Timestamps and spawnInterval
+    public long minSpawnInterval = 1200;
+    public long obstacleSpawnInterval = minSpawnInterval;
+    public long buffSpawnInterval = minSpawnInterval * 2;
+    public long obstacleTimestamp = TimeUtils.millis() - 1200;    // Time since last obstacle spawn
+    public long buffTimestamp = TimeUtils.millis() - 1200;    // Time since last buff/debuff spawn
+    
+
+    // Vars for environment
+    public boolean isDead = false;
+    public int score = 0;
+    public int velocityIncrement = 0;
+
+    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
+    
 
 
-    // BodyEditorLoader for loading complex polygons to FixtureDef to Body
-    // Declared here (only obstacle, buff, debuff) as repeatedly called and used (player is only used once, hence not here)
-    private BodyEditorLoader buffLoader;
-    private BodyEditorLoader debuffLoader;
+
 
     // ArrayList for spawn randomization
-    private ArrayList<Integer> obstacleSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2,3));
-    private ArrayList<Integer> obstacleSpawnUsed = new ArrayList<>();
     private ArrayList<Integer> buffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2,3));
     private ArrayList<Integer> buffSpawnUsed = new ArrayList<>();
     private ArrayList<Integer> debuffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2));
     private ArrayList<Integer> debuffSpawnUsed = new ArrayList<>();
 
-    // Vars for environment
-    public long obstacleTime = TimeUtils.millis() - 1200;    // Time since last obstacle spawn
-    public long buffTime = TimeUtils.millis() - 1200;    // Time since last buff/debuff spawn
-    public boolean isDead = false;
-    public boolean immunity = false;
-    public int score = 0;
-    public int velocityIncrement = 0;
+
 
 
     // Enum for obstacle, buff, debuff
@@ -94,15 +99,6 @@ public class GameWorld {
     private static final int CULINARY_MAJOR = ConstHub.CULINARY_MAJOR;
     private static final int BEER = ConstHub.BEER;
 
-    /* Individual Buff Debuff
-    * variables are declared here in logic model,
-    * variables are edited in contact listener,
-    * effects are activated and processed deactivated after x seconds in logic model (sorry, had to change to logic model as i'll be using the Body(s) in main screen, didn't feel like importing again to contact listener)
-    */
-    public long[] effectTime = new long[4];            // effect(buff and debuff of same category) start time
-    public boolean[] effectActive = new boolean[4];    // effect(buff and debuff of same category) active or not 
-    public boolean[] buffActive = new boolean[4];      // whether buff is active or not 
-    public boolean[] debuffActive = new boolean[4];    // whether debuff is active or not (last one is a place holder to counter Dean buff)
 
     // enum for jump
     public int NORMAL = 115;
@@ -330,17 +326,47 @@ public class GameWorld {
 
 
 
+
+
+    private void spanw(){
+        // Spawn obstacle based on speed var determiner 
+        if(TimeUtils.timeSinceMillis(gameWorld.obstacleTime) > obstacleSpawnInterval) 
+            gameWorld.spawnObstacles(gameWorld.regular);
+        gameWorld.trackObstacles();
+
+        // Randomly choose to spawn buff or debuff  
+        // Type of buff/debuff will be randomly choosen by .create method in GameWorld
+        int choice = random.nextInt(2);
+        if (TimeUtils.timeSinceMillis(gameWorld.buffTime) > buffSpawnInterval){
+            if (choice == 0) 
+                gameWorld.spawnBuffs();
+            else if (choice == 1)
+                gameWorld.spawnDebuffs();
+        }
+        gameWorld.trackBuffsDebuffs();
+    }
+
+
+
+
+    public void removeCollidedObstacle(){
+        collideObstacle.setTransform(-27f, collideObstacle.getPosition().y, collideObstacle.getAngle());
+    }
+
+
+    public void removeCollidedDeBuff(){
+        collideDeBuff.setTransform(-27f, collideDeBuff.getPosition().y, collideDeBuff.getAngle());
+        collideDeBuff = null;
+    }
+
+
+
+
     public void passThrough(Body bod) {
         for (Fixture fix : bod.getFixtureList()) {
             fix.setSensor(true);
         }
     }
-
-
- 
-
-
-
     public void spawnObstacles(float v) {
         obstacles.add(obstacleClass.createObstacle(v));
         obstacleTime = TimeUtils.millis();
@@ -385,49 +411,4 @@ public class GameWorld {
         }
     }
 
-
-
-
-
-
-
-
-    // Takes Body
-    // Returns BodyObjectType (player, obstacle, buff, debuff)
-    // Used to check what Body it is (mostly in contact listener)
-    public String getBodyObjectType(Body bod){
-        return ((BodyData) bod.getUserData()).bodyObjectType;
-    }
-
-    // Takes Body, bodyObjectType
-    // Sets bodyObjectType to BodyData (SLEEP_PLAYER, PLAYER)
-    // Used to manipulate which body to use
-    public void setBodyObjectType(Body bod, String bodObjType){
-        ((BodyData) bod.getUserData()).bodyObjectType = bodObjType;
-    }
-
-    // Takes Body
-    // Returns TextureId (int)
-    // Used to check what texture Body is using (mostly for obstacle, buff, debuff) (mostly used for hitbox and rendering)
-    public int getTextureId(Body bod){
-        return ((BodyData) bod.getUserData()).textureId;
-    }
-
-
-
-
-    public void removeCollidedObstacle(){
-        collideObstacle.setTransform(-27f, collideObstacle.getPosition().y, collideObstacle.getAngle());
-    }
-
-    public void resetImmune(){
-        effectActive[DEAN] = false;
-        buffActive[DEAN] = false;
-        immunity = false;
-    }
-
-    public void removeCollidedDeBuff(){
-        collideDeBuff.setTransform(-27f, collideDeBuff.getPosition().y, collideDeBuff.getAngle());
-        collideDeBuff = null;
-    }
 }

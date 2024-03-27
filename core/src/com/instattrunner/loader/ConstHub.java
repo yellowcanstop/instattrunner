@@ -38,11 +38,12 @@ public class ConstHub {
     public final Vector2[] debuffWidHei = new Vector2[] {new Vector2(809.0f, 467.0f), new Vector2(364.0f, 935.0f), new Vector2(360.0f, 468.0f)};
 
     // Scale of category of body
-    public final float REFplayerScale = 0.007f;    // Used to store a reference copy (constant) of playerScale as playerScale will be changed throughout the game
-    public float renderPlayerScale = REFplayerScale;
     public final float regularPlayerScale = 0.007f;
     public final float smallPlayerScale = 0.0054f;
     public final float bigPlayerScale = 0.0082f;
+
+    public float renderPlayerScale = regularPlayerScale;
+
     public final float obstacleScale = 0.009f;
     public final float buffScale = 0.006f;
     public final float debuffScale = 0.0073f;

@@ -33,7 +33,7 @@ public class GameScreen implements Screen {
     private BitmapFont font;
 
     private Box2DDebugRenderer debugRenderer;
-    private boolean debug = true; // tweak if want to debug
+    private boolean debug = false; // tweak if want to debug
     
     // Declare Texture var for all Body in game
     private final Texture floorTex;

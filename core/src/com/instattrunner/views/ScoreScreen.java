@@ -63,14 +63,11 @@ public class ScoreScreen implements Screen {
 
         // Push input to stage
         Gdx.input.setInputProcessor(stage);
-        // Should not need
-        // stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        // stage.draw();
 
         // Add table (which holds buttons) to the stage
         table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        // table.setDebug(true);
 
 
         // Create labels

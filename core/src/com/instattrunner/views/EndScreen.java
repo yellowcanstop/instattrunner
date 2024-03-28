@@ -63,14 +63,11 @@ public class EndScreen implements Screen {
 
         // Push input to stage
         Gdx.input.setInputProcessor(stage);
-        // Should not need
-        // stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        // stage.draw();
 
         // Create table (which holds buttons) and set to fill whole screen (parent)
         table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        // table.setDebug(true);
 
         // Create button and label
         Label l1 = new Label("Oh no you didn't make it in time!\nInstatt is locked again.", skin, "big");

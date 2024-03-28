@@ -61,14 +61,10 @@ public class MenuScreen implements Screen {
         // Push input to stage
         Gdx.input.setInputProcessor(stage);
 
-        // should not need
-        // stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        // stage.draw();
-
         // Add table (which holds buttons) to the stage
         table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        // table.setDebug(true);
 
         // Create LabelStyle for labels
         LabelStyle bigLabelStyle = skin.get("menu", LabelStyle.class);

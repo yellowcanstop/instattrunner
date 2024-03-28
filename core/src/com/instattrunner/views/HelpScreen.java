@@ -62,14 +62,11 @@ public class HelpScreen implements Screen {
 
         // Push input to stage
         Gdx.input.setInputProcessor(stage);
-        // should not need
-        // stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        // stage.draw();
 
         // Add table (which holds buttons) to the stage
         table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        // table.setDebug(true);
 
         // Check to see if boolean is true or false (boolean changed by clicking the label)
         // if false, then show not detail

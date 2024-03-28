@@ -57,6 +57,7 @@ public class HelpScreen implements Screen {
     public void show() {
         // Set the background image
         backgroundImage.setFillParent(true);
+        stage.clear();
         stage.addActor(backgroundImage);
 
         // Push input to stage

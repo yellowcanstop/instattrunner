@@ -52,21 +52,21 @@ public class ConstHub {
     public static final int smallNormalJump = 100;
     public static final int smallHighJump = 35;
 
-    public static final int regularLowJump = 115; 
-    public static final int regularNormalJump = 135;
-    public static final int regularHighJump = 73;
+    public static final int regularLowJump = 111; 
+    public static final int regularNormalJump = 128;
+    public static final int regularHighJump = 70;
 
-    public static final int bigLowJump = 160;
-    public static final int bigNormalJump = 185;
-    public static final int bigHighJump = 115;
+    public static final int bigLowJump = 158;
+    public static final int bigNormalJump = 182;
+    public static final int bigHighJump = 112;
 
     // Speed of obstacle when speed change
-    public static final float slowSpeed = -15f;
+    public static final float slowSpeed = -17f;
     public static final float regularSpeed = -20f;
-    public static final float fastSpeed = -32f;
+    public static final float fastSpeed = -31f;
 
     // Minimum spawn time interval when speed change
-    public static final long slowMinSpawnInterval = 850;
+    public static final long slowMinSpawnInterval = 920;
     public static final long regularMinSpawnInterval = 1200;
     public static final long fastMinSpawnInterval = 1600;
 

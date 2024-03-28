@@ -55,6 +55,7 @@ public class MenuScreen implements Screen {
     public void show() {
         // Set the background image
         backgroundImage.setFillParent(true);
+        stage.clear();
         stage.addActor(backgroundImage);
 
         // Push input to stage
@@ -70,7 +71,7 @@ public class MenuScreen implements Screen {
         table.setDebug(true);
 
         // Create LabelStyle for labels
-        LabelStyle bigLabelStyle = skin.get("big", LabelStyle.class);
+        LabelStyle bigLabelStyle = skin.get("menu", LabelStyle.class);
         bigLabelStyle.font.getData().setScale(2); // Set font scale to 2, making it twice as big
 
         // Create labels and buttons

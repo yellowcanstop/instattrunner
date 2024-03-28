@@ -3,7 +3,7 @@ A few classes are created
 They are not used yet, just trying to sort out what goes where
 After everyone agrees on stoping, will start to migrate calls to the seperate classes
 
-
+----done-----
 
 Temp classes 
 - ScoreManager
@@ -22,16 +22,27 @@ menu screen migration completed
 end screen done 
 score screen done 
 working on help screen
-
-
 jsut take enums directly idiot
 put the renders into the class itslef and refer back to const hub lah bodoh
+jump 
+skin size of text
+help screen render
+random slow first obstacle
+
+
+
+
+
+
+----not done------
+
 
 
 if highscore doesnt work, likely to be static messing things up 
 
 if jump normal is fed, proabbly jumpcontroller if else if statement f'ed things up 
 
+cant make immediately spawn 
 
 
 - PASSTHROUGH REMAINS IN GAME WORLD AS WOULD BE USED BY 3 CLASSES AND NO CHANGE TO CODE

@@ -159,19 +159,19 @@ public class GameScreen implements Screen {
         // Set the font size for the "Score" text
         font.getData().setScale(0.03f);
         // Draw the "Score" text
-        font.draw(sb, "Score", 5, 11);
+        font.draw(sb, "Score", 4, 11);
 
         // Set the font size for the "Score" text
         font.getData().setScale(0.03f);
         // Draw the "Score" text
-        font.draw(sb, String.format("%04d", gameWorld.score), 6, 9);
+        font.draw(sb, String.format("%04d", gameWorld.score), 5, 9);
 
         // Set the font size for the "HighScore" text
         font.getData().setScale(0.03f);
-        font.draw(sb, "H1ghscore", -10,11);
+        font.draw(sb, "H1ghscore", -9,11);
 
         font.getData().setScale(0.03f);
-        font.draw(sb, String.format("%04d", highscore), -8,9);
+        font.draw(sb, String.format("%04d", highscore), -7,9);
 
         // End sprite batch
         sb.end();

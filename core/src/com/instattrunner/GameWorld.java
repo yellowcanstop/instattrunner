@@ -54,8 +54,8 @@ public class GameWorld {
     public long renderMinSpawnInterval = ConstHub.regularMinSpawnInterval;    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
     public long obstacleSpawnInterval = renderMinSpawnInterval;    //Obstacle and buff/debuff set to min and four times of min during init
     public long buffDebuffSpawnInterval = renderMinSpawnInterval * 4;    //Changed to random within range everytime new obstacle/buff/debuff spawn
-    public long obstacleTimestamp = TimeUtils.millis() - 1200;    // Time since last obstacle spawn
-    public long buffDebuffTimestamp = TimeUtils.millis() - 1200;    // Time since last buff/debuff spawn
+    public long obstacleTimestamp = TimeUtils.millis();    // Time since last obstacle spawn
+    public long buffDebuffTimestamp = TimeUtils.millis();    // Time since last buff/debuff spawn
     
 
     // Vars for environment
@@ -145,8 +145,8 @@ public class GameWorld {
     private void spawnLogic() {
         // Spawn obstacle based on speed var determiner 
         if(TimeUtils.timeSinceMillis(obstacleTimestamp) > obstacleSpawnInterval) 
-            spawnNTrackClass.spawnObstacles(renderSpeed);
-
+            spawnNTrackClass.spawnObstacles(renderSpeed + velocityIncrement);
+            
         // Randomly choose to spawn buff or debuff  
         // Type of buff/debuff will be randomly choosen by .create method in GameWorld
         int choice = random.nextInt(2);

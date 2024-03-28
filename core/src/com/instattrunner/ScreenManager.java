@@ -17,7 +17,7 @@ import com.instattrunner.views.ScoreScreen;
 - controllers for mapping user input to methods in model */
 public class ScreenManager extends Game {
     // Constants Hub and Asset Manager
-    public GameAssetManager assMan = new GameAssetManager(this);
+    public GameAssetManager assMan = new GameAssetManager();
 
     // Screens
 	private MenuScreen menuScreen;
@@ -47,11 +47,14 @@ public class ScreenManager extends Game {
 	public int finalScore = 0; // set value when player dies
 
     
-
-
 	// Set default screen when application opens
 	@Override
 	public void create() {
+        // Load background for all other screens
+        assMan.queueAddBackground();
+        assMan.manager.finishLoading();
+        backgroundTexture = assMan.manager.get(ConstHub.bgImageName);
+
 		menuScreen = new MenuScreen(this);
 		setScreen(menuScreen);
 
@@ -61,12 +64,7 @@ public class ScreenManager extends Game {
 		bgMusic = assMan.manager.get(ConstHub.bgMusicName);
 		gmMusic = assMan.manager.get(ConstHub.gmMusicName);
 		bgMusic.play();
-
-        // Load background for all other screens
-        assMan.queueAddBackground();
-        assMan.manager.finishLoading();
-        backgroundTexture = assMan.manager.get(ConstHub.bgImageName);
-	}
+    }
 
 
 	// Method to swap between screens
@@ -104,7 +102,6 @@ public class ScreenManager extends Game {
 
 	@Override
 	public void dispose() {
-        System.out.println("dispspsspsppssppsoooooossseeeddd");
 		assMan.manager.dispose();
 		bgMusic.dispose();
         gmMusic.dispose();

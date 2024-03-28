@@ -30,6 +30,8 @@ put the renders into the class itslef and refer back to const hub lah bodoh
 
 if highscore doesnt work, likely to be static messing things up 
 
+if jump normal is fed, proabbly jumpcontroller if else if statement f'ed things up 
+
 
 
 - PASSTHROUGH REMAINS IN GAME WORLD AS WOULD BE USED BY 3 CLASSES AND NO CHANGE TO CODE

@@ -17,21 +17,21 @@ public class SpawnNTrack {
     public void spawnObstacles(float v) {
         parent.obstacles.add(parent.obstacleClass.createObstacle(v));
         parent.obstacleTimestamp = TimeUtils.millis();
-        parent.obstacleSpawnInterval = parent.minSpawnInterval + (300 * parent.random.nextInt(6));
+        parent.obstacleSpawnInterval = parent.renderMinSpawnInterval + (300 * parent.random.nextInt(6));
     }
 
 
     public void spawnBuffs() {
         parent.buffs.add(parent.buffClass.createBuff());
         parent.buffDebuffTimestamp = TimeUtils.millis();
-        parent.buffDebuffSpawnInterval = (parent.minSpawnInterval * 4) + (300 * parent.random.nextInt(6));
+        parent.buffDebuffSpawnInterval = (parent.renderMinSpawnInterval * 4) + (300 * parent.random.nextInt(6));
     }
 
 
     public void spawnDebuffs() {
         parent.debuffs.add(parent.debuffClass.createDebuff());
         parent.buffDebuffTimestamp = TimeUtils.millis();
-        parent.buffDebuffSpawnInterval = (parent.minSpawnInterval * 4) + (300 * parent.random.nextInt(6));
+        parent.buffDebuffSpawnInterval = (parent.renderMinSpawnInterval * 4) + (300 * parent.random.nextInt(6));
     }
 
 

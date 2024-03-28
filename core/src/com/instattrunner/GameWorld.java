@@ -1,12 +1,6 @@
 package com.instattrunner;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter.SpawnEllipseSide;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -20,16 +14,13 @@ import com.instattrunner.loader.ConstHub;
 import com.instattrunner.loader.GameAssetManager;
 import com.instattrunner.views.GameScreen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Random;
 
 // Controls all logic in game
 public class GameWorld {
     private GameScreen parent;
     public World world;
-    private KeyboardController controller;
+    public KeyboardController controller;
     public GameAssetManager assMan;
 
     // Random generator
@@ -56,7 +47,8 @@ public class GameWorld {
 
     // Declare different support classes to access their methods
     private SpawnNTrack spawnNTrackClass;
-    private BuffDebuffEffects buffDebuffEffectsClass;
+    public BuffDebuffEffects buffDebuffEffectsClass;
+    public JumpController jumpControllerClass;
     
     // Timestamps and spawnInterval
     public long renderMinSpawnInterval = ConstHub.regularMinSpawnInterval;    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
@@ -76,6 +68,9 @@ public class GameWorld {
     // Will be refered by multiple classes for read and write 
     public float renderPlayerScale = ConstHub.regularPlayerScale;
     public float renderSpeed = ConstHub.regularSpeed;
+    public int renderLowJump = ConstHub.regularLowJump;
+    public int renderNormalJump = ConstHub.regularNormalJump;
+    public int renderHighJump = ConstHub.regularHighJump;
 
 
     
@@ -83,11 +78,11 @@ public class GameWorld {
 
 
 
-    // ArrayList for spawn randomization
-    private ArrayList<Integer> buffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2,3));
-    private ArrayList<Integer> buffSpawnUsed = new ArrayList<>();
-    private ArrayList<Integer> debuffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2));
-    private ArrayList<Integer> debuffSpawnUsed = new ArrayList<>();
+    // // ArrayList for spawn randomization
+    // private ArrayList<Integer> buffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2,3));
+    // private ArrayList<Integer> buffSpawnUsed = new ArrayList<>();
+    // private ArrayList<Integer> debuffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2));
+    // private ArrayList<Integer> debuffSpawnUsed = new ArrayList<>();
 
 
     // Contructor
@@ -109,6 +104,8 @@ public class GameWorld {
         debuffClass = new Debuff(this);
 
         spawnNTrackClass = new SpawnNTrack(this);
+        buffDebuffEffectsClass = new BuffDebuffEffects(this);
+        jumpControllerClass = new JumpController(this);
 
         collideDeBuff = null;
         
@@ -133,8 +130,11 @@ public class GameWorld {
         if (collideDeBuff != null)
             removeCollidedDeBuff();
 
-        jumplogic;
-        effectlogic;
+        buffDebuffEffectsClass.checkBuffDebuffExpire();
+        buffDebuffEffectsClass.checkBuffDebuffPairs();
+        buffDebuffEffectsClass.activateBuffDebuffEffect();
+
+        jumpControllerClass.jumpLogic();
         
         endGameLogic();
 

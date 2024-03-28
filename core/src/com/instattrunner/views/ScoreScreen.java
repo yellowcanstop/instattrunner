@@ -15,14 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.instattrunner.ScoreManager;
 import com.instattrunner.ScreenManager;
+import com.instattrunner.loader.ConstHub;
 
 public class ScoreScreen implements Screen {
     // ScreenManager as Parent 
     private ScreenManager parent;
 
-    // Use to call load and store score methods
-    private ScoreManager scoreManager; 
- 
     // Create Stage to store ui elements and skin for button skins
     private Stage stage;
     private Skin skin;
@@ -46,14 +44,13 @@ public class ScoreScreen implements Screen {
         // Load skin using asset manager
         parent.assMan.queueAddSkin();
         parent.assMan.manager.finishLoading();
-        skin = parent.assMan.manager.get(parent.constHub.skinName);
+        skin = parent.assMan.manager.get(ConstHub.skinName);
 
         // Create Image from backgroundTexture from ScreenManager
         backgroundImage = new Image(parent.backgroundTexture);
 
         // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
-        scoreManager = new ScoreManager();
-        highscore = scoreManager.loadTextFile();
+        highscore = ScoreManager.loadTextFile();
     }
 
 

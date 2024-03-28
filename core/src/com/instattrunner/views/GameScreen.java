@@ -2,22 +2,14 @@ package com.instattrunner.views;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.BodyData;
@@ -147,14 +139,14 @@ public class GameScreen implements Screen {
         float tempLocBuff = gameWorld.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
         float tempLocDebuff = gameWorld.floor.getPosition().x - (floorWidHei.x / 2) + 0.5f;
         for (int i = 0; i < 4; i++){
-            if (gameWorld.buffActive[i]){
+            if (gameWorld.buffDebuffEffectsClass.buffActive[i]){
                 if (buffWidHei[i].x > buffWidHei[i].y)
                     sb.draw(buffTexs.get(i), tempLocBuff, 9.8f, 1.5f, 1.5f / buffWidHei[i].x * buffWidHei[i].y);
                 else
                     sb.draw(buffTexs.get(i), tempLocBuff, 9.5f, 2 / buffWidHei[i].y * buffWidHei[i].x, 2);
                 tempLocBuff += 2f;
             }
-            if (gameWorld.debuffActive[i]){
+            if (gameWorld.buffDebuffEffectsClass.debuffActive[i]){
                 if (debuffWidHei[i].x > debuffWidHei[i].y)
                     sb.draw(debuffTexs.get(i), tempLocDebuff,7.1f, 1.5f, 1.5f / debuffWidHei[i].x * debuffWidHei[i].y);
                 else
@@ -228,7 +220,7 @@ public class GameScreen implements Screen {
         for (Body body : bodys) {
             // .getTextureId return texture id of particular model and use it as index on the texture array 
             // .getPosition returns bottom left coord as these are complex polygon (only floor .getPosition return center)
-            tempTextureId = gameWorld.getTextureId(body);
+            tempTextureId = BodyData.getTextureId(body);
             tempWidHei = bodyWidHei[tempTextureId];
             sb.draw(bodyTexs.get(tempTextureId), body.getPosition().x, body.getPosition().y, tempWidHei.x* bodyScale, tempWidHei.y * bodyScale);
         }

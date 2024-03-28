@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.instattrunner.ScoreManager;
 import com.instattrunner.ScreenManager;
+import com.instattrunner.loader.ConstHub;
 
 public class EndScreen implements Screen {
     // ScreenManager as Parent
@@ -43,7 +44,7 @@ public class EndScreen implements Screen {
         // Load skin using asset manager
         parent.assMan.queueAddSkin();
         parent.assMan.manager.finishLoading();
-        skin = parent.assMan.manager.get(parent.constHub.skinName);
+        skin = parent.assMan.manager.get(ConstHub.skinName);
 
         // Create Image from backgroundTexture from ScreenManager
         backgroundImage = new Image(parent.backgroundTexture);

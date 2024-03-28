@@ -82,9 +82,9 @@ public class BuffDebuffEffects {
         // Change size of obstacle logic
         if (effectActive[SIZE]) {
             if (buffActive[NUTRITION_MAJOR])
-                setSize(0.0054f);
+                setSize(ConstHub.smallPlayerScale, parent.player, parent.smallPlayer, ConstHub.smallLowJump, ConstHub.smallNormalJump, ConstHub.smallHighJump);
             else if (debuffActive[CULINARY_MAJOR])
-                setSize(0.0082f);
+                setSize(ConstHub.bigPlayerScale, parent.player, parent.bigPlayer, ConstHub.bigLowJump, ConstHub.bigNormalJump, ConstHub.bigHighJump);
         }
 
         // Enable immunity of player
@@ -100,7 +100,7 @@ public class BuffDebuffEffects {
                 break;
 
             case SIZE:
-                setSize(assMan.REFplayerScale);
+                setSize(ConstHub.regularPlayerScale, parent.player, parent.regularPlayer, ConstHub.regularLowJump, ConstHub.regularNormalJump, ConstHub.regularHighJump);
                 break;
 
             case JUMP:
@@ -115,6 +115,7 @@ public class BuffDebuffEffects {
         }
     }
 
+
     private void setSpeed(float velocity, long minSpawnInterval, float renderSpeed){
         // Set render variables to respective effect 
         parent.renderMinSpawnInterval = 850;
@@ -125,46 +126,30 @@ public class BuffDebuffEffects {
             osbtacle.setLinearVelocity(velocity + renderSpeed, 0);
     }
 
-    private void setSize(float scale, Body currentPlayer, Body targetPlayer){
+
+    private void setSize(float scale, Body currentPlayer, Body targetPlayer, int lowJump, int normalJump, int highJump){
         // Change playerScale that MainScreen uses to render texture of player
         parent.renderPlayerScale = scale;
 
         float lastPlayerPosY = currentPlayer.getPosition().y;
         Vector2 lastPlayerVelocity = currentPlayer.getLinearVelocity();
             
-        setBodyObjectType(currentPlayer, "SLEEP_PLAYER");
+        // Put current player to sleep and move to right side of screen
+        BodyData.setBodyObjectType(currentPlayer, "SLEEP_PLAYER");
         currentPlayer.setTransform(14f, (float)(parent.floor.getPosition().y + (ConstHub.floorWidHei.y / 2) + 0.001), currentPlayer.getAngle());
-        setBodyObjectType(bigPlayer, "SLEEP_PLAYER");
-        bigPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), bigPlayer.getAngle());
 
-        parent.player = targetPlayer;
-
-        setBodyObjectType(targetPlayer, "PLAYER");
+        // Wake up target player and move to left side of screen
+        BodyData.setBodyObjectType(targetPlayer, "PLAYER");
         targetPlayer.setTransform(-14f, lastPlayerPosY, targetPlayer.getAngle());
         targetPlayer.setLinearVelocity(lastPlayerVelocity);
- 
-       // Set player to different sizes depending on parameter
-        if (scale == 0.0054f){
-            player = smallPlayer;
-            NORMAL = 78;
-            HIGH = 100;
-            LOW = 35;
-        }
-        else if (scale == 0.007f){
-            player = regularPlayer;
-            NORMAL = 115;
-            HIGH = 135;
-            LOW = 73;
-        }
 
-        else if (scale == 0.0082f){
-            player = bigPlayer;
-            NORMAL = 160;
-            HIGH = 185;
-            LOW = 115;
-        }
-        else 
-            System.out.println("Some error has occured while changing sizes.");
+        // Set current player to target player
+        parent.player = targetPlayer;
+ 
+        // Set render low/normal/high jump to corresponding jump for body size
+        parent.renderLowJump = lowJump;
+        parent.renderNormalJump = normalJump;
+        parent.renderHighJump = highJump;
     }
 
  

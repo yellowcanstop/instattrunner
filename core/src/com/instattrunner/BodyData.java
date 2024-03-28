@@ -15,7 +15,7 @@ public class BodyData {
     // Takes Body
     // Returns BodyObjectType (player, obstacle, buff, debuff)
     // Used to check what Body it is (mostly in contact listener)
-    public String getBodyObjectType(Body bod){
+    public static String getBodyObjectType(Body bod){
         return ((BodyData) bod.getUserData()).bodyObjectType;
     }
 
@@ -23,7 +23,7 @@ public class BodyData {
     // Takes Body, bodyObjectType
     // Sets bodyObjectType to BodyData (SLEEP_PLAYER, PLAYER)
     // Used to manipulate which body to use
-    public void setBodyObjectType(Body bod, String bodObjType){
+    public static void setBodyObjectType(Body bod, String bodObjType){
         ((BodyData) bod.getUserData()).bodyObjectType = bodObjType;
     }
 
@@ -31,7 +31,7 @@ public class BodyData {
     // Takes Body
     // Returns TextureId (int)
     // Used to check what texture Body is using (mostly for obstacle, buff, debuff) (mostly used for hitbox and rendering)
-    public int getTextureId(Body bod){
+    public static int getTextureId(Body bod){
         return ((BodyData) bod.getUserData()).textureId;
     }
 }

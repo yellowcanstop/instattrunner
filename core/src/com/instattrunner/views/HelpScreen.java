@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.instattrunner.ScreenManager;
+import com.instattrunner.loader.ConstHub;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -45,7 +46,7 @@ public class HelpScreen implements Screen {
         // Load skin using asset manager
         parent.assMan.queueAddSkin();
         parent.assMan.manager.finishLoading();
-        skin = parent.assMan.manager.get(parent.constHub.skinName);
+        skin = parent.assMan.manager.get(ConstHub.skinName);
 
         // Create Image from backgroundTexture from ScreenManager
         backgroundImage = new Image(parent.backgroundTexture);
@@ -68,10 +69,6 @@ public class HelpScreen implements Screen {
         table = new Table();
         table.setFillParent(true);
         table.setDebug(true);
-
-        // Create buttons
-        skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
-
 
         // Check to see if boolean is true or false (boolean changed by clicking the label)
         // if false, then show not detail

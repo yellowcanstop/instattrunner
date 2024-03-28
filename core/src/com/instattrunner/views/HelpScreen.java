@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.instattrunner.InstattRunner;
 import com.instattrunner.ScreenManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -104,7 +103,7 @@ public class HelpScreen implements Screen {
             menu.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    parent.changeScreen(InstattRunner.MENU);
+                    parent.changeScreen(ScreenManager.MENU);
                 }
             });
 

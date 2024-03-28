@@ -20,9 +20,6 @@ public class EndScreen implements Screen {
     // ScreenManager as Parent
     private ScreenManager parent;
 
-    // Use to call load and store score methods
-    private ScoreManager scoreManager; 
-
     // Create Stage to store ui elements and skin for button skins
     private Stage stage;
     private Skin skin;
@@ -52,7 +49,7 @@ public class EndScreen implements Screen {
         backgroundImage = new Image(parent.backgroundTexture);
         
         // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
-        highscore = scoreManager.loadTextFile();
+        highscore = ScoreManager.loadTextFile();
     }
 
   

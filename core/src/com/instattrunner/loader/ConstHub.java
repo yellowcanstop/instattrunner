@@ -22,20 +22,20 @@ public class ConstHub {
 
 
     // Images file names
-    public final String bgImageName = "pic/background.jpg";
-    public final String floorImageName = "pic/Floor.png";
-    public final String playerImageName = "pic/Sprite.png";
-    public final String[] obstacleImagesName = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
-    public final String[] buffImagesName = {"pic/Business man 1 (AI).png", "pic/Nutrition major.png", "pic/Coffee.png", "pic/Dean.png"};
-    public final String[] debuffImagesName = {"pic/Sports science major.png", "pic/Culinary major.png", "pic/Beer.png"};
+    public static final String bgImageName = "pic/background.jpg";
+    public static final String floorImageName = "pic/Floor.png";
+    public static final String playerImageName = "pic/Sprite.png";
+    public static final String[] obstacleImagesName = {"pic/Cat.png", "pic/Goose.png", "pic/Lake.png", "pic/Stairs.png"};
+    public static final String[] buffImagesName = {"pic/Business man 1 (AI).png", "pic/Nutrition major.png", "pic/Coffee.png", "pic/Dean.png"};
+    public static final String[] debuffImagesName = {"pic/Sports science major.png", "pic/Culinary major.png", "pic/Beer.png"};
 
     // Body height and width with respect to import
     // Multiply by scale when used
-    public final Vector2 floorWidHei = new Vector2(32f, 3f);
-    public final Vector2 playerWidHei = new Vector2(580.0f, 886.0f);
-    public final Vector2[] obstacleWidHei = new Vector2[] {new Vector2(388.0f, 239.0f), new Vector2(554.0f, 427.0f), new Vector2(792.0f, 351.0f), new Vector2(499.0f, 616.0f)};
-    public final Vector2[] buffWidHei = new Vector2[] {new Vector2(308.0f, 942.0f), new Vector2(487.0f, 935.0f), new Vector2(301.0f, 467.0f), new Vector2(334.0f, 935.0f)};
-    public final Vector2[] debuffWidHei = new Vector2[] {new Vector2(809.0f, 467.0f), new Vector2(364.0f, 935.0f), new Vector2(360.0f, 468.0f)};
+    public static final Vector2 floorWidHei = new Vector2(32f, 3f);
+    public static final Vector2 playerWidHei = new Vector2(580.0f, 886.0f);
+    public static final Vector2[] obstacleWidHei = new Vector2[] {new Vector2(388.0f, 239.0f), new Vector2(554.0f, 427.0f), new Vector2(792.0f, 351.0f), new Vector2(499.0f, 616.0f)};
+    public static final Vector2[] buffWidHei = new Vector2[] {new Vector2(308.0f, 942.0f), new Vector2(487.0f, 935.0f), new Vector2(301.0f, 467.0f), new Vector2(334.0f, 935.0f)};
+    public static final Vector2[] debuffWidHei = new Vector2[] {new Vector2(809.0f, 467.0f), new Vector2(364.0f, 935.0f), new Vector2(360.0f, 468.0f)};
 
     // Scale of category of body
     public final float regularPlayerScale = 0.007f;
@@ -44,9 +44,9 @@ public class ConstHub {
 
     public float renderPlayerScale = regularPlayerScale;
 
-    public final float obstacleScale = 0.009f;
-    public final float buffScale = 0.006f;
-    public final float debuffScale = 0.0073f;
+    public static final float obstacleScale = 0.009f;
+    public static final float buffScale = 0.006f;
+    public static final float debuffScale = 0.0073f;
 
     // Sound effect files
     public final String jumpSoundName = "sounds/drop.wav";

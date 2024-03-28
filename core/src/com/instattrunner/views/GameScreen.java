@@ -33,8 +33,7 @@ import java.util.Random;
 // Screen which shows the game play
 public class GameScreen implements Screen {
     // ScreenManager as Parent
-    private ScreenManager parent;
-    private ScoreManager scoreManager;
+    public ScreenManager parent;
     private OrthographicCamera cam;
     private KeyboardController controller;
     public ConstHub locCHub;
@@ -46,19 +45,19 @@ public class GameScreen implements Screen {
     private boolean debug = true; // tweak if want to debug
     
     // Declare Texture var for all Body in game
-    private Texture floorTex;
-    private Texture playerTex;
-    private Texture bgTex;
+    private final Texture floorTex;
+    private final Texture playerTex;
+    // private final Texture bgTex;
     private Array<Texture> obTexs = new Array<Texture>();
     private Array<Texture> buffTexs = new Array<Texture>();
     private Array<Texture> debuffTexs = new Array<Texture>();
 
     // Declare array to store width and height of different player, obstacle, buff and debuff
-    private Vector2 floorWidHei;
-    private Vector2 playerWidHei;
-    private Vector2[] obstacleWidHei;
-    private Vector2[] buffWidHei;
-    private Vector2[] debuffWidHei; 
+    private final Vector2 floorWidHei;
+    private final Vector2 playerWidHei;
+    private final Vector2[] obstacleWidHei;
+    private final Vector2[] buffWidHei;
+    private final Vector2[] debuffWidHei; 
 
     // Scale of category of body
     private final float obstacleScale;
@@ -96,30 +95,29 @@ public class GameScreen implements Screen {
 
         // Gets images as Texture from asset manager (indivdual Texture for player and background)
         // Load images as Texture into array of Texture (obstacle, buff, debuff as there are multiple options)
-        floorTex = parent.assMan.manager.get(locCHub.floorImageName);
-        playerTex = parent.assMan.manager.get(locCHub.playerImageName);
-        for (String obstacleImage : locCHub.obstacleImagesName)
+        floorTex = parent.assMan.manager.get(ConstHub.floorImageName);
+        playerTex = parent.assMan.manager.get(ConstHub.playerImageName);
+        for (String obstacleImage : ConstHub.obstacleImagesName)
             obTexs.add(parent.assMan.manager.get(obstacleImage));
-        for (String buffImage : locCHub.buffImagesName)
+        for (String buffImage : ConstHub.buffImagesName)
             buffTexs.add(parent.assMan.manager.get(buffImage));
-        for (String debuffImage : locCHub.debuffImagesName)
+        for (String debuffImage : ConstHub.debuffImagesName)
             debuffTexs.add(parent.assMan.manager.get(debuffImage));
 
         // Load width and heigth of player, obstacle, buff and debuff
-        floorWidHei = locCHub.floorWidHei;
-        playerWidHei = locCHub.playerWidHei;
-        obstacleWidHei = locCHub.obstacleWidHei;
-        buffWidHei = locCHub.buffWidHei;
-        debuffWidHei = locCHub.debuffWidHei;
+        floorWidHei = ConstHub.floorWidHei;
+        playerWidHei = ConstHub.playerWidHei;
+        obstacleWidHei = ConstHub.obstacleWidHei;
+        buffWidHei = ConstHub.buffWidHei;
+        debuffWidHei = ConstHub.debuffWidHei;
 
         // Load scale of category of Body
-        obstacleScale = locCHub.obstacleScale;
-        buffScale = locCHub.buffScale;
-        debuffScale = locCHub.debuffScale;
+        obstacleScale = ConstHub.obstacleScale;
+        buffScale = ConstHub.buffScale;
+        debuffScale = ConstHub.debuffScale;
 
         font = new BitmapFont(Gdx.files.internal("skin/score.fnt"));
-        scoreManager = new ScoreManager();
-        highscore = scoreManager.loadTextFile();
+        highscore = ScoreManager.loadTextFile();
     }
 
 
@@ -191,26 +189,6 @@ public class GameScreen implements Screen {
 
         // End sprite batch
         sb.end();
-
-        if (gameWorld.isDead) {
-            if (gameWorld.immunity){
-                gameWorld.removeCollidedObstacle();
-                gameWorld.resetImmune();
-            }
-
-            else {
-                if (highscore < gameWorld.score) {
-                    highscore = gameWorld.score;
-                    System.out.print("new high score obtain  :  ");
-                    System.out.println(highscore);
-                    scoreManager.updateHighScore(highscore); 
-                }
-                parent.finalScore = gameWorld.score;
-                parent.changeScreen(ScreenManager.END);
-            }
-
-            gameWorld.isDead = false;
-        }
     }
 
 
@@ -237,7 +215,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         playerTex.dispose();
-        bgTex.dispose();
+        // bgTex.dispose();
         for (Texture obTex : obTexs)
             obTex.dispose();
         for (Texture buffTex : buffTexs)

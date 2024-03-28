@@ -24,6 +24,12 @@ score screen done
 working on help screen
 
 
+jsut take enums directly idiot
+put the renders into the class itslef and refer back to const hub lah bodoh
+
+
+if highscore doesnt work, likely to be static messing things up 
+
 
 
 - PASSTHROUGH REMAINS IN GAME WORLD AS WOULD BE USED BY 3 CLASSES AND NO CHANGE TO CODE

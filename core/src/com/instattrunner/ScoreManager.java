@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 public class ScoreManager {
-    public int loadTextFile(){
+    public static int loadTextFile(){
         // Load the file using a FileHandle
         FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
 
@@ -25,7 +25,7 @@ public class ScoreManager {
     } 
   
 
-    public void updateHighScore(int newHighScore) {
+    public static void updateHighScore(int newHighScore) {
         FileHandle fileHandle = Gdx.files.local("score/HighScore.txt");
         String stringHighScore = Integer.toString(newHighScore);
 

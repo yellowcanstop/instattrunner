@@ -31,7 +31,6 @@ public class GameWorld {
     public World world;
     private KeyboardController controller;
     public GameAssetManager assMan;
-    public ConstHub locCHub;
 
     // Random generator
     public Random random = new Random(TimeUtils.millis());
@@ -60,9 +59,9 @@ public class GameWorld {
     private BuffDebuffEffects buffDebuffEffectsClass;
     
     // Timestamps and spawnInterval
-    public long minSpawnInterval = 1200;    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
-    public long obstacleSpawnInterval = minSpawnInterval;    //Obstacle and buff/debuff set to min and four times of min during init
-    public long buffDebuffSpawnInterval = minSpawnInterval * 4;    //Changed to random within range everytime new obstacle/buff/debuff spawn
+    public long renderMinSpawnInterval = ConstHub.regularMinSpawnInterval;    // Determines how many milli second has to pass to spawn new obstacle/buff/debuff
+    public long obstacleSpawnInterval = renderMinSpawnInterval;    //Obstacle and buff/debuff set to min and four times of min during init
+    public long buffDebuffSpawnInterval = renderMinSpawnInterval * 4;    //Changed to random within range everytime new obstacle/buff/debuff spawn
     public long obstacleTimestamp = TimeUtils.millis() - 1200;    // Time since last obstacle spawn
     public long buffDebuffTimestamp = TimeUtils.millis() - 1200;    // Time since last buff/debuff spawn
     
@@ -72,6 +71,12 @@ public class GameWorld {
     public int score = 0;
     public int velocityIncrement = 0;
     private int highscore = ScoreManager.loadTextFile();
+
+    // Run time decided variables (moved over from ConstHub to make only const in ConstHub)
+    // Will be refered by multiple classes for read and write 
+    public float renderPlayerScale = ConstHub.regularPlayerScale;
+    public float renderSpeed = ConstHub.regularSpeed;
+
 
     
 
@@ -84,17 +89,6 @@ public class GameWorld {
     private ArrayList<Integer> debuffSpawnUnused = new ArrayList<>(Arrays.asList(0,1,2));
     private ArrayList<Integer> debuffSpawnUsed = new ArrayList<>();
 
-    // enum for jump
-    public int NORMAL = 115;
-    public int HIGH = 135;
-    public int LOW = 73;
-
-    // tweak speed of obstacles
-    /* Sports: obstacles move faster; Biz: obstacles move slower; Otherwise: regular */
-    public float regular = -20f;
-    public float fast = -40f;
-    public float slow = -5f;
-
 
     // Contructor
     // world to keep all physical objects in the game
@@ -104,7 +98,6 @@ public class GameWorld {
         controller = cont;
         parent = gameScreen;
         assMan = assetMan;
-        locCHub = parent.locCHub;
         world = new World(new Vector2(0, -60f), true);
         world.setContactListener(new CollisionListener(this));
 
@@ -141,6 +134,7 @@ public class GameWorld {
             removeCollidedDeBuff();
 
         jumplogic;
+        effectlogic;
         
         endGameLogic();
 
@@ -151,7 +145,7 @@ public class GameWorld {
     private void spawnLogic() {
         // Spawn obstacle based on speed var determiner 
         if(TimeUtils.timeSinceMillis(obstacleTimestamp) > obstacleSpawnInterval) 
-            spawnNTrackClass.spawnObstacles(gameWorld.regular);
+            spawnNTrackClass.spawnObstacles(renderSpeed);
 
         // Randomly choose to spawn buff or debuff  
         // Type of buff/debuff will be randomly choosen by .create method in GameWorld

@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.instattrunner.BodyData;
 import com.instattrunner.BodyEditorLoader;
 import com.instattrunner.GameWorld;
+import com.instattrunner.loader.ConstHub;
 
 public class Obstacle {
     private GameWorld parent;
@@ -30,7 +31,7 @@ public class Obstacle {
 
     public Obstacle(GameWorld gameWorld){
         parent = gameWorld;
-        floorWidHei = parent.locCHub.floorWidHei;
+        floorWidHei = ConstHub.floorWidHei;
         obstacleLoader = new BodyEditorLoader(Gdx.files.internal("obstacleComplexPolygons.json"));
         obstacleImagesName = parent.locCHub.obstacleImagesName;
         obstacleScale = parent.locCHub.obstacleScale;

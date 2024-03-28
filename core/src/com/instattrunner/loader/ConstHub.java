@@ -38,24 +38,46 @@ public class ConstHub {
     public static final Vector2[] debuffWidHei = new Vector2[] {new Vector2(809.0f, 467.0f), new Vector2(364.0f, 935.0f), new Vector2(360.0f, 468.0f)};
 
     // Scale of category of body
-    public final float regularPlayerScale = 0.007f;
-    public final float smallPlayerScale = 0.0054f;
-    public final float bigPlayerScale = 0.0082f;
-
-    public float renderPlayerScale = regularPlayerScale;
-
     public static final float obstacleScale = 0.009f;
     public static final float buffScale = 0.006f;
     public static final float debuffScale = 0.0073f;
 
+    // Scale of player body when size change
+    public static final float smallPlayerScale = 0.0054f;
+    public static final float regularPlayerScale = 0.007f;
+    public static final float bigPlayerScale = 0.0082f;
+
+    // Impulse of jump when body size change
+    public static final int smallLowJump = 78;
+    public static final int smallNormalJump = 100;
+    public static final int smallHighJump = 35;
+
+    public static final int regularLowJump = 115; 
+    public static final int regularNormalJump = 135;
+    public static final int regularHighJump = 73;
+
+    public static final int bigLowJump = 160;
+    public static final int bigNormalJump = 185;
+    public static final int bigHighJump = 115;
+
+    // Speed of obstacle when speed change
+    public static final float slowSpeed = -15f;
+    public static final float regularSpeed = -20f;
+    public static final float fastSpeed = -32f;
+
+    // Minimum spawn time interval when speed change
+    public static final long slowMinSpawnInterval = 850;
+    public static final long regularMinSpawnInterval = 1200;
+    public static final long fastMinSpawnInterval = 1600;
+
     // Sound effect files
-    public final String jumpSoundName = "sounds/drop.wav";
-    public final String collectSoundName = "sounds/drop.wav";
+    public static final String jumpSoundName = "sounds/drop.wav";
+    public static final String collectSoundName = "sounds/drop.wav";
 
     // Music file
-    public final String bgMusicName = "music/rain.mp3";
-    public final String gmMusicName = "music/game.mp3";
+    public static final String bgMusicName = "music/rain.mp3";
+    public static final String gmMusicName = "music/game.mp3";
  
     // Texture file
-    public final String skinName = "skin/comic-ui.json";
+    public static final String skinName = "skin/comic-ui.json";
 }

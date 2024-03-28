@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.loader.ConstHub;
 
 public class BuffDebuffEffects {
+    private GameWorld parent;
     // Enum for obstacle, buff, debuff
     // buff/debuff category
     private static final int SPEED = ConstHub.BUSINESS_MAN_1_AI;
@@ -15,12 +16,10 @@ public class BuffDebuffEffects {
     // buff
     private static final int BUSINESS_MAN_1_AI = ConstHub.BUSINESS_MAN_1_AI;
     private static final int NUTRITION_MAJOR = ConstHub.NUTRITION_MAJOR;
-    private static final int COFFEE = ConstHub.COFFEE;
     private static final int DEAN = ConstHub.DEAN;
     // debuff
     private static final int SPORTS_SCIENCE_MAJOR = ConstHub.SPORTS_SCIENCE_MAJOR;
     private static final int CULINARY_MAJOR = ConstHub.CULINARY_MAJOR;
-    private static final int BEER = ConstHub.BEER;
     
     /* Individual Buff Debuff
     * variables are declared here in logic model,
@@ -35,8 +34,8 @@ public class BuffDebuffEffects {
     public boolean immunity = false;
 
     // Constructor
-    public BuffDebuffEffects(){
-
+    public BuffDebuffEffects(GameWorld gameWorld){
+        parent = gameWorld;
     }
 
 
@@ -74,13 +73,10 @@ public class BuffDebuffEffects {
         // Move on to process active buff/debuff and enable their effects
         // Change speed of obstacle logic
         if (effectActive[SPEED]) {
-            if (buffActive[BUSINESS_MAN_1_AI]) {
-                setSpeed(velocityIncrement + (-14));
-                main.minSpawnInterval = 1600;
-            } else if (debuffActive[SPORTS_SCIENCE_MAJOR]) {
-                setSpeed(velocityIncrement + (-30));
-                main.minSpawnInterval = 850;
-            }
+            if (buffActive[BUSINESS_MAN_1_AI]) 
+                setSpeed(parent.velocityIncrement, ConstHub.slowMinSpawnInterval, ConstHub.slowSpeed);
+            else if (debuffActive[SPORTS_SCIENCE_MAJOR])
+                setSpeed(parent.velocityIncrement, ConstHub.fastMinSpawnInterval, ConstHub.fastSpeed);
         }
 
         // Change size of obstacle logic
@@ -100,8 +96,7 @@ public class BuffDebuffEffects {
     private void effectCancellation(int effectType){
         switch (effectType) {
             case SPEED:
-                setSpeed(velocityIncrement + (-20));
-                main.minSpawnInterval = 1000;
+                setSpeed(parent.velocityIncrement, ConstHub.regularMinSpawnInterval, ConstHub.regularSpeed);
                 break;
 
             case SIZE:
@@ -120,26 +115,34 @@ public class BuffDebuffEffects {
         }
     }
 
-    private void setSpeed(int velocity){
+    private void setSpeed(float velocity, long minSpawnInterval, float renderSpeed){
+        // Set render variables to respective effect 
+        parent.renderMinSpawnInterval = 850;
+        parent.renderSpeed = renderSpeed;
+
         // Loop through all obstacles and set linear velocity to parameter (can be faster or slower, or regular)
-        for (Body osbtacle : obstacles) 
-            osbtacle.setLinearVelocity((float) velocity, 0);
+        for (Body osbtacle : parent.obstacles) 
+            osbtacle.setLinearVelocity(velocity + renderSpeed, 0);
     }
 
-    private void setSize(float scale){
+    private void setSize(float scale, Body currentPlayer, Body targetPlayer){
         // Change playerScale that MainScreen uses to render texture of player
-        assMan.playerScale = scale;
+        parent.renderPlayerScale = scale;
 
-        float lastPlayerPosY = player.getPosition().y;
-        Vector2 lastPlayerVelocity = player.getLinearVelocity();
+        float lastPlayerPosY = currentPlayer.getPosition().y;
+        Vector2 lastPlayerVelocity = currentPlayer.getLinearVelocity();
             
-        setBodyObjectType(regularPlayer, "SLEEP_PLAYER");
-        regularPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), regularPlayer.getAngle());
-        setBodyObjectType(smallPlayer, "SLEEP_PLAYER");
-        smallPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), smallPlayer.getAngle());
+        setBodyObjectType(currentPlayer, "SLEEP_PLAYER");
+        currentPlayer.setTransform(14f, (float)(parent.floor.getPosition().y + (ConstHub.floorWidHei.y / 2) + 0.001), currentPlayer.getAngle());
         setBodyObjectType(bigPlayer, "SLEEP_PLAYER");
         bigPlayer.setTransform(14f, (float)(floor.getPosition().y + (floorWidHei.y / 2) + 0.001), bigPlayer.getAngle());
 
+        parent.player = targetPlayer;
+
+        setBodyObjectType(targetPlayer, "PLAYER");
+        targetPlayer.setTransform(-14f, lastPlayerPosY, targetPlayer.getAngle());
+        targetPlayer.setLinearVelocity(lastPlayerVelocity);
+ 
        // Set player to different sizes depending on parameter
         if (scale == 0.0054f){
             player = smallPlayer;
@@ -162,10 +165,6 @@ public class BuffDebuffEffects {
         }
         else 
             System.out.println("Some error has occured while changing sizes.");
-
-        setBodyObjectType(player, "PLAYER");
-        player.setTransform(-14f, lastPlayerPosY, player.getAngle());
-        player.setLinearVelocity(lastPlayerVelocity);
     }
 
  

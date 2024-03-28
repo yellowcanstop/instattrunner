@@ -36,7 +36,6 @@ public class GameScreen implements Screen {
     public ScreenManager parent;
     private OrthographicCamera cam;
     private KeyboardController controller;
-    public ConstHub locCHub;
     private GameWorld gameWorld;
     private SpriteBatch sb;
     private BitmapFont font;
@@ -74,7 +73,6 @@ public class GameScreen implements Screen {
 
     public GameScreen(ScreenManager screenManager) {
         parent = screenManager;
-        locCHub = parent.constHub;
 
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
@@ -83,10 +81,6 @@ public class GameScreen implements Screen {
         sb.setProjectionMatrix(cam.combined);
 
         controller = new KeyboardController();
-
-        // Reset all constHub's values changed
-        locCHub.renderPlayerScale = locCHub.regularPlayerScale;
-
 
         gameWorld = new GameWorld(controller, parent.assMan, this);
     
@@ -141,7 +135,7 @@ public class GameScreen implements Screen {
  
         // Draw all objects
         // Draw player 
-        sb.draw(playerTex, gameWorld.player.getPosition().x, gameWorld.player.getPosition().y, playerWidHei.x * locCHub.renderPlayerScale, playerWidHei.y * locCHub.renderPlayerScale);
+        sb.draw(playerTex, gameWorld.player.getPosition().x, gameWorld.player.getPosition().y, playerWidHei.x * gameWorld.renderPlayerScale, playerWidHei.y * gameWorld.renderPlayerScale);
         // Draw floor
         sb.draw(floorTex, gameWorld.floor.getPosition().x - (floorWidHei.x / 2), gameWorld.floor.getPosition().y - (floorWidHei.y / 2), floorWidHei.x, floorWidHei.y);
         // Draw all obstacles, buffs, debuffs

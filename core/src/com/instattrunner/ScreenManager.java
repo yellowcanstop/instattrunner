@@ -2,9 +2,7 @@ package com.instattrunner;
 
 import com.badlogic.gdx.Game; // game class used to delegate between different screens
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.instattrunner.loader.ConstHub;
 import com.instattrunner.loader.GameAssetManager;
 import com.instattrunner.views.EndScreen;
@@ -19,7 +17,6 @@ import com.instattrunner.views.ScoreScreen;
 - controllers for mapping user input to methods in model */
 public class ScreenManager extends Game {
     // Constants Hub and Asset Manager
-    public ConstHub constHub = new ConstHub();
     public GameAssetManager assMan = new GameAssetManager(this);
 
     // Screens
@@ -61,14 +58,14 @@ public class ScreenManager extends Game {
         // Load and play music
         assMan.queueAddMusic();
 		assMan.manager.finishLoading();
-		bgMusic = assMan.manager.get(constHub.bgMusicName);
-		gmMusic = assMan.manager.get(constHub.gmMusicName);
+		bgMusic = assMan.manager.get(ConstHub.bgMusicName);
+		gmMusic = assMan.manager.get(ConstHub.gmMusicName);
 		bgMusic.play();
 
         // Load background for all other screens
         assMan.queueAddBackground();
         assMan.manager.finishLoading();
-        backgroundTexture = assMan.manager.get(constHub.bgImageName);
+        backgroundTexture = assMan.manager.get(ConstHub.bgImageName);
 	}
 
 

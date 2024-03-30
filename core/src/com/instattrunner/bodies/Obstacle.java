@@ -13,7 +13,7 @@ import com.instattrunner.GameWorld;
 import com.instattrunner.loader.ConstHub;
 
 public class Obstacle {
-    private GameWorld parent;
+    private GameWorld container;
 
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
     private BodyEditorLoader obstacleLoader;
@@ -24,7 +24,7 @@ public class Obstacle {
 
 
     public Obstacle(GameWorld gameWorld){
-        parent = gameWorld;
+        container = gameWorld;
         obstacleLoader = new BodyEditorLoader(Gdx.files.internal("obstacleComplexPolygons.json"));
     }
 
@@ -38,15 +38,15 @@ public class Obstacle {
             obstacleSpawnUnused = obstacleSpawnUsed;
             obstacleSpawnUsed = temp;
         }
-        int tempTextureId = obstacleSpawnUnused.remove(parent.random.nextInt(obstacleSpawnUnused.size()));
+        int tempTextureId = obstacleSpawnUnused.remove(container.random.nextInt(obstacleSpawnUnused.size()));
         obstacleSpawnUsed.add(tempTextureId);
 
         // Create new BodyDef 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(parent.floor.getPosition().y + (ConstHub.floorWidHei.y / 2)));
+        bodyDef.position.set(16, (float)(container.floor.getPosition().y + (ConstHub.floorWidHei.y / 2)));
         // Create new Body in World
-        Body obstacle = parent.world.createBody(bodyDef);
+        Body obstacle = container.world.createBody(bodyDef);
 
         // Create new FixtureDef
         FixtureDef fixtureDef = new FixtureDef();
@@ -61,7 +61,7 @@ public class Obstacle {
         // Set custom class BodyData to UserData of Body of player to store bodyType and textureId
         obstacle.setUserData(new BodyData("OBSTACLE", tempTextureId));
 
-        parent.passThrough(obstacle);
+        container.passThrough(obstacle);
         
         return obstacle;
     }

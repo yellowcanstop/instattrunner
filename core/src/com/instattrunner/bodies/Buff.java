@@ -10,25 +10,25 @@ import com.instattrunner.GameWorld;
 import com.instattrunner.loader.ConstHub;
 
 public class Buff {
-    private GameWorld parent;
+    private GameWorld container;
 
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
     private BodyEditorLoader buffLoader;
 
 
     public Buff(GameWorld gameWorld){
-        parent = gameWorld;
+        container = gameWorld;
         buffLoader = new BodyEditorLoader(Gdx.files.internal("buffComplexPolygons.json"));
     }  
 
     public Body createBuff() {
-        int tempTextureId = parent.random.nextInt(4);
+        int tempTextureId = container.random.nextInt(4);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(16, (float)(parent.floor.getPosition().y + (ConstHub.floorWidHei.y / 2) + (ConstHub.obstacleWidHei[3].y*ConstHub.obstacleScale) + 8*parent.random.nextFloat()));
+        bodyDef.position.set(16, (float)(container.floor.getPosition().y + (ConstHub.floorWidHei.y / 2) + (ConstHub.obstacleWidHei[3].y*ConstHub.obstacleScale) + 8*container.random.nextFloat()));
 
-        Body buff = parent.world.createBody(bodyDef);
+        Body buff = container.world.createBody(bodyDef);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 1f;
@@ -38,7 +38,7 @@ public class Buff {
         buff.setLinearVelocity(-20f, 0);
         buff.setUserData(new BodyData("BUFF", tempTextureId));
 
-        parent.passThrough(buff);
+        container.passThrough(buff);
 
         return buff;
     }

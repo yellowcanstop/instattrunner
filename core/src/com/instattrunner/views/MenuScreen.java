@@ -17,12 +17,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.instattrunner.ScreenManager;
 import com.instattrunner.loader.ConstHub;
 
+
 /* displays the menu screen to the user
 for them to decide what action to take next
  */
 public class MenuScreen implements Screen {
-    // ScreenManager as Parent
-    private ScreenManager parent;
+    // ScreenManager as Container
+    private ScreenManager container;
 
     // Create Stage to store ui elements and skin for button skins
     private Stage stage;
@@ -36,18 +37,18 @@ public class MenuScreen implements Screen {
 
 
     public MenuScreen(ScreenManager screenManager) {
-        parent = screenManager;
+        container = screenManager;
 
         OrthographicCamera gameCam  = new OrthographicCamera();
-        stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
+        stage = new Stage(new FitViewport(container.VIEW_WIDTH, container.VIEW_HEIGHT, gameCam));
 
         // Load skin using asset manager
-        parent.assMan.queueAddSkin();
-        parent.assMan.manager.finishLoading();
-        skin = parent.assMan.manager.get(ConstHub.skinName);
+        container.assMan.queueAddSkin();
+        container.assMan.manager.finishLoading();
+        skin = container.assMan.manager.get(ConstHub.skinName);
 
         // Create Image from backgroundTexture from ScreenManager
-        backgroundImage = new Image(parent.backgroundTexture);
+        backgroundImage = new Image(container.backgroundTexture);
     }
 
 
@@ -92,7 +93,7 @@ public class MenuScreen implements Screen {
         play.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(ScreenManager.PLAY);
+                container.changeScreen(ScreenManager.PLAY);
             }
         });
 
@@ -100,7 +101,7 @@ public class MenuScreen implements Screen {
         help.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(ScreenManager.HELP);
+                container.changeScreen(ScreenManager.HELP);
             }
         });
  
@@ -108,7 +109,7 @@ public class MenuScreen implements Screen {
         highscore.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(ScreenManager.SCORE);
+                container.changeScreen(ScreenManager.SCORE);
             }
         });
 

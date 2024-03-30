@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.BodyData;
 import com.instattrunner.GameWorld;
 import com.instattrunner.ScoreManager;
@@ -19,13 +18,11 @@ import com.instattrunner.ScreenManager;
 import com.instattrunner.controller.KeyboardController;
 import com.instattrunner.loader.ConstHub;
 
-import java.util.Random;
-
 
 // Screen which shows the game play
 public class GameScreen implements Screen {
-    // ScreenManager as Parent
-    public ScreenManager parent;
+    // ScreenManager as Container
+    public ScreenManager container;
     private OrthographicCamera cam;
     private KeyboardController controller;
     private GameWorld gameWorld;
@@ -55,16 +52,12 @@ public class GameScreen implements Screen {
     private final float buffScale;
     private final float debuffScale;
 
-
-    // Create random object to get random numbers
-    Random random = new Random(TimeUtils.millis());
-
     // Store high score value
     private int highscore;
 
 
     public GameScreen(ScreenManager screenManager) {
-        parent = screenManager;
+        container = screenManager;
 
         cam = new OrthographicCamera(32, 24);
         debugRenderer = new Box2DDebugRenderer(true, true, true, true,true, true);
@@ -74,21 +67,21 @@ public class GameScreen implements Screen {
 
         controller = new KeyboardController();
 
-        gameWorld = new GameWorld(controller, parent.assMan, this);
+        gameWorld = new GameWorld(controller, container.assMan, this);
     
-        parent.assMan.queueAddImages();
-        parent.assMan.manager.finishLoading();
+        container.assMan.queueAddImages();
+        container.assMan.manager.finishLoading();
 
         // Gets images as Texture from asset manager (indivdual Texture for player and background)
         // Load images as Texture into array of Texture (obstacle, buff, debuff as there are multiple options)
-        floorTex = parent.assMan.manager.get(ConstHub.floorImageName);
-        playerTex = parent.assMan.manager.get(ConstHub.playerImageName);
+        floorTex = container.assMan.manager.get(ConstHub.floorImageName);
+        playerTex = container.assMan.manager.get(ConstHub.playerImageName);
         for (String obstacleImage : ConstHub.obstacleImagesName)
-            obTexs.add(parent.assMan.manager.get(obstacleImage));
+            obTexs.add(container.assMan.manager.get(obstacleImage));
         for (String buffImage : ConstHub.buffImagesName)
-            buffTexs.add(parent.assMan.manager.get(buffImage));
+            buffTexs.add(container.assMan.manager.get(buffImage));
         for (String debuffImage : ConstHub.debuffImagesName)
-            debuffTexs.add(parent.assMan.manager.get(debuffImage));
+            debuffTexs.add(container.assMan.manager.get(debuffImage));
 
         // Load width and heigth of player, obstacle, buff and debuff
         floorWidHei = ConstHub.floorWidHei;

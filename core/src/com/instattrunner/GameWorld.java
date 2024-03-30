@@ -18,7 +18,7 @@ import java.util.Random;
 
 // Controls all logic in game
 public class GameWorld {
-    private GameScreen parent;
+    private GameScreen container;
     public World world;
     public KeyboardController controller;
     public GameAssetManager assMan;
@@ -28,8 +28,8 @@ public class GameWorld {
 
     // Bodies (yes bodies, just not human bodies, although we have a player BODY)
     public Body player;
-    public Body regularPlayer;
     public Body smallPlayer;    // Pre-build as very computationaly intensive, tends to crash game when done during run time
+    public Body regularPlayer;
     public Body bigPlayer;
     public Body floor;
     public Array<Body> obstacles = new Array<Body>();
@@ -73,9 +73,6 @@ public class GameWorld {
     public int renderHighJump = ConstHub.regularHighJump;
 
 
-    
-
-
 
 
     // // ArrayList for spawn randomization
@@ -91,7 +88,7 @@ public class GameWorld {
         System.out.println("New Model Created.");
 
         controller = cont;
-        parent = gameScreen;
+        container = gameScreen;
         assMan = assetMan;
         world = new World(new Vector2(0, -60f), true);
         world.setContactListener(new CollisionListener(this));
@@ -145,7 +142,7 @@ public class GameWorld {
     private void spawnLogic() {
         // Spawn obstacle based on speed var determiner 
         if(TimeUtils.timeSinceMillis(obstacleTimestamp) > obstacleSpawnInterval) 
-            spawnNTrackClass.spawnObstacles(renderSpeed + velocityIncrement);
+            spawnNTrackClass.spawnObstacles(renderSpeed - velocityIncrement);
             
         // Randomly choose to spawn buff or debuff  
         // Type of buff/debuff will be randomly choosen by .create method in GameWorld
@@ -173,8 +170,8 @@ public class GameWorld {
                     System.out.println(highscore);
                     ScoreManager.updateHighScore(highscore);
                 }
-                parent.parent.finalScore = score;
-                parent.parent.changeScreen(ScreenManager.END);
+                container.container.finalScore = score;
+                container.container.changeScreen(ScreenManager.END);
             }
 
             isDead = false;

@@ -43,7 +43,7 @@ public class SpawnNTrack {
                 parent.score++;
                 iter.remove();
                 // Set velocity increment
-                parent.velocityIncrement = (int) (parent.score / 10) * 3;
+                parent.velocityIncrement = (int) (parent.score / 10) * 4;
             }
         }
     }

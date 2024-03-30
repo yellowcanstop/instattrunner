@@ -17,9 +17,10 @@ import com.instattrunner.ScoreManager;
 import com.instattrunner.ScreenManager;
 import com.instattrunner.loader.ConstHub;
 
+
 public class EndScreen implements Screen {
-    // ScreenManager as Parent
-    private ScreenManager parent;
+    // ScreenManager as Container
+    private ScreenManager container;
 
     // Create Stage to store ui elements and skin for button skins
     private Stage stage;
@@ -36,18 +37,18 @@ public class EndScreen implements Screen {
 
 
     public EndScreen(ScreenManager screenManager) {
-        parent = screenManager;
+        container = screenManager;
 
         OrthographicCamera gameCam = new OrthographicCamera();
-        stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
+        stage = new Stage(new FitViewport(container.VIEW_WIDTH, container.VIEW_HEIGHT, gameCam));
 
         // Load skin using asset manager
-        parent.assMan.queueAddSkin();
-        parent.assMan.manager.finishLoading();
-        skin = parent.assMan.manager.get(ConstHub.skinName);
+        container.assMan.queueAddSkin();
+        container.assMan.manager.finishLoading();
+        skin = container.assMan.manager.get(ConstHub.skinName);
 
         // Create Image from backgroundTexture from ScreenManager
-        backgroundImage = new Image(parent.backgroundTexture);
+        backgroundImage = new Image(container.backgroundTexture);
         
         // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
         highscore = ScoreManager.loadTextFile();
@@ -71,7 +72,7 @@ public class EndScreen implements Screen {
 
         // Create button and label
         Label l1 = new Label("Oh no you didn't make it in time!\nInstatt is locked again.", skin, "big");
-        Label l2 = new Label("Your score: " + parent.finalScore, skin, "big");
+        Label l2 = new Label("Your score: " + container.finalScore, skin, "big");
         Label l3 = new Label("Your high score is " + highscore, skin, "big");
 
         // Button to go back to menu
@@ -81,7 +82,7 @@ public class EndScreen implements Screen {
         menu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(ScreenManager.MENU);
+                container.changeScreen(ScreenManager.MENU);
             }
         });
 

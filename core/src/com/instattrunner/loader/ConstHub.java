@@ -49,10 +49,10 @@ public class ConstHub {
 
     // Impulse of jump when body size change
     public static final int smallLowJump = 35;
-    public static final int smallNormalJump = 78;
+    public static final int smallNormalJump = 75;
     public static final int smallHighJump = 88;
 
-    public static final int regularLowJump = 70;
+    public static final int regularLowJump = 80;
     public static final int regularNormalJump = 111; 
     public static final int regularHighJump = 130;
 

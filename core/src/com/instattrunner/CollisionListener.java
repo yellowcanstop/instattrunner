@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 // contact listener to react to collisions in world
 // everytime two bodies collide, beginContact is run
 public class CollisionListener implements ContactListener {
-    private GameWorld parent;
+    private GameWorld container;
     private SoundEffect soundEffectClass;
 
     // For output to terminal for debugging
@@ -18,9 +18,9 @@ public class CollisionListener implements ContactListener {
 
 
     // Constructor
-    public CollisionListener(GameWorld parent) {
-        this.parent = parent;
-        soundEffectClass = new SoundEffect(parent.assMan);
+    public CollisionListener(GameWorld gameWorld) {
+        container = gameWorld;
+        soundEffectClass = new SoundEffect(container.assMan);
     }
 
 
@@ -35,11 +35,11 @@ public class CollisionListener implements ContactListener {
         if ((BodyData.getBodyObjectType(fa.getBody()) == "OBSTACLE" && BodyData.getBodyObjectType(fb.getBody()) == "PLAYER") || (BodyData.getBodyObjectType(fb.getBody()) == "OBSTACLE" && BodyData.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.println("Player hit obstacle");
             if (BodyData.getBodyObjectType(fa.getBody()) == "OBSTACLE")
-                parent.collideObstacle = fa.getBody();
+                container.collideObstacle = fa.getBody();
             else 
-                parent.collideObstacle = fb.getBody();
+                container.collideObstacle = fb.getBody();
 
-            parent.isDead = true; // triggers change to end screen from render() in main
+            container.isDead = true; // triggers change to end screen from render() in main
             return;
         }
 
@@ -47,7 +47,7 @@ public class CollisionListener implements ContactListener {
         // Check player collide with ground to determine whether player on ground or not 
         if ((BodyData.getBodyObjectType(fa.getBody()) == "FLOOR" && BodyData.getBodyObjectType(fb.getBody()) == "PLAYER") || (BodyData.getBodyObjectType(fb.getBody()) == "FLOOR" && BodyData.getBodyObjectType(fa.getBody()) == "PLAYER")) {
             System.out.printf("Player is on ground at %f\n", fa.getBody().getPosition().y);
-            parent.jumpControllerClass.resetJump();
+            container.jumpControllerClass.resetJump();
             return;
         }
 
@@ -57,19 +57,19 @@ public class CollisionListener implements ContactListener {
             // Get TextureId of buff
             if (BodyData.getBodyObjectType(fa.getBody()) == "BUFF") {
                 tempTextureId = BodyData.getTextureId(fa.getBody());
-                parent.collideDeBuff = fa.getBody();
+                container.collideDeBuff = fa.getBody();
             }
             
             else {   
                 tempTextureId = BodyData.getTextureId(fb.getBody());
-                parent.collideDeBuff = fb.getBody();
+                container.collideDeBuff = fb.getBody();
             }
             
             System.out.printf("Buff : %s\n", buffTypes[tempTextureId]);
             soundEffectClass.playSound(SoundEffect.COLLECT_SOUND);
-            parent.buffDebuffEffectsClass.effectTime[tempTextureId] = TimeUtils.millis();
-            parent.buffDebuffEffectsClass.effectActive[tempTextureId] = true;
-            parent.buffDebuffEffectsClass.buffActive[tempTextureId] = true;
+            container.buffDebuffEffectsClass.effectTime[tempTextureId] = TimeUtils.millis();
+            container.buffDebuffEffectsClass.effectActive[tempTextureId] = true;
+            container.buffDebuffEffectsClass.buffActive[tempTextureId] = true;
             return;
         }
 
@@ -79,19 +79,19 @@ public class CollisionListener implements ContactListener {
             // Get TextureId of buff
             if (BodyData.getBodyObjectType(fa.getBody()) == "DEBUFF"){
                 tempTextureId = BodyData.getTextureId(fa.getBody());
-                parent.collideDeBuff = fa.getBody();
+                container.collideDeBuff = fa.getBody();
             }
 
             else {
                 tempTextureId = BodyData.getTextureId(fb.getBody());
-                parent.collideDeBuff = fb.getBody();
+                container.collideDeBuff = fb.getBody();
             }
 
             System.out.printf("Debuff : %s\n", debuffTypes[tempTextureId]);
             soundEffectClass.playSound(SoundEffect.COLLECT_SOUND);
-            parent.buffDebuffEffectsClass.effectTime[tempTextureId] = TimeUtils.millis();
-            parent.buffDebuffEffectsClass.effectActive[tempTextureId] = true;
-            parent.buffDebuffEffectsClass.debuffActive[tempTextureId] = true;
+            container.buffDebuffEffectsClass.effectTime[tempTextureId] = TimeUtils.millis();
+            container.buffDebuffEffectsClass.effectActive[tempTextureId] = true;
+            container.buffDebuffEffectsClass.debuffActive[tempTextureId] = true;
             return;
         }
     }

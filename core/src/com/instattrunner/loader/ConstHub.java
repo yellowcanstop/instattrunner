@@ -52,7 +52,7 @@ public class ConstHub {
     public static final int smallNormalJump = 75;
     public static final int smallHighJump = 88;
 
-    public static final int regularLowJump = 80;
+    public static final int regularLowJump = 95;
     public static final int regularNormalJump = 111; 
     public static final int regularHighJump = 130;
 

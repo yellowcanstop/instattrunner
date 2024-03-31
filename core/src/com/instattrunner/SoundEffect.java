@@ -5,8 +5,8 @@ import com.instattrunner.loader.GameAssetManager;
 
 public class SoundEffect {
     // Declare object Sound to store sound loaded from asset manager
-    private Sound jump;
-    private Sound collect;
+    public Sound jump;
+    public Sound collect;
 
     // enum for sound 
     public static final int JUMP_SOUND = 0;

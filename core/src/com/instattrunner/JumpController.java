@@ -3,7 +3,7 @@ package com.instattrunner;
 import com.instattrunner.loader.ConstHub;
 
 public class JumpController {
-    private GameWorld parent;
+    private GameWorld containter;
 
     // Enum for obstacle, buff, debuff
     private static final int COFFEE = ConstHub.COFFEE;
@@ -16,37 +16,37 @@ public class JumpController {
 
     
     public JumpController(GameWorld gameWorld){
-        parent = gameWorld;
+        containter = gameWorld;
     }
 
 
     public void jumpLogic() {
-        if (parent.buffDebuffEffectsClass.buffActive[COFFEE]) {
-            if (parent.controller.space) {
+        if (containter.buffDebuffEffectsClass.buffActive[COFFEE]) {
+            if (containter.controller.space) {
                 jumped = true;
-                tweakJump(parent.renderHighJump);
+                tweakJump(containter.renderHighJump);
             } 
-            else if (!parent.controller.space && jumped) {
+            else if (!containter.controller.space && jumped) {
                 canJump = false;
             }
         }
 
-        else if (parent.buffDebuffEffectsClass.debuffActive[BEER]) {
-            if (parent.controller.space) {
+        else if (containter.buffDebuffEffectsClass.debuffActive[BEER]) {
+            if (containter.controller.space) {
                 jumped = true;
-                tweakJump(parent.renderLowJump);
+                tweakJump(containter.renderLowJump);
             } 
-            else if (!parent.controller.space && jumped) {
+            else if (!containter.controller.space && jumped) {
                 canJump = false;
             }
         }
 
-        else if (parent.controller.space) {
+        else if (containter.controller.space) {
             jumped = true;
-            tweakJump(parent.renderNormalJump);
+            tweakJump(containter.renderNormalJump);
         } 
 
-        else if (!parent.controller.space && jumped) {
+        else if (!containter.controller.space && jumped) {
             canJump = false;
             System.out.printf("Toggled canJump: %b  jumped: %b\n", canJump, jumped);
         }
@@ -54,11 +54,11 @@ public class JumpController {
 
 
     private void tweakJump(int y) {
-        if (parent.player.getPosition().y < 9 && canJump && jumpCount < 5) {
-            parent.player.applyLinearImpulse(0, y, parent.player.getWorldCenter().x, parent.player.getWorldCenter().y, true);
+        if (containter.player.getPosition().y < 9 && canJump && jumpCount < 5) {
+            containter.player.applyLinearImpulse(0, y, containter.player.getWorldCenter().x, containter.player.getWorldCenter().y, true);
             jumpCount++;
         } 
-        else if (parent.player.getPosition().y > 9) {
+        else if (containter.player.getPosition().y > 9) {
             canJump = false;
         }
     }

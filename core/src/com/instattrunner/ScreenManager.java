@@ -103,6 +103,7 @@ public class ScreenManager extends Game {
 	@Override
 	public void dispose() {
 		assMan.manager.dispose();
+        backgroundTexture.dispose();
 		bgMusic.dispose();
         gmMusic.dispose();
 	}

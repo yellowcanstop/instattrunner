@@ -194,7 +194,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         playerTex.dispose();
-        // bgTex.dispose();
         for (Texture obTex : obTexs)
             obTex.dispose();
         for (Texture buffTex : buffTexs)
@@ -202,6 +201,8 @@ public class GameScreen implements Screen {
         for (Texture debuffTex : debuffTexs)
             debuffTex.dispose();
         sb.dispose();
+        gameWorld.collisionListener.soundEffectClass.jump.dispose();
+        gameWorld.collisionListener.soundEffectClass.collect.dispose();
     }
 
 

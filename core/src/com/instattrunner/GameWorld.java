@@ -22,6 +22,7 @@ public class GameWorld {
     public World world;
     public KeyboardController controller;
     public GameAssetManager assMan;
+    public CollisionListener collisionListener;
 
     // Random generator
     public Random random = new Random(TimeUtils.millis());
@@ -91,7 +92,8 @@ public class GameWorld {
         container = gameScreen;
         assMan = assetMan;
         world = new World(new Vector2(0, -60f), true);
-        world.setContactListener(new CollisionListener(this));
+        collisionListener = new CollisionListener(this);
+        world.setContactListener(collisionListener);
 
         // Init different type of Body classes
         floorClass = new Floor(this);

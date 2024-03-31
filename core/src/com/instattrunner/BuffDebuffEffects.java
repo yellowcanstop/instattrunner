@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.instattrunner.loader.ConstHub;
 
 public class BuffDebuffEffects {
-    private GameWorld parent;
+    private GameWorld container;
     // Enum for obstacle, buff, debuff
     // buff/debuff category
     private static final int SPEED = ConstHub.BUSINESS_MAN_1_AI;
@@ -33,9 +33,10 @@ public class BuffDebuffEffects {
 
     public boolean immunity = false;
 
+
     // Constructor
     public BuffDebuffEffects(GameWorld gameWorld){
-        parent = gameWorld;
+        container = gameWorld;
     }
 
 
@@ -74,17 +75,17 @@ public class BuffDebuffEffects {
         // Change speed of obstacle logic
         if (effectActive[SPEED]) {
             if (buffActive[BUSINESS_MAN_1_AI]) 
-                setSpeed(parent.velocityIncrement, ConstHub.slowMinSpawnInterval, ConstHub.slowSpeed);
+                setSpeed(container.velocityIncrement, ConstHub.slowMinSpawnInterval, ConstHub.slowSpeed);
             else if (debuffActive[SPORTS_SCIENCE_MAJOR])
-                setSpeed(parent.velocityIncrement, ConstHub.fastMinSpawnInterval, ConstHub.fastSpeed);
+                setSpeed(container.velocityIncrement, ConstHub.fastMinSpawnInterval, ConstHub.fastSpeed);
         }
 
         // Change size of obstacle logic
         if (effectActive[SIZE]) {
             if (buffActive[NUTRITION_MAJOR])
-                setSize(ConstHub.smallPlayerScale, parent.player, parent.smallPlayer, ConstHub.smallLowJump, ConstHub.smallNormalJump, ConstHub.smallHighJump);
+                setSize(ConstHub.smallPlayerScale, container.player, container.smallPlayer, ConstHub.smallLowJump, ConstHub.smallNormalJump, ConstHub.smallHighJump);
             else if (debuffActive[CULINARY_MAJOR])
-                setSize(ConstHub.bigPlayerScale, parent.player, parent.bigPlayer, ConstHub.bigLowJump, ConstHub.bigNormalJump, ConstHub.bigHighJump);
+                setSize(ConstHub.bigPlayerScale, container.player, container.bigPlayer, ConstHub.bigLowJump, ConstHub.bigNormalJump, ConstHub.bigHighJump);
         }
 
         // Enable immunity of player
@@ -96,11 +97,11 @@ public class BuffDebuffEffects {
     private void effectCancellation(int effectType){
         switch (effectType) {
             case SPEED:
-                setSpeed(parent.velocityIncrement, ConstHub.regularMinSpawnInterval, ConstHub.regularSpeed);
+                setSpeed(container.velocityIncrement, ConstHub.regularMinSpawnInterval, ConstHub.regularSpeed);
                 break;
 
             case SIZE:
-                setSize(ConstHub.regularPlayerScale, parent.player, parent.regularPlayer, ConstHub.regularLowJump, ConstHub.regularNormalJump, ConstHub.regularHighJump);
+                setSize(ConstHub.regularPlayerScale, container.player, container.regularPlayer, ConstHub.regularLowJump, ConstHub.regularNormalJump, ConstHub.regularHighJump);
                 break;
 
             case JUMP:
@@ -118,25 +119,25 @@ public class BuffDebuffEffects {
 
     private void setSpeed(float velocity, long minSpawnInterval, float renderSpeed){
         // Set render variables to respective effect 
-        parent.renderMinSpawnInterval = 850;
-        parent.renderSpeed = renderSpeed;
+        container.renderMinSpawnInterval = 850;
+        container.renderSpeed = renderSpeed;
 
         // Loop through all obstacles and set linear velocity to parameter (can be faster or slower, or regular)
-        for (Body osbtacle : parent.obstacles) 
+        for (Body osbtacle : container.obstacles) 
             osbtacle.setLinearVelocity(velocity + renderSpeed, 0);
     }
 
 
     private void setSize(float scale, Body currentPlayer, Body targetPlayer, int lowJump, int normalJump, int highJump){
         // Change playerScale that MainScreen uses to render texture of player
-        parent.renderPlayerScale = scale;
+        container.renderPlayerScale = scale;
 
         float lastPlayerPosY = currentPlayer.getPosition().y;
         Vector2 lastPlayerVelocity = currentPlayer.getLinearVelocity();
             
         // Put current player to sleep and move to right side of screen
         BodyData.setBodyObjectType(currentPlayer, "SLEEP_PLAYER");
-        currentPlayer.setTransform(14f, (float)(parent.floor.getPosition().y + (ConstHub.floorWidHei.y / 2) + 0.001), currentPlayer.getAngle());
+        currentPlayer.setTransform(14f, (float)(container.floor.getPosition().y + (ConstHub.floorWidHei.y / 2) + 0.001), currentPlayer.getAngle());
 
         // Wake up target player and move to left side of screen
         BodyData.setBodyObjectType(targetPlayer, "PLAYER");
@@ -144,12 +145,12 @@ public class BuffDebuffEffects {
         targetPlayer.setLinearVelocity(lastPlayerVelocity);
 
         // Set current player to target player
-        parent.player = targetPlayer;
+        container.player = targetPlayer;
  
         // Set render low/normal/high jump to corresponding jump for body size
-        parent.renderLowJump = lowJump;
-        parent.renderNormalJump = normalJump;
-        parent.renderHighJump = highJump;
+        container.renderLowJump = lowJump;
+        container.renderNormalJump = normalJump;
+        container.renderHighJump = highJump;
     }
 
  
@@ -159,4 +160,3 @@ public class BuffDebuffEffects {
         immunity = false;
     }
 }
-

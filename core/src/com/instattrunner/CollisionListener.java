@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 // everytime two bodies collide, beginContact is run
 public class CollisionListener implements ContactListener {
     private GameWorld container;
-    private SoundEffect soundEffectClass;
+    public SoundEffect soundEffectClass;
 
     // For output to terminal for debugging
     public final String[] buffTypes = {"Business man 1 (AI)", "Nutrition major", "Coffee", "Dean"};

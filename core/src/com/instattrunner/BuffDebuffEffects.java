@@ -117,14 +117,14 @@ public class BuffDebuffEffects {
     }
 
 
-    private void setSpeed(float velocity, long minSpawnInterval, float renderSpeed){
+    public void setSpeed(float velocity, long minSpawnInterval, float renderSpeed){
         // Set render variables to respective effect 
-        container.renderMinSpawnInterval = 850;
+        container.renderMinSpawnInterval = minSpawnInterval;
         container.renderSpeed = renderSpeed;
 
         // Loop through all obstacles and set linear velocity to parameter (can be faster or slower, or regular)
         for (Body osbtacle : container.obstacles) 
-            osbtacle.setLinearVelocity(velocity + renderSpeed, 0);
+            osbtacle.setLinearVelocity(renderSpeed - velocity, 0);
     }
 
 

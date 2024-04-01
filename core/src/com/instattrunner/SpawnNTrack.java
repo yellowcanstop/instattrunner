@@ -18,7 +18,7 @@ public class SpawnNTrack {
     public void spawnObstacles(float v) {
         containter.obstacles.add(containter.obstacleClass.createObstacle(v));
         containter.obstacleTimestamp = TimeUtils.millis();
-        containter.obstacleSpawnInterval = containter.renderMinSpawnInterval + (300 * containter.random.nextInt(6));
+        containter.obstacleSpawnInterval = containter.renderMinSpawnInterval + (180 * containter.random.nextInt(6));
     }
 
 
@@ -44,7 +44,11 @@ public class SpawnNTrack {
                 containter.score++;
                 iter.remove();
                 // Set velocity increment
-                containter.velocityIncrement = (int) (containter.score / 10) * 7;
+                containter.velocityIncrement = ((int) (containter.score / 10)) * 6;
+                containter.spawnIntervalDecrement = containter.velocityIncrement * 65;
+                // System.out.println("ad");
+                // containter.buffDebuffEffectsClass.setSpeed(containter.velocityIncrement, containter.renderMinSpawnInterval, containter.renderSpeed);
+                // System.out.println("adsfg");
             }
         }
     }

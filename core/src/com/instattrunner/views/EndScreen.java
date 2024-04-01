@@ -49,9 +49,6 @@ public class EndScreen implements Screen {
 
         // Create Image from backgroundTexture from ScreenManager
         backgroundImage = new Image(container.backgroundTexture);
-        
-        // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
-        highscore = ScoreManager.loadTextFile();
     }
 
   
@@ -68,7 +65,10 @@ public class EndScreen implements Screen {
         // Create table (which holds buttons) and set to fill whole screen (parent)
         table = new Table();
         table.setFillParent(true);
-        // table.setDebug(true);
+        // table.setDebug(true); 
+
+        // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
+        highscore = ScoreManager.loadTextFile();
 
         // Create button and label
         Label l1 = new Label("Oh no you didn't make it in time!\nInstatt is locked again.", skin, "big");

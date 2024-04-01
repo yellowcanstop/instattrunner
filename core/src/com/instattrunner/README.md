@@ -28,6 +28,8 @@ jump
 skin size of text
 help screen render
 random slow first obstacle
+if highscore doesnt work, likely to be static messing things up 
+cant make immediately spawn 
 
 
 
@@ -36,13 +38,16 @@ random slow first obstacle
 
 ----not done------
 
+increased speed is fucked up 
+net to change all obstacle speed (not important)
+need to reduce min interval
 
 
-if highscore doesnt work, likely to be static messing things up 
+
+
 
 if jump normal is fed, proabbly jumpcontroller if else if statement f'ed things up 
 
-cant make immediately spawn 
 
 
 - PASSTHROUGH REMAINS IN GAME WORLD AS WOULD BE USED BY 3 CLASSES AND NO CHANGE TO CODE

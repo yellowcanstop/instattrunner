@@ -61,7 +61,7 @@ public class GameWorld {
 
     // Vars for environment
     public boolean isDead = false;
-    public int score = 8;
+    public int score = 0;
     public int velocityIncrement = 0;
     public long spawnIntervalDecrement = 0;
     private int highscore = ScoreManager.loadTextFile();

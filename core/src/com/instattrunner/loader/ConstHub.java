@@ -48,15 +48,15 @@ public class ConstHub {
     public static final float bigPlayerScale = 0.0082f;
 
     // Impulse of jump when body size change
-    public static final int smallLowJump = 35;
-    public static final int smallNormalJump = 75;
-    public static final int smallHighJump = 88;
+    public static final int smallLowJump = 55;
+    public static final int smallNormalJump = 70;
+    public static final int smallHighJump = 85;
 
-    public static final int regularLowJump = 95;
+    public static final int regularLowJump = 98;
     public static final int regularNormalJump = 111; 
     public static final int regularHighJump = 130;
 
-    public static final int bigLowJump = 112;
+    public static final int bigLowJump = 140;
     public static final int bigNormalJump = 158;
     public static final int bigHighJump = 182;
 

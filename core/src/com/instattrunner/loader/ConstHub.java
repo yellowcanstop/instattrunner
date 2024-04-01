@@ -63,12 +63,12 @@ public class ConstHub {
     // Speed of obstacle when speed change
     public static final float slowSpeed = -15f;
     public static final float regularSpeed = -20f;
-    public static final float fastSpeed = -21f;
+    public static final float fastSpeed = -23f;
 
     // Minimum spawn time interval when speed change
-    public static final long slowMinSpawnInterval = 920;
+    public static final long slowMinSpawnInterval = 1400;
     public static final long regularMinSpawnInterval = 1200;
-    public static final long fastMinSpawnInterval = 1600;
+    public static final long fastMinSpawnInterval = 900;
 
     // Sound effect files
     public static final String jumpSoundName = "sounds/drop.wav";

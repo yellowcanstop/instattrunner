@@ -12,7 +12,7 @@ import com.instattrunner.BodyEditorLoader;
 import com.instattrunner.GameWorld;
 import com.instattrunner.loader.ConstHub;
 
-public class Obstacle {
+public class Obstacle extends Body{
     private GameWorld container;
 
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
@@ -23,7 +23,8 @@ public class Obstacle {
     private ArrayList<Integer> obstacleSpawnUsed = new ArrayList<>();
 
 
-    public Obstacle(GameWorld gameWorld){
+    public Obstacle(GameWorld gameWorld, Long addr){
+        super(gameWorld.world, addr);
         container = gameWorld;
         obstacleLoader = new BodyEditorLoader(Gdx.files.internal("obstacleComplexPolygons.json"));
     }

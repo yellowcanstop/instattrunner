@@ -9,14 +9,15 @@ import com.instattrunner.BodyEditorLoader;
 import com.instattrunner.GameWorld;
 import com.instattrunner.loader.ConstHub;
 
-public class Debuff {
+public class Debuff extends Body {
     private GameWorld container;
 
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
     private BodyEditorLoader debuffLoader;
 
 
-    public Debuff(GameWorld gameWorld){
+    public Debuff(GameWorld gameWorld, Long addr){
+        super(gameWorld.world, addr);
         container = gameWorld;
         debuffLoader = new BodyEditorLoader(Gdx.files.internal("debuffComplexPolygons.json"));
     }  

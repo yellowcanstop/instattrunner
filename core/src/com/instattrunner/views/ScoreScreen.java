@@ -50,8 +50,7 @@ public class ScoreScreen implements Screen {
         // Create Image from backgroundTexture from ScreenManager
         backgroundImage = new Image(container.backgroundTexture);
 
-        // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
-        highscore = ScoreManager.loadTextFile();
+
     }
 
 
@@ -70,6 +69,8 @@ public class ScoreScreen implements Screen {
         table.setFillParent(true);
         // table.setDebug(true);
 
+        // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
+        highscore = ScoreManager.loadTextFile();
 
         // Create labels
         Label titleLabel = new Label("High Score", skin,"big");

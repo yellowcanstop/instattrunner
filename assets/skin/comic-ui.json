@@ -12,6 +12,9 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	big:  {
 		file: font-button-export.fnt
 	}
+    menu:  {
+		file: font-button-export.fnt
+	}
 }
 com.badlogic.gdx.graphics.Color: {
 	black: {
@@ -114,8 +117,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 		font: font
 		fontColor: black
 		background: textbox
-
-
+	}
+    menu: {
+		font: menu
+		fontColor: black
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {

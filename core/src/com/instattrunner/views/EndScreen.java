@@ -2,11 +2,8 @@ package com.instattrunner.views;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -15,78 +12,81 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.instattrunner.InstattRunner;
+import com.instattrunner.ScoreManager;
+import com.instattrunner.ScreenManager;
+import com.instattrunner.loader.ConstHub;
 
 
 public class EndScreen implements Screen {
-    private InstattRunner parent;
+    // ScreenManager as Container
+    private ScreenManager container;
+
+    // Create Stage to store ui elements and skin for button skins
     private Stage stage;
     private Skin skin;
-    private Texture backgroundTexture;
 
-    public EndScreen(InstattRunner instattRunner) {
-        parent = instattRunner;
+    // Image of background
+    private Image backgroundImage;
+
+    // Table to store ui elements in it and then only pass the table to stage
+    private Table table;
+    
+    // Store highscore value
+    private int highscore;
+
+
+    public EndScreen(ScreenManager screenManager) {
+        container = screenManager;
+
         OrthographicCamera gameCam = new OrthographicCamera();
-        stage = new Stage(new FitViewport(parent.VIEW_WIDTH, parent.VIEW_HEIGHT, gameCam));
+        stage = new Stage(new FitViewport(container.VIEW_WIDTH, container.VIEW_HEIGHT, gameCam));
 
-        // Load the background image
-        backgroundTexture = new Texture(Gdx.files.internal("pic/background.jpg")); // Change "background_image.png" to your image path
+        // Load skin using asset manager
+        container.assMan.queueAddSkin();
+        container.assMan.manager.finishLoading();
+        skin = container.assMan.manager.get(ConstHub.skinName);
+
+        // Create Image from backgroundTexture from ScreenManager
+        backgroundImage = new Image(container.backgroundTexture);
     }
 
-    int highScore;
-    public int loadTextFile(){
-        // Load the file using a FileHandle
-        FileHandle fileHandle = Gdx.files.internal("score/HighScore.txt");
-
-        // Read the contents of the file into a String
-        String highScoreString = fileHandle.readString();
-
-        int score=0;
-        // Parse the String to an integer
-        try {
-            score = Integer.parseInt(highScoreString.trim());
-        } catch (NumberFormatException e) {
-            // Handle parsing error (e.g., file contents are not a valid integer)
-            e.printStackTrace();
-        }
-
-        return score;
-    }
-
+  
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(stage);
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        stage.draw();
-
         // Set the background image
-        Image background = new Image(backgroundTexture);
-        background.setFillParent(true);
-        stage.addActor(background);
+        backgroundImage.setFillParent(true);
+        stage.clear();
+        stage.addActor(backgroundImage);
 
-        // Create table (which holds buttons) and set background
-        Table table = new Table();
+        // Push input to stage
+        Gdx.input.setInputProcessor(stage);
+
+        // Create table (which holds buttons) and set to fill whole screen (parent)
+        table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        // table.setDebug(true); 
+
+        // Call loadTextFile method in scoreManager to retrieve highscore from file and store to local highscore variable
+        highscore = ScoreManager.loadTextFile();
 
         // Create button and label
-        highScore = loadTextFile();
-        skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
         Label l1 = new Label("Oh no you didn't make it in time!\nInstatt is locked again.", skin, "big");
-        Label l2 = new Label("Your score: " + parent.finalScore, skin, "big");
-        Label l3 = new Label("Your high score is " + highScore,skin,"big");
+        Label l2 = new Label("Your score: " + container.finalScore, skin, "big");
+        Label l3 = new Label("Your high score is " + highscore, skin, "big");
 
-        // Go back to menu
+        // Button to go back to menu
         TextButton menu = new TextButton("Back to Menu", skin);
+
+        // Action for menu button
         menu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(InstattRunner.MENU);
+                container.changeScreen(ScreenManager.MENU);
             }
         });
 
+        // Add labels and buttons to table
         table.add(l1).colspan(2);
         table.row().pad(10, 0, 10, 0);
         table.add(l2).colspan(2);
@@ -99,6 +99,7 @@ public class EndScreen implements Screen {
         stage.addActor(table);
     }
 
+
     @Override
     public void render(float delta) {
         // Clear screen before start drawing the next screen
@@ -108,31 +109,35 @@ public class EndScreen implements Screen {
         stage.draw();
     }
 
+
     @Override
     public void resize(int width, int height) {
         // recalculate viewport each time window is resized
         stage.getViewport().update(width, height, true);
     }
 
+
     @Override
     public void pause() {
 
     }
 
+
     @Override
     public void resume() {
 
     }
+    
 
     @Override
     public void hide() {
 
     }
 
+
     @Override
     public void dispose() {
         stage.dispose();
-        // skin disposed via asset manager
-        backgroundTexture.dispose();
+        skin.dispose();
     }
 }

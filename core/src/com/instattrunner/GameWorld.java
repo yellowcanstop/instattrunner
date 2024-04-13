@@ -97,11 +97,11 @@ public class GameWorld {
         world.setContactListener(collisionListener);
 
         // Init different type of Body classes
-        floorClass = new Floor(this);
-        playerClass = new Player(this);
-        obstacleClass = new Obstacle(this);
-        buffClass = new Buff(this);
-        debuffClass = new Debuff(this);
+        floorClass = new Floor(this, 1L);
+        playerClass = new Player(this, 1L);
+        obstacleClass = new Obstacle(this, 1L);
+        buffClass = new Buff(this, 1L);
+        debuffClass = new Debuff(this, 1L);
 
         spawnNTrackClass = new SpawnNTrack(this);
         buffDebuffEffectsClass = new BuffDebuffEffects(this);

@@ -1,6 +1,7 @@
 package com.instattrunner.bodies;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -9,7 +10,7 @@ import com.instattrunner.BodyEditorLoader;
 import com.instattrunner.GameWorld;
 import com.instattrunner.loader.ConstHub;
 
-public class Player {
+public class Player extends Body {
     private GameWorld container;
 
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
@@ -17,7 +18,8 @@ public class Player {
 
 
     // Constructor
-    public Player(GameWorld gameWorld){
+    public Player(GameWorld gameWorld, Long addr){
+        super(gameWorld.world, addr);
         container = gameWorld;
         playerLoader = new BodyEditorLoader(Gdx.files.internal("playerComplexPolygons.json"));
     }

@@ -1,16 +1,18 @@
 package com.instattrunner.bodies;
 
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.instattrunner.BodyData;
 import com.instattrunner.GameWorld;
 import com.instattrunner.loader.ConstHub;
 
-public class Floor {
+public class Floor extends Body {
     private GameWorld container;
 
 
-    public Floor(GameWorld gameWorld){
+    public Floor(GameWorld gameWorld, Long addr){
+        super(gameWorld.world, addr);
         container = gameWorld;
     }
 

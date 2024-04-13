@@ -9,14 +9,15 @@ import com.instattrunner.BodyEditorLoader;
 import com.instattrunner.GameWorld;
 import com.instattrunner.loader.ConstHub;
 
-public class Buff {
+public class Buff extends Body {
     private GameWorld container;
 
     // BodyEditorLoader for loading complex polygons to FixtureDef to Body
     private BodyEditorLoader buffLoader;
 
 
-    public Buff(GameWorld gameWorld){
+    public Buff(GameWorld gameWorld, Long addr){
+        super(gameWorld.world, addr);
         container = gameWorld;
         buffLoader = new BodyEditorLoader(Gdx.files.internal("buffComplexPolygons.json"));
     }  
